@@ -3,7 +3,7 @@
 about :
 
   name : 'wNpmTools'
-  description : '___'
+  description : 'Collection of tools to use npm programmatically.'
   version : '0.9.0'
   enabled : 1
   interpreters :
@@ -92,4 +92,3 @@ build :
       # - build::npm
       - build::proto.export
       # - build::doc.export
-

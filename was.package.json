@@ -2,12 +2,12 @@
 {
   "name": "wnpmtools",
   "version": "0.3.0",
-  "description": "___",
+  "description": "Collection of tools to use npm programmatically.",
   "author": "Kostiantyn Wandalen <wanalen@willbe.so>",
   "license": "MIT",
-  "main": "proto/dwtools/amid/___",
+  "main": "proto/dwtools/amid/l3/npm/IncludeMid.s",
   "files": [
-    "proto/dwtools/amid",
+    "proto/dwtools/amid/l3",
     "proto/dwtools/Tools.s"
   ],
   "scripts": {
@@ -21,8 +21,13 @@
   "bugs": {
     "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
-  "dependencies": {
-    "wTools": ""
+  "dependencies":
+  {
+    "wTools" : "",
+    "wCopyable" : "",
+    "wFiles" : "",
+    "wappbasic" : "",
+    "wnpmtools" : "file:."
   },
   "devDependencies": {
     "wTesting": ""

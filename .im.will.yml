@@ -1,9 +1,17 @@
 
-
 submodule :
 
   wTools :
     path : npm:///wTools
+    enabled : 0 # submodule
+  wCopyable :
+    path : npm:///wCopyable
+    enabled : 0 # submodule
+  wFiles :
+    path : npm:///wFiles
+    enabled : 0 # submodule
+  wAppBasic :
+    path : npm:///wappbasic
     enabled : 0 # submodule
 
 path :
@@ -41,7 +49,7 @@ path :
       content : prime
 
   entry.proto.no.tests :
-    path : proto/dwtools/___
+    path : proto/dwtools/amid/l3/npm/IncludeMid.s
     criterion :
       tests : 'no.tests'
   entry.proto.only.tests :
@@ -49,11 +57,8 @@ path :
     criterion :
       tests : 'only.tests'
 
-  # npm.entry : proto/dwtools/___
-  # npm.files : proto
-
   entry.out.raw.debug :
-    path : '{path::out.*=1}/source/dwtools/___'
+    path : '{path::out.*=1}/source/dwtools/amid/l3/npm/IncludeMid.s'
     criterion :
       debug : [ debug, release ]
       raw : raw
@@ -222,4 +227,3 @@ build :
       - build::raw.release
       - build::release
       - build::npm
-
