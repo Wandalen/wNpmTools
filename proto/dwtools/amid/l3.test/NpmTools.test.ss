@@ -6,9 +6,7 @@ if( typeof module !== 'undefined' )
 {
 
   let _ = require( '../../Tools.s' );
-
   _.include( 'wTesting' );
-
   require( '../l3/npm/IncludeMid.s' );
 }
 
@@ -31,6 +29,8 @@ function onSuiteBegin( test )
 
 }
 
+//
+
 function onSuiteEnd( test )
 {
   let context = this;
@@ -42,6 +42,16 @@ function onSuiteEnd( test )
 // --
 // tests
 // --
+
+function trivial( test )
+{
+
+  var about = _.npm.aboutFromRemote( 'wTools' );
+  test.is( !!about );
+  var exp = 'wTools';
+  test.identical( about.name, exp );
+
+}
 
 // --
 // declare
@@ -64,6 +74,7 @@ var Proto =
 
   tests :
   {
+    trivial,
   },
 
 }
