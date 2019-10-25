@@ -4,11 +4,12 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( '../../../Tools.s' );
+
+  let _ = require( '../../Tools.s' );
 
   _.include( 'wTesting' );
 
-  require( '../../l3/npm/IncludeMid.s' );
+  require( '../l3/npm/IncludeMid.s' );
 }
 
 //
