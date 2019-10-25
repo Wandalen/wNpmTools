@@ -27,6 +27,7 @@
     "wCopyable" : "",
     "wFiles" : "",
     "wappbasic" : "",
+    "package-json" : "6.5.0",
     "wnpmtools" : "file:."
   },
   "devDependencies": {
