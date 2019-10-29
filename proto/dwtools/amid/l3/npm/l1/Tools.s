@@ -16,6 +16,17 @@ let Self = _.npm = _.npm || Object.create( null );
 // inter
 // --
 
+/**
+ * @summary Publishes a package to the npm registry.
+ * {@see https://docs.npmjs.com/cli/publish}
+ * @param {String} o.localPath Path to package directory.
+ * @param {String} o.tag Registers the published package with the given tag.
+ * @param {Object} o.ready Consequence instance.
+ * @param {Number} o.verbosity Verbosity control.
+ * @function publish
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function publish( o )
 {
   let self = this;
@@ -60,6 +71,18 @@ publish.defaults =
 
 //
 
+/**
+ * @summary Fixates versions of the dependecies in provided package.
+ * @param {String} o.localPath Path to package directory.
+ * @param {String} o.configPath Path to package.json file.
+ * @param {String} o.tag Sets specified tag to all dependecies.
+ * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function fixate
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function fixate( o )
 {
   let self = this;
@@ -103,6 +126,16 @@ fixate.defaults =
 }
 
 //
+
+/**
+ * @summary Fixates versions of the dependecies in provided config.
+ * @param {Object} o.config Object representation of package.json file.
+ * @param {String} o.tag Sets specified tag to all dependecies.
+ * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function structureFixate
+ * @memberof module:Tools/mid/NpmTools.
+ */
 
 function structureFixate( o )
 {
@@ -174,6 +207,17 @@ structureFixate.defaults =
 
 //
 
+/**
+ * @summary Bumps package version.
+ * @param {String} o.localPath Path to package directory.
+ * @param {Object} o.configPath Path to package.json file.
+ * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function bump
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function bump( o )
 {
   let self = this;
@@ -217,6 +261,13 @@ bump.defaults =
 
 //
 
+/**
+ * @summary Bumps package version using provided config.
+ * @param {Object} o.config Object representation of package.json file.
+ * @function structureBump
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function structureBump( o )
 {
 
@@ -258,6 +309,15 @@ structureBump.defaults =
 }
 
 //
+
+/**
+ * @summary Gets package metadata from npm registry.
+ * @param {String} o.name Package name
+ * @param {Boolean} [o.sync=1] Controls sync/async execution mode
+ * @param {Boolean} [o.throwing=0] Controls error throwing
+ * @function aboutFromRemote
+ * @memberof module:Tools/mid/NpmTools.
+ */
 
 function aboutFromRemote( o )
 {
@@ -378,7 +438,7 @@ _readChangeWrite.defaults =
  * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm.RemotePathComponents}.
  * @param {String} remotePath Remote path.
  * @function pathParse
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function pathParse( remotePath )
@@ -458,7 +518,7 @@ function pathParse( remotePath )
  * @summary Returns true if remote path `filePath` has fixed version of npm package.
  * @param {String} filePath Global path.
  * @function pathIsFixated
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function pathIsFixated( filePath )
@@ -481,7 +541,7 @@ function pathIsFixated( filePath )
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function pathIsFixated
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function pathFixate( o )
@@ -523,7 +583,7 @@ defaults.verbosity = 0;
  * @param {String} o.localPath Path to npm package on hard drive.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionLocalRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function versionLocalRetrive( o )
@@ -572,7 +632,7 @@ defaults.verbosity = 0;
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteLatestRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function versionRemoteLatestRetrive( o )
@@ -623,7 +683,7 @@ defaults.verbosity = 0;
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteCurrentRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function versionRemoteCurrentRetrive( o )
@@ -658,7 +718,7 @@ defaults.verbosity = 0;
  * @param {String} o.remotePath Remote path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function isUpToDate
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function isUpToDate( o )
@@ -706,7 +766,7 @@ defaults.verbosity = 0;
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function isDownloaded
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @memberof module:Tools/mid/NpmTools.
  */
 
 function isDownloaded( o )
