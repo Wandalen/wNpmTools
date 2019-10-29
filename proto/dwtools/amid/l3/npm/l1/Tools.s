@@ -357,6 +357,388 @@ _readChangeWrite.defaults =
   onChange : null,
 }
 
+//
+
+// --
+// path
+// --
+
+/**
+ * @typedef {Object} RemotePathComponents
+ * @property {String} protocol
+ * @property {String} hash
+ * @property {String} longPath
+ * @property {String} localVcsPath
+ * @property {String} remoteVcsPath
+ * @property {String} longerRemoteVcsPath
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm
+ */
+
+/**
+ * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm.RemotePathComponents}.
+ * @param {String} remotePath Remote path.
+ * @function pathParse
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function pathParse( remotePath )
+{
+  let self = this;
+  let path = _.uri;
+  let result = Object.create( null );
+
+  if( _.mapIs( remotePath ) )
+  return remotePath;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( remotePath ) );
+  _.assert( path.isGlobal( remotePath ) )
+
+  /* */
+
+  let parsed1 = path.parseConsecutive( remotePath );
+  _.mapExtend( result, parsed1 );
+
+  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
+  result.localVcsPath = p[ 1 ];
+
+  /* */
+
+  let parsed2 = _.mapExtend( null, parsed1 );
+  parsed2.protocol = null;
+  parsed2.hash = null;
+  parsed2.longPath = p[ 0 ];
+  result.remoteVcsPath = path.str( parsed2 );
+
+  /* */
+
+  let parsed3 = _.mapExtend( null, parsed1 );
+  parsed3.longPath = parsed2.longPath;
+  parsed3.protocol = null;
+  parsed3.hash = null;
+  result.longerRemoteVcsPath = path.str( parsed3 );
+  if( parsed1.hash )
+  result.longerRemoteVcsPath += '@' + parsed1.hash;
+
+  /* */
+
+  result.isFixated = self.pathIsFixated( result );
+
+  return result
+
+/*
+
+  remotePath : 'npm:///wColor/out/wColor#0.3.100'
+
+  protocol : 'npm',
+  hash : '0.3.100',
+  longPath : '/wColor/out/wColor',
+  localVcsPath : 'out/wColor',
+  remoteVcsPath : 'wColor',
+  longerRemoteVcsPath : 'wColor@0.3.100'
+
+*/
+
+  /* */
+
+  function pathIsolateGlobalAndLocal( longPath )
+  {
+    let parsed = path.parseConsecutive( longPath );
+    let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
+    parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
+    let globalPath = path.str( parsed );
+    return [ globalPath, splits[ 2 ] ];
+  }
+
+}
+
+//
+
+/**
+ * @summary Returns true if remote path `filePath` has fixed version of npm package.
+ * @param {String} filePath Global path.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function pathIsFixated( filePath )
+{
+  let self = this;
+  let path = _.uri;
+  let parsed = self.pathParse( filePath );
+
+  if( !parsed.hash )
+  return false;
+
+  return true;
+}
+
+//
+
+/**
+ * @summary Changes version of package specified in path `o.remotePath` to latest available.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function pathFixate( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+  _.routineOptions( pathFixate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let parsed = self.pathParse( o.remotePath );
+  let latestVersion = self.versionRemoteLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  let result = path.str
+  ({
+    protocol : parsed.protocol,
+    longPath : parsed.longPath,
+    hash : latestVersion,
+  });
+
+  return result;
+}
+
+var defaults = pathFixate.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns version of npm package located at `o.localPath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Path to npm package on hard drive.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionLocalRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function versionLocalRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( versionLocalRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  if( !self.isDownloaded( o ) )
+  return '';
+
+  let localProvider = self.system.providerForPath( o.localPath );
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  let currentVersion;
+  try
+  {
+    let read = localProvider.fileRead({ filePath : path.join( o.localPath, 'package.json' ), encoding : 'json' });
+    currentVersion = read.version;
+  }
+  catch( err )
+  {
+    debugger;
+    return null;
+  }
+
+  return currentVersion || null;
+}
+
+var defaults = versionLocalRetrive.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns latest version of npm package using its remote path `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteLatestRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function versionRemoteLatestRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteLatestRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  let parsed = self.pathParse( o.remotePath );
+  let shell = _.process.starter
+  ({
+    verbosity : o.verbosity - 1,
+    outputCollecting : 1,
+    sync : 1,
+    deasync : 0,
+  });
+
+  let got = shell( 'npm show ' + parsed.remoteVcsPath );
+  let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
+
+  if( !latestVersion )
+  {
+    debugger;
+    throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+  }
+
+  latestVersion = latestVersion[ 1 ];
+
+  return latestVersion;
+}
+
+var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns current version of npm package using its remote path `o.remotePath`.
+ * @description Returns latest version if no version specified in remote path.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteCurrentRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function versionRemoteCurrentRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteCurrentRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  let parsed = self.pathParse( o.remotePath );
+  if( parsed.isFixated )
+  return parsed.hash;
+
+  return self.versionRemoteLatestRetrive( o );
+}
+
+var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns true if local copy of package `o.localPath` is up to date with remote version `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {String} o.remotePath Remote path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isUpToDate
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function isUpToDate( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  _.routineOptions( isUpToDate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  let parsed = self.pathParse( o.remotePath );
+
+  let currentVersion = self.versionLocalRetrive
+  ({
+    localPath : o.localPath,
+    verbosity : o.verbosity,
+  });
+
+  if( !currentVersion )
+  return false;
+
+  if( parsed.hash === currentVersion )
+  return true;
+
+  let latestVersion = self.versionRemoteLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  return currentVersion === latestVersion;
+}
+
+var defaults = isUpToDate.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns true if path `o.localPath` contains a package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isDownloaded
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function isDownloaded( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  _.routineOptions( isDownloaded, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  let srcCurrentPath;
+  let localProvider = self.system.providerForPath( o.localPath );
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !localProvider.fileExists( o.localPath ) )
+  return false;
+
+  // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
+  // return false;
+
+  if( !localProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
+  return false;
+
+  return true;
+}
+
+var defaults = isDownloaded.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
 // --
 // relations
 // --
@@ -378,6 +760,17 @@ let Extend =
   aboutFromRemote,
 
   _readChangeWrite,
+
+  // vcs
+
+  pathParse,
+  pathIsFixated,
+  pathFixate,
+  versionLocalRetrive,
+  versionRemoteLatestRetrive,
+  versionRemoteCurrentRetrive,
+  isUpToDate,
+  isDownloaded,
 
 }
 
