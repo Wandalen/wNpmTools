@@ -715,17 +715,26 @@ function versionRemoteCurrentRetrive( o )
 
   _.routineOptions( versionRemoteCurrentRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
 
-  let parsed = self.pathParse( o.remotePath );
-  if( parsed.isFixated )
-  return parsed.hash;
+  let ready = new _.Consequence().take( null );
 
-  return self.versionRemoteLatestRetrive( o );
+  ready.then( () =>
+  {
+    let parsed = self.pathParse( o.remotePath );
+    if( parsed.isFixated )
+    return parsed.hash;
+    return self.versionRemoteLatestRetrive( o );
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
 }
 
 var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
 defaults.remotePath = null;
+defaults.sync = 1;
 defaults.verbosity = 0;
 
 //
