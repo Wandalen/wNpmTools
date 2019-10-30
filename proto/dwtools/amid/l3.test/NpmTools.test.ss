@@ -143,6 +143,35 @@ function pathFixate( test )
   test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
+function versionLocalRetrive( test )
+{
+  let self = this;
+  let testPath = _.path.join( self.suitePath, test.name );
+  let filePath = _.path.join( testPath, 'package.json' );
+
+  test.case = 'path doesn`t exist'
+  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  test.identical( got, '' );
+
+  _.fileProvider.dirMake( testPath );
+
+  test.case = 'no package'
+  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  test.identical( got, '' );
+
+  test.case = 'after init'
+  var data = { version : '1.0.0' }
+  _.fileProvider.fileWrite({ filePath, data, encoding : 'json' })
+  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  test.identical( got, '1.0.0' );
+
+  test.case = 'after init'
+  var data = { version : null }
+  _.fileProvider.fileWrite({ filePath, data, encoding : 'json' })
+  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  test.identical( got, null );
+}
+
 // --
 // declare
 // --
@@ -167,7 +196,9 @@ var Proto =
     trivial,
     pathParse,
     pathIsFixated,
-    pathFixate
+    pathFixate,
+
+    versionLocalRetrive,
   },
 
 }

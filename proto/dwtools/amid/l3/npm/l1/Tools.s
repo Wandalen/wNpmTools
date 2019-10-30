@@ -624,6 +624,8 @@ function versionLocalRetrive( o )
   {
     if( err )
     return null;
+    if( _.strIs( read ) )
+    return read;
     if( !read.version )
     return null;
     return read.version;
