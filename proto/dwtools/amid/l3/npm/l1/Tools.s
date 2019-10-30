@@ -789,6 +789,36 @@ defaults.verbosity = 0;
 //
 
 /**
+ * @summary Returns true if path `o.localPath` contains npm package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function hasFiles
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function hasFiles( o )
+{
+  let localProvider = _.fileProvider;
+
+  _.routineOptions( hasFiles, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !localProvider.isDir( o.localPath  ) )
+  return false;
+  if( !localProvider.dirIsEmpty( o.localPath ) )
+  return true;
+
+  return false;
+}
+
+var defaults = hasFiles.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
  * @summary Returns true if path `o.localPath` contains a package.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
@@ -948,6 +978,7 @@ let Extend =
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
   isUpToDate,
+  hasFiles,
   isRepository,
   hasRemote,
 
