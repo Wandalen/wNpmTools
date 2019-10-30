@@ -653,33 +653,44 @@ function versionRemoteLatestRetrive( o )
 
   _.routineOptions( versionRemoteLatestRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
 
-  let parsed = self.pathParse( o.remotePath );
+  let ready = new _.Consequence().take( null );
   let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     outputCollecting : 1,
-    sync : 1,
+    sync : 0,
     deasync : 0,
   });
+  let parsed = null;
 
-  let got = shell( 'npm show ' + parsed.remoteVcsPath );
-  let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
-
-  if( !latestVersion )
+  ready.then( () =>
   {
-    debugger;
-    throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
-  }
+    parsed = self.pathParse( o.remotePath );
+    return shell( 'npm show ' + parsed.remoteVcsPath );
+  })
+  ready.then( ( got ) =>
+  {
+    let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
+    if( !latestVersion )
+    {
+      debugger;
+      throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+    }
+    latestVersion = latestVersion[ 1 ];
 
-  latestVersion = latestVersion[ 1 ];
+    return latestVersion;
+  })
 
-  return latestVersion;
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
 }
 
 var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
 defaults.remotePath = null;
+defaults.sync = 1;
 defaults.verbosity = 0;
 
 //
