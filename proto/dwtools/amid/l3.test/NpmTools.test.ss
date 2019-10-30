@@ -199,6 +199,34 @@ function versionRemoteLatestRetrive( test )
 
 versionRemoteLatestRetrive.timeOut = 30000;
 
+//
+
+function versionRemoteCurrentRetrive( test )
+{
+  var remotePath = 'npm:///wpathbasic'
+  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  test.is( _.strDefined( got ) );
+
+  var remotePath = 'npm:///wpathbasic@latest'
+  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  test.is( _.strDefined( got ) );
+  test.notIdentical( got, remotePath );
+
+  var remotePath = 'npm:///wpathbasic@beta'
+  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  test.is( _.strDefined( got ) );
+  test.notIdentical( got, remotePath );
+
+  var remotePath = 'npm:///wpathbasic#0.7.1'
+  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  test.is( _.strDefined( got ) );
+  test.identical( got, '0.7.1' );
+}
+
+versionRemoteCurrentRetrive.timeOut = 30000;
+
+
+
 // --
 // declare
 // --
@@ -227,6 +255,7 @@ var Proto =
 
     versionLocalRetrive,
     versionRemoteLatestRetrive,
+    versionRemoteCurrentRetrive
   },
 
 }
