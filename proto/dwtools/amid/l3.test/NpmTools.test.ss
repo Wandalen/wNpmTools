@@ -308,6 +308,65 @@ function isUpToDate( test )
 
 isUpToDate.timeOut = 60000;
 
+//
+
+function isRepository( test )
+{
+  let self = this;
+  let testPath = _.path.join( self.suitePath, test.name );
+  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let ready = new _.Consequence().take( null );
+
+  _.fileProvider.dirMake( testPath )
+
+  let install = _.process.starter
+  ({
+    execPath : 'npm install --no-package-lock --legacy-bundling --prefix ' + _.fileProvider.path.nativize( testPath ),
+    currentPath : testPath,
+    ready
+  })
+
+  ready
+
+  .then( () =>
+  {
+    test.case = 'no package'
+    var got = _.npm.isRepository({ localPath });
+    test.identical( got, false );
+    return null;
+  })
+
+  install( 'wpathbasic' )
+  .then( () =>
+  {
+    test.case = 'installed latest'
+    var got = _.npm.isRepository({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  install( 'wpathbasic@beta' )
+  .then( () =>
+  {
+    test.case = 'installed beta'
+    var got = _.npm.isRepository({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  install( 'wpathbasic@0.7.1' )
+  .then( () =>
+  {
+    test.case = 'installed version'
+    var got = _.npm.isRepository({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  return ready;
+}
+
+isRepository.timeOut = 20000;
 
 // --
 // declare
@@ -339,7 +398,8 @@ var Proto =
     versionRemoteLatestRetrive,
     versionRemoteCurrentRetrive,
 
-    isUpToDate
+    isUpToDate,
+    isRepository
   },
 
 }
