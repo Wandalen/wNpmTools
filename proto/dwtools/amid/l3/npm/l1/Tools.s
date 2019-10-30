@@ -596,32 +596,40 @@ function versionLocalRetrive( o )
 
   _.routineOptions( versionLocalRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
 
-  if( !self.isRepository( o ) )
-  return '';
+  let ready = new _.Consequence().take( null );
 
-  let localProvider = self.system.providerForPath( o.localPath );
-
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  let currentVersion;
-  try
+  ready.then( () => self.isRepository( o ) )
+  ready.then( ( isRepository ) =>
   {
-    let read = localProvider.fileRead({ filePath : path.join( o.localPath, 'package.json' ), encoding : 'json' });
-    currentVersion = read.version;
-  }
-  catch( err )
+    if( !isRepository )
+    return '';
+
+    return _.fileProvider.fileRead
+    ({
+      filePath : path.join( o.localPath, 'package.json' ),
+      encoding : 'json',
+      sync : 0,
+    });
+  })
+  ready.finally( ( err, read ) =>
   {
-    debugger;
+    if( err )
     return null;
-  }
+    if( !read.version )
+    return null;
+    return read.version;
+  })
 
-  return currentVersion || null;
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
 }
 
 var defaults = versionLocalRetrive.defaults = Object.create( null );
 defaults.localPath = null;
+defaults.sync = 1;
 defaults.verbosity = 0;
 
 //
