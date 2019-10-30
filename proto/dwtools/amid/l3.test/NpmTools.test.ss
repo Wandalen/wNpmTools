@@ -123,6 +123,26 @@ function pathIsFixated( test )
   test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
 }
 
+function pathFixate( test )
+{
+  var remotePath = 'npm:///wpathbasic'
+  var got = _.npm.pathFixate( remotePath );
+  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+
+  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var got = _.npm.pathFixate( remotePath );
+  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.notIdentical( got, remotePath );
+
+  var remotePath = 'npm:///wpathbasic@beta'
+  var got = _.npm.pathFixate( remotePath );
+  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.notIdentical( got, remotePath );
+
+  var remotePath = 'npm:///wpathbasic#1.0.0@beta'
+  test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
+}
+
 // --
 // declare
 // --
@@ -146,7 +166,8 @@ var Proto =
   {
     trivial,
     pathParse,
-    pathIsFixated
+    pathIsFixated,
+    pathFixate
   },
 
 }
