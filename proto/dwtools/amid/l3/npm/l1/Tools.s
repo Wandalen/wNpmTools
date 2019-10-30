@@ -830,6 +830,21 @@ defaults.localPath = null;
 defaults.sync = 1;
 defaults.verbosity = 0;
 
+//
+
+function hasLocalChanges( o )
+{
+  if( _.objectIs( o ) )
+  if( o.sync !== undefined )
+  {
+    if( o.sync )
+    return false;
+    else
+    return new _.Consequence().take( false );
+  }
+  return false;
+}
+
 // --
 // relations
 // --
@@ -862,6 +877,8 @@ let Extend =
   versionRemoteCurrentRetrive,
   isUpToDate,
   isRepository,
+
+  hasLocalChanges,
 
 }
 
