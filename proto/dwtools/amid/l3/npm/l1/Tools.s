@@ -832,6 +832,78 @@ defaults.verbosity = 0;
 
 //
 
+/**
+ * @summary Returns true if path `o.localPath` contains a npm package that was installed from remote `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {String} o.remotePath Remote path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function hasRemote
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function hasRemote( o )
+{
+  let self = this;
+  let localProvider = _.fileProvider;
+  let path = localProvider.path;
+
+  _.routineOptions( hasRemote, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strDefined( o.localPath ) );
+  _.assert( _.strDefined( o.remotePath ) );
+
+  let ready = new _.Consequence().take( null );
+
+  ready.then( () =>
+  {
+    let result = Object.create( null );
+    result.downloaded = true;
+    result.remoteIsValid = false;
+
+    if( !localProvider.fileExists( o.localPath ) )
+    {
+      result.downloaded = false;
+      return result;
+    }
+
+    let configPath = path.join( o.localPath, 'package.json' );
+    let configExists = localProvider.fileExists( configPath );
+
+    if( !configExists )
+    {
+      result.downloaded = false;
+      return result;
+    }
+
+    let config = localProvider.fileConfigRead( configPath );
+    let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    let originVcsPath = config.name;
+
+    _.sure( _.strDefined( remoteVcsPath ) );
+    _.sure( _.strDefined( originVcsPath ) );
+
+    result.remoteVcsPath = remoteVcsPath;
+    result.originVcsPath = originVcsPath;
+    result.remoteIsValid = originVcsPath === remoteVcsPath;
+
+    return result;
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = hasRemote.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
 function hasLocalChanges( o )
 {
   if( _.objectIs( o ) )
@@ -877,8 +949,9 @@ let Extend =
   versionRemoteCurrentRetrive,
   isUpToDate,
   isRepository,
+  hasRemote,
 
-  hasLocalChanges,
+  hasLocalChanges
 
 }
 
