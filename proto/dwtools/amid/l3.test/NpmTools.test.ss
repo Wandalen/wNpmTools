@@ -103,6 +103,26 @@ function pathParse( test )
   test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
 }
 
+//
+
+function pathIsFixated( test )
+{
+  var remotePath = 'npm:///wpathbasic'
+  var got = _.npm.pathIsFixated( remotePath );
+  test.identical( got, false );
+
+  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var got = _.npm.pathIsFixated( remotePath );
+  test.identical( got, true );
+
+  var remotePath = 'npm:///wpathbasic@beta'
+  var got = _.npm.pathIsFixated( remotePath );
+  test.identical( got, false );
+
+  var remotePath = 'npm:///wpathbasic#1.0.0@beta'
+  test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
+}
+
 // --
 // declare
 // --
@@ -126,6 +146,7 @@ var Proto =
   {
     trivial,
     pathParse,
+    pathIsFixated
   },
 
 }
