@@ -226,6 +226,88 @@ function versionRemoteCurrentRetrive( test )
 versionRemoteCurrentRetrive.timeOut = 30000;
 
 
+function isUpToDate( test )
+{
+  let self = this;
+  let testPath = _.path.join( self.suitePath, test.name );
+  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let ready = new _.Consequence().take( null );
+
+  _.fileProvider.dirMake( testPath )
+
+  let install = _.process.starter
+  ({
+    execPath : 'npm install --no-package-lock --legacy-bundling --prefix ' + _.fileProvider.path.nativize( testPath ),
+    currentPath : testPath,
+    ready
+  })
+
+  ready
+
+  .then( () =>
+  {
+    test.case = 'no package'
+    let remotePath = 'npm:///wpathbasic'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, false );
+    return null;
+  })
+
+  install( 'wpathbasic' )
+  .then( () =>
+  {
+    test.case = 'installed latest, remote points to latest'
+    let remotePath = 'npm:///wpathbasic'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, true );
+    return null;
+  })
+
+  install( 'wpathbasic@beta' )
+  .then( () =>
+  {
+    test.case = 'installed beta, remote points to latest'
+    let remotePath = 'npm:///wpathbasic'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, false );
+    return null;
+  })
+
+  install( 'wpathbasic@latest' )
+  .then( () =>
+  {
+    test.case = 'installed beta, remote points to latest'
+    let remotePath = 'npm:///wpathbasic'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, true );
+    return null;
+  })
+
+  install( 'wpathbasic@0.7.1' )
+  .then( () =>
+  {
+    test.case = 'installed version, remote points to latest'
+    let remotePath = 'npm:///wpathbasic'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, false );
+    return null;
+  })
+
+  install( 'wpathbasic@0.7.1' )
+  .then( () =>
+  {
+    test.case = 'installed version, remote points to beta'
+    let remotePath = 'npm:///wpathbasic@beta'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, false );
+    return null;
+  })
+
+  return ready;
+}
+
+isUpToDate.timeOut = 60000;
+
 
 // --
 // declare
@@ -255,7 +337,9 @@ var Proto =
 
     versionLocalRetrive,
     versionRemoteLatestRetrive,
-    versionRemoteCurrentRetrive
+    versionRemoteCurrentRetrive,
+
+    isUpToDate
   },
 
 }
