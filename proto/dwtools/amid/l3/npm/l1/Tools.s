@@ -368,6 +368,8 @@ _readChangeWrite.defaults =
 let Extend =
 {
 
+  protocols : [ 'npm' ],
+
   publish,
 
   fixate,
