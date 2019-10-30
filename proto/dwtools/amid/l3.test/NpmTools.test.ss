@@ -53,6 +53,56 @@ function trivial( test )
 
 }
 
+//
+
+function pathParse( test )
+{
+  var remotePath = 'npm:///wpathbasic'
+  var expected =
+  {
+    'protocol' : 'npm',
+    'longPath' : '/wpathbasic',
+    'tag' : 'latest',
+    'localVcsPath' : '',
+    'remoteVcsPath' : 'wpathbasic',
+    'longerRemoteVcsPath' : 'wpathbasic',
+    'isFixated' : false
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, expected );
+
+  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var expected =
+  {
+    'protocol' : 'npm',
+    'hash' : '1.0.0',
+    'longPath' : '/wpathbasic',
+    'localVcsPath' : '',
+    'remoteVcsPath' : 'wpathbasic',
+    'longerRemoteVcsPath' : 'wpathbasic@1.0.0',
+    'isFixated' : true
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, expected );
+
+  var remotePath = 'npm:///wpathbasic@beta'
+  var expected =
+  {
+    'protocol' : 'npm',
+    'tag' : 'beta',
+    'longPath' : '/wpathbasic',
+    'localVcsPath' : '',
+    'remoteVcsPath' : 'wpathbasic',
+    'longerRemoteVcsPath' : 'wpathbasic@beta',
+    'isFixated' : false
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, expected );
+
+  var remotePath = 'npm:///wpathbasic#1.0.0@beta'
+  test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
+}
+
 // --
 // declare
 // --
@@ -75,6 +125,7 @@ var Proto =
   tests :
   {
     trivial,
+    pathParse,
   },
 
 }
