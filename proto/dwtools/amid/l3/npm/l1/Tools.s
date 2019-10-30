@@ -776,27 +776,30 @@ function isRepository( o )
 
   _.routineOptions( isRepository, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
 
-  let srcCurrentPath;
-  let localProvider = self.system.providerForPath( o.localPath );
+  let ready = _.Consequence.Try( () =>
+  {
+    if( !_.fileProvider.fileExists( o.localPath ) )
+    return false;
 
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+    // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
+    // return false;
 
-  if( !localProvider.fileExists( o.localPath ) )
-  return false;
+    if( !_.fileProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
+    return false;
 
-  // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
-  // return false;
+    return true;
+  })
 
-  if( !localProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
-  return false;
+  if( o.sync )
+  return ready.syncMaybe();
 
-  return true;
+  return ready;
 }
 
 var defaults = isRepository.defaults = Object.create( null );
 defaults.localPath = null;
+defaults.sync = 1;
 defaults.verbosity = 0;
 
 // --
