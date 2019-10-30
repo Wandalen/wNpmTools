@@ -756,34 +756,34 @@ function isUpToDate( o )
 
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
 
   let parsed = self.pathParse( o.remotePath );
 
-  let currentVersion = self.versionLocalRetrive
-  ({
-    localPath : o.localPath,
-    verbosity : o.verbosity,
-  });
+  let ready = new _.Consequence().take( null );
 
-  if( !currentVersion )
-  return false;
+  ready.then( () => self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity, sync : 0 }) )
+  ready.then( ( currentVersion ) =>
+  {
+    if( !currentVersion )
+    return false;
 
-  if( parsed.hash === currentVersion )
-  return true;
+    if( parsed.hash === currentVersion )
+    return true;
 
-  let latestVersion = self.versionRemoteLatestRetrive
-  ({
-    remotePath : o.remotePath,
-    verbosity : o.verbosity,
-  });
+    return self.versionRemoteLatestRetrive({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
+    .then( ( latestVersion ) => currentVersion === latestVersion )
+  })
 
-  return currentVersion === latestVersion;
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
 }
 
 var defaults = isUpToDate.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.remotePath = null;
+defaults.sync = 1;
 defaults.verbosity = 0;
 
 //
