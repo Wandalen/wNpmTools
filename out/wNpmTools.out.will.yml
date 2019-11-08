@@ -3,14 +3,14 @@ root:
   - wNpmTools.out
 consistency:
   wNpmTools.out.will.yml: &ref_0
-    hash: e22aa96795a0e76e9fcaf1298577b368
-    size: 38207
+    hash: 32e6a9d73ea70f5a546560bfe66c15d9
+    size: 38374
   ../.ex.will.yml: &ref_1
     hash: 054d2a6865d78674e0e9fec71b4f2447
     size: 1710
   ../.im.will.yml: &ref_2
-    hash: 348c136e94724c2114f1523b49b6e240
-    size: 4888
+    hash: 92e790b794241babde21cb866657f7c3
+    size: 4962
 module:
   wNpmTools.out:
     about:
@@ -62,9 +62,6 @@ module:
       download:
         criterion:
           predefined: 1
-      remote:
-        criterion:
-          predefined: 1
       repository:
         path: 'git+https:///github.com/Wandalen/wNpmTools.git'
       origins:
@@ -78,7 +75,11 @@ module:
       out:
         path: .
       temp:
-        path: 'path::out'
+        path:
+          - 'path::out'
+          - ../package-lock.json
+          - ../package.json
+          - ../node_modules
       proto:
         path: ../proto
       export:
@@ -143,11 +144,13 @@ module:
         path: '{path::out.*=}/source/Index.s'
       exported.dir.proto.export:
         criterion:
+          generated: 1
           content: proto
           export: 1
         path: ../proto
       exported.files.proto.export:
         criterion:
+          generated: 1
           content: proto
           export: 1
         path:
@@ -334,6 +337,7 @@ module:
           prefixPath: ../proto
         mandatory: 1
         criterion:
+          generated: 1
           content: proto
           export: 1
       exported.files.proto.export:
@@ -346,6 +350,7 @@ module:
         recursive: 0
         mandatory: 1
         criterion:
+          generated: 1
           content: proto
           export: 1
     step:
@@ -703,6 +708,7 @@ module:
         opts:
           reflector: 'reflector::exported.proto.export*'
         criterion:
+          generated: 1
           content: proto
           export: 1
         inherit:
@@ -711,6 +717,7 @@ module:
         opts:
           reflector: 'reflector::exported.files.proto.export*'
         criterion:
+          generated: 1
           content: proto
           export: 1
         inherit:
@@ -856,9 +863,6 @@ module:
       download:
         criterion:
           predefined: 1
-      remote:
-        criterion:
-          predefined: 1
       repository:
         path: 'git+https:///github.com/Wandalen/wNpmTools.git'
       origins:
@@ -872,13 +876,17 @@ module:
       out:
         path: out
       temp:
-        path: 'path::out'
+        path:
+          - 'path::out'
+          - package-lock.json
+          - package.json
+          - node_modules
       proto:
-        path: ./proto
+        path: proto
       export:
         path: '{path::proto}/**'
       doc:
-        path: ./doc
+        path: doc
       out.raw.debug:
         criterion:
           debug: debug
@@ -1500,6 +1508,8 @@ module:
         hash: 054d2a6865d78674e0e9fec71b4f2447
         size: 1710
       ../.im.will.yml:
-        hash: 348c136e94724c2114f1523b49b6e240
-        size: 4888
-      wNpmTools.out.will.yml: *ref_0
+        hash: 92e790b794241babde21cb866657f7c3
+        size: 4962
+      wNpmTools.out.will.yml:
+        hash: 32e6a9d73ea70f5a546560bfe66c15d9
+        size: 38374
