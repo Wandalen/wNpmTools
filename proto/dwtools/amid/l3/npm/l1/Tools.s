@@ -72,8 +72,9 @@ function fixate( o )
   {
     let o2 = _.mapOnly( _.mapExtend( null, o ), self._readChangeWrite.defaults );
     o2.onChange = onChange;
-    o.changed = self._readChangeWrite( o2 );
-    o.config = o.config;
+    self._readChangeWrite( o2 );
+    _.mapExtend( o, o2 );
+    // o.config = o.config;
     return o;
   }
   catch( err )
@@ -186,8 +187,9 @@ function bump( o )
   {
     let o2 = _.mapOnly( _.mapExtend( null, o ), self._readChangeWrite.defaults );
     o2.onChange = onChange;
-    o.changed = self._readChangeWrite( o2 );
-    o.config = o.config;
+    self._readChangeWrite( o2 );
+    _.mapExtend( o, o2 );
+    // o.config = o.config;
   }
   catch( err )
   {
@@ -358,10 +360,6 @@ _readChangeWrite.defaults =
 }
 
 // --
-// relations
-// --
-
-// --
 // declare
 // --
 
@@ -374,7 +372,7 @@ let Extend =
 
   fixate,
   structureFixate,
-  bump,
+  bump, /* qqq : cover please */
   structureBump,
 
   aboutFromRemote,
