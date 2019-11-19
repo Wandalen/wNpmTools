@@ -292,9 +292,12 @@ function aboutFromRemote( o )
     throw _.err( err, `\nFailed to get information about remote module ${name}` );
   });
 
-  // debugger;
   if( o.sync )
-  return ready.deasync();
+  {
+    // return ready.deasync();
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
