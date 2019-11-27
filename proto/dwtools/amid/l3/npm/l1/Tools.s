@@ -754,6 +754,50 @@ defaults.verbosity = 0;
 
 //
 
+function versionRemoteRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteLatestRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let ready = new _.Consequence().take( null );
+  let shell = _.process.starter
+  ({
+    verbosity : o.verbosity - 1,
+    outputCollecting : 1,
+    sync : 0,
+    deasync : 0,
+  });
+
+  ready.then( () =>
+  { 
+    let parsed = self.pathParse( o.remotePath );
+    return shell( 'npm show ' + parsed.longerRemoteVcsPath + ' version' );
+  })
+  ready.then( ( got ) =>
+  {
+    let version = _.strStrip( got.output );
+    return version;
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = versionRemoteRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
 /**
  * @summary Returns true if local copy of package `o.localPath` is up to date with remote version `o.remotePath`.
  * @param {Object} o Options map.
@@ -990,6 +1034,7 @@ let Extend =
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
+  versionRemoteRetrive,
   isUpToDate,
   hasFiles,
   isRepository,
