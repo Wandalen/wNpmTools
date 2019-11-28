@@ -828,8 +828,8 @@ function isUpToDate( o )
 
     if( parsed.hash === currentVersion )
     return true;
-
-    return self.versionRemoteLatestRetrive({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
+    
+    return self.versionRemoteRetrive({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
     .then( ( latestVersion ) => currentVersion === latestVersion )
   })
 

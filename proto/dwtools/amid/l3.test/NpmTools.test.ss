@@ -272,6 +272,16 @@ function isUpToDate( test )
     test.identical( got, false );
     return null;
   })
+  
+  install( 'wpathbasic@beta' )
+  .then( () =>
+  {
+    test.case = 'installed beta, remote points to latest'
+    let remotePath = 'npm:///wpathbasic@beta'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, true );
+    return null;
+  })
 
   install( 'wpathbasic@latest' )
   .then( () =>
@@ -300,6 +310,16 @@ function isUpToDate( test )
     let remotePath = 'npm:///wpathbasic@beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
+    return null;
+  })
+  
+  install( 'wpathbasic@0.7.1' )
+  .then( () =>
+  {
+    test.case = 'installed version, remote points to beta'
+    let remotePath = 'npm:///wpathbasic#0.7.1'
+    var got = _.npm.isUpToDate({ localPath, remotePath });
+    test.identical( got, true );
     return null;
   })
 
