@@ -2,6 +2,8 @@
 
 'use strict';
 
+/* npm */
+
 if( typeof module !== 'undefined' )
 {
 
@@ -10,7 +12,6 @@ if( typeof module !== 'undefined' )
   _.include( 'wCopyable' );
   _.include( 'wAppBasic' );
   _.include( 'wFiles' );
-
 
 }
 
