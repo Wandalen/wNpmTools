@@ -16,6 +16,17 @@ let Self = _.npm = _.npm || Object.create( null );
 // inter
 // --
 
+/**
+ * @summary Publishes a package to the npm registry.
+ * {@see https://docs.npmjs.com/cli/publish}
+ * @param {String} o.localPath Path to package directory.
+ * @param {String} o.tag Registers the published package with the given tag.
+ * @param {Object} o.ready Consequence instance.
+ * @param {Number} o.verbosity Verbosity control.
+ * @function publish
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function publish( o )
 {
   let self = this;
@@ -59,6 +70,18 @@ publish.defaults =
 }
 
 //
+
+/**
+ * @summary Fixates versions of the dependecies in provided package.
+ * @param {String} o.localPath Path to package directory.
+ * @param {String} o.configPath Path to package.json file.
+ * @param {String} o.tag Sets specified tag to all dependecies.
+ * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function fixate
+ * @memberof module:Tools/mid/NpmTools.
+ */
 
 function fixate( o )
 {
@@ -104,6 +127,16 @@ fixate.defaults =
 }
 
 //
+
+/**
+ * @summary Fixates versions of the dependecies in provided config.
+ * @param {Object} o.config Object representation of package.json file.
+ * @param {String} o.tag Sets specified tag to all dependecies.
+ * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function structureFixate
+ * @memberof module:Tools/mid/NpmTools.
+ */
 
 function structureFixate( o )
 {
@@ -175,6 +208,17 @@ structureFixate.defaults =
 
 //
 
+/**
+ * @summary Bumps package version.
+ * @param {String} o.localPath Path to package directory.
+ * @param {Object} o.configPath Path to package.json file.
+ * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function bump
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function bump( o )
 {
   let self = this;
@@ -219,6 +263,13 @@ bump.defaults =
 
 //
 
+/**
+ * @summary Bumps package version using provided config.
+ * @param {Object} o.config Object representation of package.json file.
+ * @function structureBump
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
 function structureBump( o )
 {
 
@@ -260,6 +311,15 @@ structureBump.defaults =
 }
 
 //
+
+/**
+ * @summary Gets package metadata from npm registry.
+ * @param {String} o.name Package name
+ * @param {Boolean} [o.sync=1] Controls sync/async execution mode
+ * @param {Boolean} [o.throwing=0] Controls error throwing
+ * @function aboutFromRemote
+ * @memberof module:Tools/mid/NpmTools.
+ */
 
 function aboutFromRemote( o )
 {
@@ -362,6 +422,590 @@ _readChangeWrite.defaults =
   onChange : null,
 }
 
+//
+
+// --
+// path
+// --
+
+/**
+ * @typedef {Object} RemotePathComponents
+ * @property {String} protocol
+ * @property {String} hash
+ * @property {String} longPath
+ * @property {String} localVcsPath
+ * @property {String} remoteVcsPath
+ * @property {String} longerRemoteVcsPath
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm
+ */
+
+/**
+ * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm.RemotePathComponents}.
+ * @param {String} remotePath Remote path.
+ * @function pathParse
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function pathParse( remotePath )
+{
+  let self = this;
+  let path = _.uri;
+  let result = Object.create( null );
+
+  if( _.mapIs( remotePath ) )
+  return remotePath;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( remotePath ) );
+  _.assert( path.isGlobal( remotePath ) )
+
+  /* */
+
+  let parsed1 = path.parseConsecutive( remotePath );
+  _.mapExtend( result, parsed1 );
+
+  if( !result.tag && !result.hash )
+  result.tag = 'latest';
+
+  _.assert( !result.tag || !result.hash, 'Remote path:', _.strQuote( remotePath ), 'should contain only hash or tag, but not both.' )
+
+  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
+  result.localVcsPath = p[ 1 ];
+
+  /* */
+
+  let parsed2 = _.mapExtend( null, parsed1 );
+  parsed2.protocol = null;
+  parsed2.hash = null;
+  parsed2.tag = null;
+  parsed2.longPath = p[ 0 ];
+  result.remoteVcsPath = path.str( parsed2 );
+
+  /* */
+
+  let parsed3 = _.mapExtend( null, parsed1 );
+  parsed3.longPath = parsed2.longPath;
+  parsed3.protocol = null;
+  parsed3.hash = null;
+  parsed3.tag = null;
+  result.longerRemoteVcsPath = path.str( parsed3 );
+  let version = parsed1.hash || parsed1.tag;
+  if( version )
+  result.longerRemoteVcsPath += '@' + version;
+
+  /* */
+
+  result.isFixated = self.pathIsFixated( result );
+
+  return result
+
+/*
+
+  remotePath : 'npm:///wColor/out/wColor#0.3.100'
+
+  protocol : 'npm',
+  hash : '0.3.100',
+  longPath : '/wColor/out/wColor',
+  localVcsPath : 'out/wColor',
+  remoteVcsPath : 'wColor',
+  longerRemoteVcsPath : 'wColor@0.3.100'
+
+*/
+
+  /* */
+
+  function pathIsolateGlobalAndLocal( longPath )
+  {
+    let parsed = path.parseConsecutive( longPath );
+    let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
+    parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
+    let globalPath = path.str( parsed );
+    return [ globalPath, splits[ 2 ] ];
+  }
+
+}
+
+//
+
+/**
+ * @summary Returns true if remote path `filePath` has fixed version of npm package.
+ * @param {String} filePath Global path.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function pathIsFixated( filePath )
+{
+  let self = this;
+  let path = _.uri;
+  let parsed = self.pathParse( filePath );
+
+  if( !parsed.hash )
+  return false;
+
+  return true;
+}
+
+//
+
+/**
+ * @summary Changes version of package specified in path `o.remotePath` to latest available.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function pathFixate( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+  _.routineOptions( pathFixate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let parsed = self.pathParse( o.remotePath );
+  let latestVersion = self.versionRemoteLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  let result = path.str
+  ({
+    protocol : parsed.protocol,
+    longPath : parsed.longPath,
+    hash : latestVersion,
+  });
+
+  return result;
+}
+
+var defaults = pathFixate.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns version of npm package located at `o.localPath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Path to npm package on hard drive.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionLocalRetrive
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function versionLocalRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( versionLocalRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let ready = new _.Consequence().take( null );
+
+  ready.then( () => self.isRepository( o ) )
+  ready.then( ( isRepository ) =>
+  {
+    if( !isRepository )
+    return '';
+
+    return _.fileProvider.fileRead
+    ({
+      filePath : path.join( o.localPath, 'package.json' ),
+      encoding : 'json',
+      sync : 0,
+    });
+  })
+  ready.finally( ( err, read ) =>
+  {
+    if( err )
+    return null;
+    if( _.strIs( read ) )
+    return read;
+    if( !read.version )
+    return null;
+    return read.version;
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = versionLocalRetrive.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns latest version of npm package using its remote path `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteLatestRetrive
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function versionRemoteLatestRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteLatestRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let ready = new _.Consequence().take( null );
+  let shell = _.process.starter
+  ({
+    verbosity : o.verbosity - 1,
+    outputCollecting : 1,
+    sync : 0,
+    deasync : 0,
+  });
+  let parsed = null;
+
+  ready.then( () =>
+  {
+    parsed = self.pathParse( o.remotePath );
+    return shell( 'npm show ' + parsed.remoteVcsPath );
+  })
+  ready.then( ( got ) =>
+  {
+    let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
+    if( !latestVersion )
+    {
+      debugger;
+      throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+    }
+    latestVersion = latestVersion[ 1 ];
+
+    return latestVersion;
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns current version of npm package using its remote path `o.remotePath`.
+ * @description Returns latest version if no version specified in remote path.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteCurrentRetrive
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function versionRemoteCurrentRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteCurrentRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let ready = new _.Consequence().take( null );
+
+  ready.then( () =>
+  {
+    let parsed = self.pathParse( o.remotePath );
+    if( parsed.isFixated )
+    return parsed.hash;
+    return self.versionRemoteLatestRetrive( o );
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+function versionRemoteRetrive( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteLatestRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let ready = new _.Consequence().take( null );
+  let shell = _.process.starter
+  ({
+    verbosity : o.verbosity - 1,
+    outputCollecting : 1,
+    sync : 0,
+    deasync : 0,
+  });
+
+  ready.then( () =>
+  { 
+    let parsed = self.pathParse( o.remotePath );
+    return shell( 'npm show ' + parsed.longerRemoteVcsPath + ' version' );
+  })
+  ready.then( ( got ) =>
+  {
+    let version = _.strStrip( got.output );
+    return version;
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = versionRemoteRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns true if local copy of package `o.localPath` is up to date with remote version `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {String} o.remotePath Remote path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isUpToDate
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function isUpToDate( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  _.routineOptions( isUpToDate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let parsed = self.pathParse( o.remotePath );
+
+  let ready = new _.Consequence().take( null );
+
+  ready.then( () => self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity, sync : 0 }) )
+  ready.then( ( currentVersion ) =>
+  {
+    if( !currentVersion )
+    return false;
+
+    if( parsed.hash === currentVersion )
+    return true;
+    
+    return self.versionRemoteRetrive({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
+    .then( ( latestVersion ) => currentVersion === latestVersion )
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = isUpToDate.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns true if path `o.localPath` contains npm package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function hasFiles
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function hasFiles( o )
+{
+  let localProvider = _.fileProvider;
+
+  _.routineOptions( hasFiles, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !localProvider.isDir( o.localPath  ) )
+  return false;
+  if( !localProvider.dirIsEmpty( o.localPath ) )
+  return true;
+
+  return false;
+}
+
+var defaults = hasFiles.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns true if path `o.localPath` contains a package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isRepository
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function isRepository( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  _.routineOptions( isRepository, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let ready = _.Consequence.Try( () =>
+  {
+    if( !_.fileProvider.fileExists( o.localPath ) )
+    return false;
+
+    // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
+    // return false;
+
+    if( !_.fileProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
+    return false;
+
+    return true;
+  })
+
+  if( o.sync )
+  return ready.syncMaybe();
+
+  return ready;
+}
+
+var defaults = isRepository.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+/**
+ * @summary Returns true if path `o.localPath` contains a npm package that was installed from remote `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {String} o.remotePath Remote path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function hasRemote
+ * @memberof module:Tools/mid/NpmTools.
+ */
+
+function hasRemote( o )
+{
+  let self = this;
+  let localProvider = _.fileProvider;
+  let path = localProvider.path;
+
+  _.routineOptions( hasRemote, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strDefined( o.localPath ) );
+  _.assert( _.strDefined( o.remotePath ) );
+
+  let ready = new _.Consequence().take( null );
+
+  ready.then( () =>
+  {
+    let result = Object.create( null );
+    result.downloaded = true;
+    result.remoteIsValid = false;
+
+    if( !localProvider.fileExists( o.localPath ) )
+    {
+      result.downloaded = false;
+      return result;
+    }
+
+    let configPath = path.join( o.localPath, 'package.json' );
+    let configExists = localProvider.fileExists( configPath );
+
+    if( !configExists )
+    {
+      result.downloaded = false;
+      return result;
+    }
+
+    let config = localProvider.fileConfigRead( configPath );
+    let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    let originVcsPath = config.name;
+
+    _.sure( _.strDefined( remoteVcsPath ) );
+    _.sure( _.strDefined( originVcsPath ) );
+
+    result.remoteVcsPath = remoteVcsPath;
+    result.originVcsPath = originVcsPath;
+    result.remoteIsValid = originVcsPath === remoteVcsPath;
+
+    return result;
+  })
+
+  if( o.sync )
+  return ready.deasync();
+
+  return ready;
+}
+
+var defaults = hasRemote.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.sync = 1;
+defaults.verbosity = 0;
+
+//
+
+function hasLocalChanges( o )
+{
+  if( _.objectIs( o ) )
+  if( o.sync !== undefined )
+  {
+    if( o.sync )
+    return false;
+    else
+    return new _.Consequence().take( false );
+  }
+  return false;
+}
+
 // --
 // declare
 // --
@@ -381,6 +1025,22 @@ let Extend =
   aboutFromRemote,
 
   _readChangeWrite,
+
+  // vcs
+
+  pathParse,
+  pathIsFixated,
+  pathFixate,
+  versionLocalRetrive,
+  versionRemoteLatestRetrive,
+  versionRemoteCurrentRetrive,
+  versionRemoteRetrive,
+  isUpToDate,
+  hasFiles,
+  isRepository,
+  hasRemote,
+
+  hasLocalChanges
 
 }
 
