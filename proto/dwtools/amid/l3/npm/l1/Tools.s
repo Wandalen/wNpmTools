@@ -354,7 +354,6 @@ function aboutFromRemote( o )
 
   if( o.sync )
   {
-    // return ready.deasync();
     ready.deasyncWait();
     return ready.sync();
   }
@@ -637,7 +636,10 @@ function versionLocalRetrive( o )
   })
 
   if( o.sync )
-  return ready.deasync();
+  {
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
@@ -698,7 +700,10 @@ function versionRemoteLatestRetrive( o )
   })
 
   if( o.sync )
-  return ready.deasync();
+  {
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
@@ -742,7 +747,10 @@ function versionRemoteCurrentRetrive( o )
   })
 
   if( o.sync )
-  return ready.deasync();
+  {
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
@@ -786,7 +794,10 @@ function versionRemoteRetrive( o )
   })
 
   if( o.sync )
-  return ready.deasync();
+  {
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
@@ -834,7 +845,10 @@ function isUpToDate( o )
   })
 
   if( o.sync )
-  return ready.deasync();
+  {
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
@@ -980,7 +994,10 @@ function hasRemote( o )
   })
 
   if( o.sync )
-  return ready.deasync();
+  {
+    ready.deasyncWait();
+    return ready.sync();
+  }
 
   return ready;
 }
