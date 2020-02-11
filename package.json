@@ -1,6 +1,6 @@
 {
   "name" : "wnpmtools", 
-  "version" : "0.3.41", 
+  "version" : "0.3.40", 
   "description" : "Collection of tools to use npm programmatically.", 
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
   "license" : "MIT", 
@@ -18,12 +18,12 @@
   }, 
   "dependencies" : 
   {
-    "wTools" : "", 
-    "wCopyable" : "", 
-    "wFiles" : "", 
-    "wappbasic" : "", 
-    "package-json" : "6.5.0"
+    "package-json" : "6.5.0", 
+    "wTools" : "alpha", 
+    "wCopyable" : "alpha", 
+    "wFiles" : "alpha", 
+    "wappbasic" : "alpha"
   }, 
-  "devDependencies" : { "wTesting" : "" }, 
+  "devDependencies" : { "wTesting" : "alpha" }, 
   "keywords" : [ "wTools" ]
 }
