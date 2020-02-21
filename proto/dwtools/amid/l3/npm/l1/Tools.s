@@ -380,7 +380,7 @@ function _readChangeWrite( o )
 
   if( !o.configPath )
   o.configPath = _.path.join( o.localPath, 'package.json' );
-  o.config = _.fileProvider.fileConfigRead( o.configPath );
+  o.config = _.fileProvider.configRead( o.configPath );
 
   o.changed = o.onChange( o );
 
@@ -979,7 +979,7 @@ function hasRemote( o )
       return result;
     }
 
-    let config = localProvider.fileConfigRead( configPath );
+    let config = localProvider.configRead( configPath );
     let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
     let originVcsPath = config.name;
 
