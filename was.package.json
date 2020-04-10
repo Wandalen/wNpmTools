@@ -1,6 +1,6 @@
 {
   "name" : "wnpmtools", 
-  "version" : "0.3.63", 
+  "version" : "0.3.64", 
   "description" : "Collection of tools to use npm programmatically.", 
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
   "license" : "MIT", 
