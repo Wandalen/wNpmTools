@@ -237,7 +237,6 @@ function bump( o )
     o2.onChange = onChange;
     self._readChangeWrite( o2 );
     _.mapExtend( o, o2 );
-    // o.config = o.config;
   }
   catch( err )
   {
@@ -404,6 +403,8 @@ function _readChangeWrite( o )
   _.assert( !!encoder, `No encoder` );
   str = encoder.encode({ data : o.config }).data;
 
+  str = str.replace( /\s\n/mg, '\n' );
+
   if( o.verbosity >= 2 )
   logger.log( str );
 
@@ -426,8 +427,6 @@ _readChangeWrite.defaults =
   verbosity : 0,
   onChange : null,
 }
-
-//
 
 // --
 // path
