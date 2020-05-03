@@ -439,7 +439,7 @@ _readChangeWrite.defaults =
  * @property {String} longPath
  * @property {String} localVcsPath
  * @property {String} remoteVcsPath
- * @property {String} longerRemoteVcsPath
+ * @property {String} remoteVcsLongerPath
  * @module Tools/mid/NpmTools
  */
 
@@ -493,10 +493,10 @@ function pathParse( remotePath )
   parsed3.protocol = null;
   parsed3.hash = null;
   parsed3.tag = null;
-  result.longerRemoteVcsPath = path.str( parsed3 );
+  result.remoteVcsLongerPath = path.str( parsed3 );
   let version = parsed1.hash || parsed1.tag;
   if( version )
-  result.longerRemoteVcsPath += '@' + version;
+  result.remoteVcsLongerPath += '@' + version;
 
   /* */
 
@@ -513,7 +513,7 @@ function pathParse( remotePath )
   longPath : '/wColor/out/wColor',
   localVcsPath : 'out/wColor',
   remoteVcsPath : 'wColor',
-  longerRemoteVcsPath : 'wColor@0.3.100'
+  remoteVcsLongerPath : 'wColor@0.3.100'
 
 */
 
@@ -796,7 +796,7 @@ function versionRemoteRetrive( o )
   ready.then( () =>
   {
     let parsed = self.pathParse( o.remotePath );
-    return shell( 'npm show ' + parsed.longerRemoteVcsPath + ' version' );
+    return shell( 'npm show ' + parsed.remoteVcsLongerPath + ' version' );
   })
   ready.then( ( got ) =>
   {
