@@ -99,7 +99,6 @@ function fixate( o )
     o2.onChange = onChange;
     self._readChangeWrite( o2 );
     _.mapExtend( o, o2 );
-    // o.config = o.config;
     return o;
   }
   catch( err )
@@ -176,9 +175,6 @@ function structureFixate( o )
       dep.config = o.config;
       if( dep.version )
       continue;
-      // if( o.onDependency )
-      // if( !o.onDependency( dep ) )
-      // continue;
       let r = o.onDependency( dep );
       _.assert( r === undefined );
       if( dep.version === depVersion && dep.name === depName )
@@ -188,18 +184,10 @@ function structureFixate( o )
       if( dep.version === undefined || dep.name === undefined )
       continue;
       o.config[ s ][ dep.name ] = dep.version;
-      // o.config[ s ][ depName ] = depVersionPatch( dep );
-      // o.config[ s ][ depName ] = depVersionPatch( dep );
     }
   });
 
   return o.changed;
-
-  // function depVersionPatch( dep )
-  // {
-  //   return o.tag;
-  // }
-
 }
 
 structureFixate.defaults =
@@ -248,8 +236,8 @@ function bump( o )
   function onChange( op )
   {
     let o2 = Object.create( null );
-    _.mapExtend( o2, _.mapOnly( o, self.structureFixate.defaults ) );
-    _.mapExtend( o2, _.mapOnly( op, self.structureFixate.defaults ) );
+    _.mapExtend( o2, _.mapOnly( o, self.structureBump.defaults ) );
+    _.mapExtend( o2, _.mapOnly( op, self.structureBump.defaults ) );
     self.structureBump( o2 );
     return o2.changed;
   }
@@ -403,7 +391,7 @@ function _readChangeWrite( o )
   _.assert( !!encoder, `No encoder` );
   str = encoder.encode({ data : o.config }).data;
 
-  str = str.replace( /\s\n/mg, '\n' );
+  str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
   if( o.verbosity >= 2 )
   logger.log( str );
@@ -462,7 +450,7 @@ function pathParse( remotePath )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( remotePath ) );
-  _.assert( path.isGlobal( remotePath ) )
+  _.assert( path.isGlobal( remotePath ) );
 
   /* */
 
@@ -474,8 +462,8 @@ function pathParse( remotePath )
 
   _.assert( !result.tag || !result.hash, 'Remote path:', _.strQuote( remotePath ), 'should contain only hash or tag, but not both.' )
 
-  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
-  result.localVcsPath = p[ 1 ];
+  let [ name, localPath ] = pathIsolateGlobalAndLocal( parsed1.longPath );
+  result.localVcsPath = localPath;
 
   /* */
 
@@ -483,20 +471,24 @@ function pathParse( remotePath )
   parsed2.protocol = null;
   parsed2.hash = null;
   parsed2.tag = null;
-  parsed2.longPath = p[ 0 ];
+  parsed2.longPath = name;
   result.remoteVcsPath = path.str( parsed2 );
 
-  /* */
+  parsed2.hash = parsed1.hash;
+  parsed2.tag = parsed1.tag;
+  result.remoteVcsLongerPath = path.str( parsed2 );
 
-  let parsed3 = _.mapExtend( null, parsed1 );
-  parsed3.longPath = parsed2.longPath;
-  parsed3.protocol = null;
-  parsed3.hash = null;
-  parsed3.tag = null;
-  result.remoteVcsLongerPath = path.str( parsed3 );
-  let version = parsed1.hash || parsed1.tag;
-  if( version )
-  result.remoteVcsLongerPath += '@' + version;
+  // /* */
+  //
+  // let parsed3 = _.mapExtend( null, parsed1 );
+  // parsed3.longPath = parsed2.longPath;
+  // parsed3.protocol = null;
+  // parsed3.hash = null;
+  // parsed3.tag = null;
+  // result.remoteVcsLongerPath = path.str( parsed3 );
+  // let version = parsed1.hash || parsed1.tag;
+  // if( version )
+  // result.remoteVcsLongerPath += '@' + version;
 
   /* */
 
@@ -521,11 +513,16 @@ function pathParse( remotePath )
 
   function pathIsolateGlobalAndLocal( longPath )
   {
-    let parsed = path.parseConsecutive( longPath );
-    let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
-    parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
-    let globalPath = path.str( parsed );
-    return [ globalPath, splits[ 2 ] ];
+    // debugger;
+    let splits = _.path.split( longPath );
+    if( splits[ 0 ] === '' )
+    splits.splice( 0, 1 );
+    return [ splits[ 0 ], splits.slice( 1 ).join( '/' ) ];
+    // let parsed = path.parseConsecutive( longPath );
+    // let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
+    // parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
+    // let globalPath = path.str( parsed );
+    // return [ globalPath, splits[ 2 ] ];
   }
 
 }
@@ -1049,10 +1046,10 @@ let Extend =
 
   publish,
 
-  fixate,
-  structureFixate,
+  fixate, /* qqq : cover please */
+  structureFixate, /* qqq : cover please */
   bump, /* qqq : cover please */
-  structureBump,
+  structureBump, /* qqq : cover please */
 
   aboutFromRemote,
 
@@ -1072,7 +1069,7 @@ let Extend =
   isRepository,
   hasRemote,
 
-  hasLocalChanges
+  hasLocalChanges,
 
 }
 

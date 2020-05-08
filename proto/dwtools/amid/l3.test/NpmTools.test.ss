@@ -57,11 +57,14 @@ function trivial( test )
 
 function pathParse( test )
 {
+
+  test.case = 'basic';
   var remotePath = 'npm:///wpathbasic'
-  var expected =
+  var exp =
   {
     'protocol' : 'npm',
     'longPath' : '/wpathbasic',
+    'parametrizedPath' : '/wpathbasic',
     'tag' : 'latest',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wpathbasic',
@@ -69,38 +72,79 @@ function pathParse( test )
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
-  test.identical( got, expected );
+  test.identical( got, exp );
 
+  test.case = 'hash';
   var remotePath = 'npm:///wpathbasic#1.0.0'
-  var expected =
+  var exp =
   {
     'protocol' : 'npm',
     'hash' : '1.0.0',
     'longPath' : '/wpathbasic',
+    'parametrizedPath' : '/wpathbasic#1.0.0',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@1.0.0',
+    'remoteVcsLongerPath' : 'wpathbasic#1.0.0',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
-  test.identical( got, expected );
+  test.identical( got, exp );
 
-  var remotePath = 'npm:///wpathbasic@beta'
-  var expected =
+  test.case = 'tag';
+  var remotePath = 'npm:///wpathbasic@beta';
+  var exp =
   {
     'protocol' : 'npm',
     'tag' : 'beta',
     'longPath' : '/wpathbasic',
+    'parametrizedPath' : '/wpathbasic@beta',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wpathbasic',
     'remoteVcsLongerPath' : 'wpathbasic@beta',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
-  test.identical( got, expected );
+  test.identical( got, exp );
 
+  test.case = 'with local';
+  var remotePath = 'npm:///wColor/out/wColor#0.3.100';
+  var exp =
+  {
+    'protocol' : 'npm',
+    'hash' : '0.3.100',
+    'longPath' : '/wColor/out/wColor',
+    'parametrizedPath' : '/wColor/out/wColor#0.3.100',
+    'localVcsPath' : 'out/wColor',
+    'remoteVcsPath' : 'wColor',
+    'remoteVcsLongerPath' : 'wColor#0.3.100',
+    'isFixated' : true
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'tag only';
+  var remotePath = '@some tag'
+  var exp =
+  {
+    'longPath' : '@some tag',
+    'parametrizedPath' : '@some tag',
+    'localVcsPath' : '',
+    'remoteVcsPath' : '',
+    'remoteVcsLongerPath' : '@some tag',
+    'isFixated' : true,
+  }
+  debugger;
+  var got = _.npm.pathParse( remotePath );
+  debugger;
+  test.identical( got, exp );
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'throwing';
   var remotePath = 'npm:///wpathbasic#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
+
 }
 
 //
@@ -272,7 +316,7 @@ function isUpToDate( test )
     test.identical( got, false );
     return null;
   })
-  
+
   install( 'wpathbasic@beta' )
   .then( () =>
   {
@@ -312,7 +356,7 @@ function isUpToDate( test )
     test.identical( got, false );
     return null;
   })
-  
+
   install( 'wpathbasic@0.7.1' )
   .then( () =>
   {
@@ -511,6 +555,7 @@ var Proto =
 
   tests :
   {
+
     trivial,
     pathParse,
     pathIsFixated,
@@ -522,7 +567,8 @@ var Proto =
 
     isUpToDate,
     isRepository,
-    hasRemote
+    hasRemote,
+
   },
 
 }

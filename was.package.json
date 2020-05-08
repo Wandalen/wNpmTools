@@ -2,7 +2,7 @@
   "name" : "wnpmtools",
   "version" : "0.3.77",
   "description" : "Collection of tools to use npm programmatically.",
-  "author" : "Kostiantyn Wandalen <wanalen@willbe.so>",
+  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "license" : "MIT",
   "main" : "proto/dwtools/amid/l3/npm/IncludeMid.s",
   "files" : [ "proto/dwtools/amid/l3", "proto/dwtools/Tools.s" ],
