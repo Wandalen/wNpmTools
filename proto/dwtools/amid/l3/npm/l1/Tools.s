@@ -1035,6 +1035,13 @@ function hasLocalChanges( o )
   return false;
 }
 
+function dependantsRertive( npmPackageName )
+{
+  let dependants = 0;
+
+  return dependants;
+}
+
 // --
 // declare
 // --
@@ -1070,6 +1077,8 @@ let Extend =
   hasRemote,
 
   hasLocalChanges,
+
+  dependantsRertive,
 
 }
 
