@@ -553,7 +553,7 @@ async function dependantsRertive( test )
 
 dependantsRertive.description =
 `
-should retrieve number of 
+should retrieve number of package dependants
 `
 
 // --
