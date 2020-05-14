@@ -535,6 +535,28 @@ function hasRemote( test )
 
 hasRemote.timeOut = 60000;
 
+//
+
+async function dependantsRertive( test )
+{
+
+  test.case = 'receive correct dependants number';
+  var got = await _.npm.dependantsRertive( 'wTools' );
+  var exp = 119;
+  test.identical( got, exp );
+
+  test.case = 'receive correct dependants number';
+  var got = await _.npm.dependantsRertive( 'request' );
+  var exp = 49170;
+  test.identical( got, exp );
+
+}
+
+dependantsRertive.description =
+`
+should retrieve number of package dependants
+`
+
 // --
 // declare
 // --
@@ -544,7 +566,7 @@ var Proto =
 
   name : 'Tools.mid.NpmTools',
   silencing : 1,
-  routineTimeOut: 60000,
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,
@@ -570,6 +592,8 @@ var Proto =
     isUpToDate,
     isRepository,
     hasRemote,
+
+    dependantsRertive,
 
   },
 

@@ -418,11 +418,42 @@ _readChangeWrite.defaults =
 
 //
 
-function dependantsRertive( npmPackageName )
+async function dependantsRertive( npmPackageName )
 {
-  let dependants = 0;
+  const fetch = require( 'node-fetch' );
+  const jsdom = require( 'jsdom' );
+  const { JSDOM } = jsdom;
 
-  /* ... */
+  const url = `https://www.npmjs.com/package/${npmPackageName}`;
+
+  let dependants = '';
+
+  try
+  {
+    const response = await fetch( url );
+    const html = await response.text();
+    const dom = new JSDOM( html );
+    const spans = Array.from( dom.window.document.getElementsByTagName( 'span' ) );
+    const neededSpan = spans.find( ( span ) => span.textContent.toLocaleLowerCase().includes( 'dependents' ) );
+    if ( neededSpan )
+    {
+      for ( let char of neededSpan.textContent )
+      {
+        if ( char.toLocaleLowerCase() !== 'd' )
+        dependants += char;
+        else
+        break;
+      }
+
+      dependants = Number( dependants.split( ',' ).join( '' ) );
+    }
+    else
+    dependants = '-';
+  }
+  catch ( error )
+  {
+    console.log( error );
+  }
 
   return dependants;
 }
