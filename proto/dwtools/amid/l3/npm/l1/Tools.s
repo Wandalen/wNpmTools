@@ -1,5 +1,4 @@
-( function _Tools_s_()
-{
+( function _Tools_s_( ) {
 
 'use strict';
 
@@ -44,7 +43,7 @@ function publish( o )
   o.ready = new _.Consequence().take( null );
 
   let start = _.process.starter
-  ( {
+  ({
     currentPath : o.localPath,
     outputCollecting : 1,
     outputGraying : 1,
@@ -52,7 +51,7 @@ function publish( o )
     inputMirroring : o.verbosity >= 2,
     mode : 'shell',
     ready : o.ready
-  } );
+  });
 
   return start( `npm publish --tag ${o.tag}` )
   .finally( ( err, arg ) =>
@@ -60,7 +59,7 @@ function publish( o )
     if( err )
     throw _.err( err, `\nFailed publish ${o.localPath} with tag ${o.tag}` );
     return arg;
-  } );
+  });
 }
 
 publish.defaults =
@@ -186,7 +185,7 @@ function structureFixate( o )
       continue;
       o.config[ s ][ dep.name ] = dep.version;
     }
-  } );
+  });
 
   return o.changed;
 }
@@ -333,7 +332,7 @@ function aboutFromRemote( o )
     // return null;
     // debugger;
     return record;
-  } );
+  });
 
   ready.catch( ( err ) =>
   {
@@ -344,7 +343,7 @@ function aboutFromRemote( o )
       return null;
     }
     throw _.err( err, `\nFailed to get information about remote module ${name}` );
-  } );
+  });
 
   if( o.sync )
   {
@@ -384,13 +383,13 @@ function _readChangeWrite( o )
 
   let str = null;
   let encoder = _.Gdf.Select
-  ( {
+  ({
     in : 'structure',
     out : 'string',
     ext : 'json',
-  } )[ 1 ]; /* xxx : workaround */
+  })[ 1 ]; /* xxx : workaround */
   _.assert( !!encoder, `No encoder` );
-  str = encoder.encode( { data : o.config } ).data;
+  str = encoder.encode({ data : o.config }).data;
 
   str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
@@ -419,42 +418,9 @@ _readChangeWrite.defaults =
 
 //
 
-async function dependantsRertive( npmPackageName )
+function dependantsRertive( npmPackageName )
 {
-  const fetch = require( 'node-fetch' );
-  const jsdom = require( 'jsdom' );
-  const { JSDOM } = jsdom;
-
-  const url = `https://www.npmjs.com/package/${npmPackageName}`;
-
-  let dependants = '';
-
-  try
-  {
-    const response = await fetch( url );
-    const html = await response.text();
-    const dom = new JSDOM( html );
-    const spans = Array.from( dom.window.document.getElementsByTagName( 'span' ) );
-    const neededSpan = spans.find( ( span ) => span.textContent.toLocaleLowerCase().includes( 'dependents' ) );
-    if ( neededSpan )
-    {
-      for ( let char of neededSpan.textContent )
-      {
-        if ( char.toLocaleLowerCase() !== 'd' )
-        dependants += char;
-        else
-        break;
-      }
-
-      dependants = Number( dependants.split( ',' ).join( '' ) );
-    }
-    else
-    dependants = '-';
-  }
-  catch ( error )
-  {
-    console.log( error );
-  }
+  let dependants = 0;
 
   return dependants;
 }
@@ -540,16 +506,13 @@ function pathParse( remotePath )
   return result
 
 /*
-
   remotePath : 'npm:///wColor/out/wColor#0.3.100'
-
   protocol : 'npm',
   hash : '0.3.100',
   longPath : '/wColor/out/wColor',
   localVcsPath : 'out/wColor',
   remoteVcsPath : 'wColor',
   remoteVcsLongerPath : 'wColor@0.3.100'
-
 */
 
   /* */
@@ -616,17 +579,17 @@ function pathFixate( o )
 
   let parsed = self.pathParse( o.remotePath );
   let latestVersion = self.versionRemoteLatestRetrive
-  ( {
+  ({
     remotePath : o.remotePath,
     verbosity : o.verbosity,
-  } );
+  });
 
   let result = path.str
-  ( {
+  ({
     protocol : parsed.protocol,
     longPath : parsed.longPath,
     hash : latestVersion,
-  } );
+  });
 
   return result;
 }
@@ -667,12 +630,12 @@ function versionLocalRetrive( o )
     return '';
 
     return _.fileProvider.fileRead
-    ( {
+    ({
       filePath : path.join( o.localPath, 'package.json' ),
       encoding : 'json',
       sync : 0,
-    } );
-  } )
+    });
+  })
   ready.finally( ( err, read ) =>
   {
     if( err )
@@ -682,7 +645,7 @@ function versionLocalRetrive( o )
     if( !read.version )
     return null;
     return read.version;
-  } )
+  })
 
   if( o.sync )
   {
@@ -723,19 +686,19 @@ function versionRemoteLatestRetrive( o )
 
   let ready = new _.Consequence().take( null );
   let shell = _.process.starter
-  ( {
+  ({
     verbosity : o.verbosity - 1,
     outputCollecting : 1,
     sync : 0,
     deasync : 0,
-  } );
+  });
   let parsed = null;
 
   ready.then( () =>
   {
     parsed = self.pathParse( o.remotePath );
     return shell( 'npm show ' + parsed.remoteVcsPath );
-  } )
+  })
   ready.then( ( got ) =>
   {
     let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
@@ -747,7 +710,7 @@ function versionRemoteLatestRetrive( o )
     latestVersion = latestVersion[ 1 ];
 
     return latestVersion;
-  } )
+  })
 
   if( o.sync )
   {
@@ -795,7 +758,7 @@ function versionRemoteCurrentRetrive( o )
     if( parsed.isFixated )
     return parsed.hash;
     return self.versionRemoteLatestRetrive( o );
-  } )
+  })
 
   if( o.sync )
   {
@@ -826,23 +789,23 @@ function versionRemoteRetrive( o )
 
   let ready = new _.Consequence().take( null );
   let shell = _.process.starter
-  ( {
+  ({
     verbosity : o.verbosity - 1,
     outputCollecting : 1,
     sync : 0,
     deasync : 0,
-  } );
+  });
 
   ready.then( () =>
   {
     let parsed = self.pathParse( o.remotePath );
     return shell( 'npm show ' + parsed.remoteVcsLongerPath + ' version' );
-  } )
+  })
   ready.then( ( got ) =>
   {
     let version = _.strStrip( got.output );
     return version;
-  } )
+  })
 
   if( o.sync )
   {
@@ -883,7 +846,7 @@ function isUpToDate( o )
 
   let ready = new _.Consequence().take( null );
 
-  ready.then( () => self.versionLocalRetrive( { localPath : o.localPath, verbosity : o.verbosity, sync : 0 } ) )
+  ready.then( () => self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity, sync : 0 }) )
   ready.then( ( currentVersion ) =>
   {
     if( !currentVersion )
@@ -892,9 +855,9 @@ function isUpToDate( o )
     if( parsed.hash === currentVersion )
     return true;
 
-    return self.versionRemoteRetrive( { remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 } )
+    return self.versionRemoteRetrive({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
     .then( ( latestVersion ) => currentVersion === latestVersion )
-  } )
+  })
 
   if( o.sync )
   {
@@ -930,7 +893,7 @@ function hasFiles( o )
   _.routineOptions( hasFiles, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( !localProvider.isDir( o.localPath ) )
+  if( !localProvider.isDir( o.localPath  ) )
   return false;
   if( !localProvider.dirIsEmpty( o.localPath ) )
   return true;
@@ -974,7 +937,7 @@ function isRepository( o )
     return false;
 
     return true;
-  } )
+  })
 
   if( o.sync )
   return ready.syncMaybe();
@@ -1046,7 +1009,7 @@ function hasRemote( o )
     result.remoteIsValid = originVcsPath === remoteVcsPath;
 
     return result;
-  } )
+  })
 
   if( o.sync )
   {
@@ -1125,4 +1088,4 @@ _.mapExtend( Self, Extend );
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = _global_.wTools;
 
-} )();
+})();
