@@ -427,19 +427,17 @@ async function dependantsRertive( npmPackageName )
 
   const url = `https://www.npmjs.com/package/${npmPackageName}`;
 
-  let html = 'start';
+  let dependants = '';
 
   try
   {
     const response = await fetch( url );
-    html = await response.text();
+    const html = await response.text();
     const dom = new JSDOM( html );
     const spans = Array.from( dom.window.document.getElementsByTagName( 'span' ) );
     const neededSpan = spans.find( ( span ) => span.textContent.toLocaleLowerCase().includes( 'dependents' ) );
     if ( neededSpan )
     {
-      let dependants = '';
-
       for ( let char of neededSpan.textContent )
       {
         if ( char.toLocaleLowerCase() !== 'd' )
@@ -447,16 +445,19 @@ async function dependantsRertive( npmPackageName )
         else
         break;
       }
+
+      dependants = Number( dependants.split( ',' ).join( '' ) );
     }
+    else
+    dependants = '-';
   }
   catch ( error )
   {
     console.log( error );
   }
 
-  return html;
+  return dependants;
 }
-dependantsRertive( 'request' )
 
 // --
 // path
