@@ -537,11 +537,11 @@ hasRemote.timeOut = 60000;
 
 //
 
-function dependantsRertive( test )
+async function dependantsRertive( test )
 {
 
   test.case = 'receive package dependants number';
-  var got = _.npm.dependantsRertive( 'wTools' );
+  var got = await _.npm.dependantsRertive( 'wTools' );
   var exp = 119;
   test.identical( got, exp );
 

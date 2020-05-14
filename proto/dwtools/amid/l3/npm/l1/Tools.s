@@ -421,24 +421,23 @@ _readChangeWrite.defaults =
 
 async function dependantsRertive( npmPackageName )
 {
-  const https = require( 'https' );
+  const fetch = require( 'node-fetch' );
   const url = `https://www.npmjs.com/package/${npmPackageName}`;
 
-  https.get( url, ( res ) =>
-    {
-    res.setEncoding( 'utf8' );
-    let html = '';
+  let html = 'start';
 
-    res.on( 'data', ( data ) =>
-    {
-      html += data;
-    } );
+  try
+  {
+    const response = await fetch( url );
+    html = await response.text();
+    html = 'from promise';
+  }
+  catch ( error )
+  {
+    console.log( error );
+  }
 
-    res.on( 'end', () =>
-    {
-      
-    } );
-  } );
+  return html;
 }
 
 // --
