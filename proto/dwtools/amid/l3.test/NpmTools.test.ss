@@ -435,7 +435,6 @@ isRepository.timeOut = 20000;
 
 //
 
-
 function hasRemote( test )
 {
   let self = this;
