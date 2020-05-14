@@ -422,6 +422,9 @@ _readChangeWrite.defaults =
 async function dependantsRertive( npmPackageName )
 {
   const fetch = require( 'node-fetch' );
+  const jsdom = require( 'jsdom' );
+  const { JSDOM } = jsdom;
+
   const url = `https://www.npmjs.com/package/${npmPackageName}`;
 
   let html = 'start';
@@ -430,7 +433,21 @@ async function dependantsRertive( npmPackageName )
   {
     const response = await fetch( url );
     html = await response.text();
-    html = 'from promise';
+    const dom = new JSDOM( html );
+    const spans = Array.from( dom.window.document.getElementsByTagName( 'span' ) );
+    const neededSpan = spans.find( ( span ) => span.textContent.toLocaleLowerCase().includes( 'dependents' ) );
+    if ( neededSpan )
+    {
+      let dependants = '';
+
+      for ( let char of neededSpan.textContent )
+      {
+        if ( char.toLocaleLowerCase() !== 'd' )
+        dependants += char;
+        else
+        break;
+      }
+    }
   }
   catch ( error )
   {
@@ -439,6 +456,7 @@ async function dependantsRertive( npmPackageName )
 
   return html;
 }
+dependantsRertive( 'request' )
 
 // --
 // path
