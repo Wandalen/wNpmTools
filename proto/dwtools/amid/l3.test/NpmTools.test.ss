@@ -540,14 +540,9 @@ hasRemote.timeOut = 60000;
 function dependantsRertive( test )
 {
 
-  test.case = 'does not exist';
-  var got = _.npm.dependantsRertive( 'somethingasdnasjfasjdfsld' );
-  var exp = 0;
-  test.identical( got, exp );
-
-  test.case = 'wmodulefortesting12ab - 0 dependants';
-  var got = _.npm.dependantsRertive( 'wmodulefortesting12ab' );
-  var exp = 0;
+  test.case = 'receive package dependants number';
+  var got = _.npm.dependantsRertive( 'wTools' );
+  var exp = 119;
   test.identical( got, exp );
 
 }

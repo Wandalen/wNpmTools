@@ -419,11 +419,26 @@ _readChangeWrite.defaults =
 
 //
 
-function dependantsRertive( npmPackageName )
+async function dependantsRertive( npmPackageName )
 {
-  let dependants = 0;
+  const https = require( 'https' );
+  const url = `https://www.npmjs.com/package/${npmPackageName}`;
 
-  return dependants;
+  https.get( url, ( res ) =>
+    {
+    res.setEncoding( 'utf8' );
+    let html = '';
+
+    res.on( 'data', ( data ) =>
+    {
+      html += data;
+    } );
+
+    res.on( 'end', () =>
+    {
+      
+    } );
+  } );
 }
 
 // --
