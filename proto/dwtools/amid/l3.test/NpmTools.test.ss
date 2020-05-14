@@ -536,24 +536,24 @@ hasRemote.timeOut = 60000;
 
 //
 
-function dependantsRertive( test )
+async function dependantsRertive( test )
 {
 
-  test.case = 'does not exist';
-  var got = _.npm.dependantsRertive( 'somethingasdnasjfasjdfsld' );
-  var exp = 0;
+  test.case = 'receive correct dependants number';
+  var got = await _.npm.dependantsRertive( 'wTools' );
+  var exp = 119;
   test.identical( got, exp );
 
-  test.case = 'wmodulefortesting12ab - 0 dependants';
-  var got = _.npm.dependantsRertive( 'wmodulefortesting12ab' );
-  var exp = 0;
+  test.case = 'receive correct dependants number';
+  var got = await _.npm.dependantsRertive( 'request' );
+  var exp = 49170;
   test.identical( got, exp );
 
 }
 
 dependantsRertive.description =
 `
-should ...
+should retrieve number of 
 `
 
 // --
