@@ -544,6 +544,7 @@ var Proto =
 
   name : 'Tools.mid.NpmTools',
   silencing : 1,
+  routineTimeOut: 60000,
 
   onSuiteBegin,
   onSuiteEnd,
