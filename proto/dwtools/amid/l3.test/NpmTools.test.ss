@@ -435,7 +435,6 @@ isRepository.timeOut = 20000;
 
 //
 
-
 function hasRemote( test )
 {
   let self = this;
@@ -535,6 +534,28 @@ function hasRemote( test )
 
 hasRemote.timeOut = 60000;
 
+//
+
+function dependantsRertive( test )
+{
+
+  test.case = 'does not exist';
+  var got = _.npm.dependantsRertive( 'somethingasdnasjfasjdfsld' );
+  var exp = 0;
+  test.identical( got, exp );
+
+  test.case = 'wmodulefortesting12ab - 0 dependants';
+  var got = _.npm.dependantsRertive( 'wmodulefortesting12ab' );
+  var exp = 0;
+  test.identical( got, exp );
+
+}
+
+dependantsRertive.description =
+`
+should ...
+`
+
 // --
 // declare
 // --
@@ -544,7 +565,7 @@ var Proto =
 
   name : 'Tools.mid.NpmTools',
   silencing : 1,
-  routineTimeOut: 60000,
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,
@@ -570,6 +591,8 @@ var Proto =
     isUpToDate,
     isRepository,
     hasRemote,
+
+    dependantsRertive,
 
   },
 
