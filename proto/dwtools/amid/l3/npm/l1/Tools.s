@@ -422,8 +422,6 @@ function dependantsRertive( npmPackageName )
 {
   let dependants = 0;
 
-  /* ... */
-
   return dependants;
 }
 
