@@ -416,6 +416,17 @@ _readChangeWrite.defaults =
   onChange : null,
 }
 
+//
+
+function dependantsRertive( npmPackageName )
+{
+  let dependants = 0;
+
+  /* ... */
+
+  return dependants;
+}
+
 // --
 // path
 // --
@@ -1035,13 +1046,6 @@ function hasLocalChanges( o )
   return false;
 }
 
-function dependantsRertive( npmPackageName )
-{
-  let dependants = 0;
-
-  return dependants;
-}
-
 // --
 // declare
 // --
@@ -1062,6 +1066,8 @@ let Extend =
 
   _readChangeWrite,
 
+  dependantsRertive,
+
   // vcs
 
   pathParse,
@@ -1077,8 +1083,6 @@ let Extend =
   hasRemote,
 
   hasLocalChanges,
-
-  dependantsRertive,
 
 }
 
