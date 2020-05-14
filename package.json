@@ -21,10 +21,12 @@
     "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
   "dependencies": {
+    "jsdom": "=16.2.2",
+    "node-fetch": "=2.6.0",
     "package-json": "6.5.0",
-    "wTools": "alpha",
     "wCopyable": "alpha",
     "wFiles": "alpha",
+    "wTools": "alpha",
     "wappbasic": "alpha"
   },
   "devDependencies": {
