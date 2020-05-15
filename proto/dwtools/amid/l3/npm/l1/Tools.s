@@ -368,7 +368,7 @@ function _readChangeWrite( o )
   let self = this;
 
   o = _.routineOptions( _readChangeWrite, o );
-  if( !o.verbosity || o.verbosity < 0 )
+  if( !o.verbosity || o.verbosity <span 0 )
   o.verbosity = 0;
 
   if( !o.configPath )
@@ -418,44 +418,38 @@ _readChangeWrite.defaults =
 
 //
 
-async function dependantsRertive( npmPackageName )
+function dependantsRertive( npmPackageName )
 {
-  const fetch = require( 'node-fetch' );
-  const jsdom = require( 'jsdom' );
-  const { JSDOM } = jsdom;
-
+  const https = require( 'https' );
   const url = `https://www.npmjs.com/package/${npmPackageName}`;
 
-  let dependants = '';
-
-  try
+  return new Promise( ( resoleve, reject ) =>
   {
-    const response = await fetch( url );
-    const html = await response.text();
-    const dom = new JSDOM( html );
-    const spans = Array.from( dom.window.document.getElementsByTagName( 'span' ) );
-    const neededSpan = spans.find( ( span ) => span.textContent.toLocaleLowerCase().includes( 'dependents' ) );
-    if ( neededSpan )
+    https.get( url, ( res ) =>
     {
-      for ( let char of neededSpan.textContent )
+      res.setEncoding( 'utf8' );
+      let html = '';
+
+      res.on( 'error', ( err ) => reject( err ) );
+
+      res.on( 'data', ( data ) =>
       {
-        if ( char.toLocaleLowerCase() !== 'd' )
-        dependants += char;
-        else
-        break;
-      }
+        html += data;
+      } );
 
-      dependants = Number( dependants.split( ',' ).join( '' ) );
-    }
-    else
-    dependants = '-';
-  }
-  catch ( error )
-  {
-    console.log( error );
-  }
+      res.on( 'end', () =>
+      {
+        let dependants = '';
+        const idx = html.match( /[1-9]*,?[1-9]*<\/span>Dependents/ ).index;
 
-  return dependants;
+        for ( let i = idx; html[ i ] !== '<'; i++ )
+        dependants += html[ i ];
+
+        resoleve( Number( dependants.split( ',' ).join( '' ) ) );
+      } );
+    } )
+
+  } )
 }
 
 // --
