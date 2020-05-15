@@ -538,39 +538,37 @@ hasRemote.timeOut = 60000;
 
 function dependantsRertive( test )
 {
-
-  test.case = 'receive correct dependants number';
-  var got;
-  var exp = 119;
   _.npm.dependantsRertive( 'wTools' )
     .then( ( dependants ) =>
     {
-      got = dependants;
+      test.case = 'receive correct dependants number';
+      var got = dependants;
+      var exp = 119;
       test.identical( got, exp );
     } )
     .catch( ( err ) =>
     {
       console.log( err );
-      got = '-';
+      test.case = 'dependants = - if error ' ;
+      var got = '-';
+      var exp = '-';
       test.identical( got, exp );
     } );
-
-
-  test.case = 'receive correct dependants number';
-  var got;
-  var exp = 49177;
-    _.npm.dependantsRertive( 'request' )
-      .then( ( dependants ) =>
-      {
-        got = dependants;
-        test.identical( got, exp );
-      } )
-      .catch( ( err ) =>
-      {
-        console.log( err );
-        got = '-';
-        test.identical( got, exp );
-      } );
+  // test.case = 'receive correct dependants number';
+  // var got;
+  // var exp = 49177;
+  //   _.npm.dependantsRertive( 'request' )
+  //     .then( ( dependants ) =>
+  //     {
+  //       got = dependants;
+  //       test.identical( got, exp );
+  //     } )
+  //     .catch( ( err ) =>
+  //     {
+  //       console.log( err );
+  //       got = '-';
+  //       test.identical( got, exp );
+  //     } );
 
 }
 
