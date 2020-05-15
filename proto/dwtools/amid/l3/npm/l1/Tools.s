@@ -368,7 +368,7 @@ function _readChangeWrite( o )
   let self = this;
 
   o = _.routineOptions( _readChangeWrite, o );
-  if( !o.verbosity || o.verbosity <span 0 )
+  if( !o.verbosity || o.verbosity < 0 )
   o.verbosity = 0;
 
   if( !o.configPath )

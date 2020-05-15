@@ -541,19 +541,36 @@ function dependantsRertive( test )
 
   test.case = 'receive correct dependants number';
   var got;
-  _.npm.dependantsRertive( 'wTools' )
-    .then( ( dependants ) => got = dependants )
-    .catch( ( err ) => got = '-' );
   var exp = 119;
-  test.identical( got, exp );
+  _.npm.dependantsRertive( 'wTools' )
+    .then( ( dependants ) =>
+    {
+      got = dependants;
+      test.identical( got, exp );
+    } )
+    .catch( ( err ) =>
+    {
+      console.log( err );
+      got = '-';
+      test.identical( got, exp );
+    } );
+
 
   test.case = 'receive correct dependants number';
   var got;
-    _.npm.dependantsRertive( 'request' )
-      .then( ( dependants ) => got = dependants )
-      .catch( ( err ) => got = '-' );
   var exp = 49177;
-  test.identical( got, exp );
+    _.npm.dependantsRertive( 'request' )
+      .then( ( dependants ) =>
+      {
+        got = dependants;
+        test.identical( got, exp );
+      } )
+      .catch( ( err ) =>
+      {
+        console.log( err );
+        got = '-';
+        test.identical( got, exp );
+      } );
 
 }
 
