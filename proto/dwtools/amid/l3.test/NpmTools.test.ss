@@ -549,10 +549,10 @@ async function dependantsRertive( test )
   test.identical( got, exp );
 
   test.case = 'if number of dependants is more than one thousand';
-  got = await _.npm.dependantsRertive( 'request' );
+  got = await _.npm.dependantsRertive( 'express' );
   test.is( _.numberIs( got ) );
-  test.gt( got, 999 );
-  
+  test.gt( got, 10000 );
+
   test.case = 'invoke with wrong package name';
   got = await _.npm.dependantsRertive( 'unknownPackageName' );
   exp = NaN;
