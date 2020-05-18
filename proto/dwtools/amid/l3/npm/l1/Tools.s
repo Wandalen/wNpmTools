@@ -447,7 +447,7 @@ function dependantsRertive( npmPackageName )
       let dependants = '';
       const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
-      if ( !strWithDep )
+      if( !strWithDep )
       {
         ready.take( NaN );
         return;
@@ -455,7 +455,7 @@ function dependantsRertive( npmPackageName )
 
       const idx = strWithDep.index;
 
-      for ( let i = idx; html[ i ] !== '<'; i++ )
+      for( let i = idx; html[ i ] !== '<'; i++ )
       dependants += html[ i ];
 
       ready.take( Number( dependants.split( ',' ).join( '' ) ) );
