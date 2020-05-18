@@ -424,12 +424,12 @@ function dependantsRertive( o )
 
   _.routineOptions( dependantsRertive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( typeof arguments[ 0 ][ 'npmPackageName' ] === 'string', 'Expects string as a package name' );
-  _.assert( arguments[ 0 ][ 'npmPackageName' ].length !== 0, 'Expects not empty string as a package name' );
-
-  const url = `'https://www.npmjs.com/package'/${o.npmPackageName}`;
+  _.assert( typeof arguments[ 0 ][ 'remotePath' ] === 'string', 'Expects string as a package name' );
+  _.assert( arguments[ 0 ][ 'remotePath' ].length !== 0, 'Expects not empty string as a package name' );
 
   let ready = new _.Consequence();
+
+  const url = `https://www.npmjs.com/package/${o.remotePath}`;
 
   https.get( url, ( res ) =>
   {
@@ -474,8 +474,7 @@ function dependantsRertive( o )
 dependantsRertive.defaults =
 {
   sync : 0,
-  remotePath : null,
-  npmPackageName : 'nonexistent package name'
+  remotePath : null
 }
 
 // --
