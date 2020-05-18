@@ -464,6 +464,11 @@ function dependantsRertive( npmPackageName )
 
   return ready;
 }
+dependantsRertive.defaults =
+{
+  sync : 0,
+  remotePath : null
+}
 
 // --
 // path
