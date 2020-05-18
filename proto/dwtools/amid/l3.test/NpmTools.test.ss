@@ -549,9 +549,9 @@ async function dependantsRertive( test )
   test.identical( got, exp );
 
   test.case = 'receive correct dependants number';
-  got = await _.npm.dependantsRertive( 'request' );
-  exp = isNaN( got );
-  test.identical( false, exp );
+  got = isNaN( await _.npm.dependantsRertive( 'request' ) );;
+  exp = false
+  test.identical( got, exp );
 
   test.case = 'invoke with wrong package name';
   got = await _.npm.dependantsRertive( 'unknownPackageName' );

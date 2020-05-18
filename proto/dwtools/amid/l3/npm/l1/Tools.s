@@ -448,7 +448,7 @@ function dependantsRertive( npmPackageName )
     res.on( 'end', () =>
     {
       let dependants = '';
-      const strWithDep = html.match( /[1-9]*,?[1-9]*<\/span>Dependents/ );
+      const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
       if ( !strWithDep )
       {
@@ -467,6 +467,7 @@ function dependantsRertive( npmPackageName )
 
   return ready;
 }
+dependantsRertive('download')
 
 // --
 // path

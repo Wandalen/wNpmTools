@@ -20,17 +20,14 @@
   "bugs": {
     "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
-  "dependencies": {
-    "package-json": "6.5.0",
-    "wCopyable": "alpha",
-    "wFiles": "alpha",
-    "wTools": "alpha",
-    "wappbasic": "alpha"
+  "dependencies" :
+  {
+    "package-json" : "6.5.0",
+    "wTools" : "alpha",
+    "wCopyable" : "alpha",
+    "wFiles" : "alpha",
+    "wappbasic" : "alpha"
   },
-  "devDependencies": {
-    "wTesting": "alpha"
-  },
-  "keywords": [
-    "wTools"
-  ]
+  "devDependencies" : { "wTesting" : "alpha" },
+  "keywords" : [ "wTools" ]
 }
