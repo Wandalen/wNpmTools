@@ -435,10 +435,7 @@ function dependantsRertive( npmPackageName )
     res.setEncoding( 'utf8' );
     let html = '';
 
-    res.on( 'error', ( err ) => {
-      console.log( err );
-      ready.take( '-' );
-    } );
+    res.on( 'error', ( err ) => err );
 
     res.on( 'data', ( data ) =>
     {
@@ -467,7 +464,6 @@ function dependantsRertive( npmPackageName )
 
   return ready;
 }
-dependantsRertive('download')
 
 // --
 // path
