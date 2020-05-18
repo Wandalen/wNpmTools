@@ -544,7 +544,27 @@ async function dependantsRertive( test )
   test.identical( got, exp );
 
   test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm://wTesting' } );
+  exp = 1;
+  test.identical( got, exp );
+
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm:///wTesting' } );
+  exp = 1;
+  test.identical( got, exp );
+
+  test.case = 'receive correct dependants number';
   got = await _.npm.dependantsRertive( { remotePath : 'wtest' } );
+  exp = 0;
+  test.identical( got, exp );
+
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm://wtest' } );
+  exp = 0;
+  test.identical( got, exp );
+
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm:///wtest' } );
   exp = 0;
   test.identical( got, exp );
 
@@ -553,8 +573,28 @@ async function dependantsRertive( test )
   test.is( _.numberIs( got ) );
   test.gt( got, 10000 );
 
+  test.case = 'if number of dependants is more than one thousand';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm://express' } );
+  test.is( _.numberIs( got ) );
+  test.gt( got, 10000 );
+
+  test.case = 'if number of dependants is more than one thousand';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm:///express' } );
+  test.is( _.numberIs( got ) );
+  test.gt( got, 10000 );
+
   test.case = 'invoke with wrong package name';
   got = await _.npm.dependantsRertive( { remotePath : 'unknownPackageName' } );
+  exp = NaN;
+  test.identical( got, exp );
+
+  test.case = 'invoke with wrong package name';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm://unknownPackageName' } );
+  exp = NaN;
+  test.identical( got, exp );
+
+  test.case = 'invoke with wrong package name';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm:///unknownPackageName' } );
   exp = NaN;
   test.identical( got, exp );
 

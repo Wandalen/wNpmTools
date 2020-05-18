@@ -420,6 +420,7 @@ _readChangeWrite.defaults =
 
 function dependantsRertive( o )
 {
+  const self = this;
   const https = require( 'https' );
 
   _.routineOptions( dependantsRertive, o );
@@ -429,7 +430,17 @@ function dependantsRertive( o )
 
   let ready = new _.Consequence();
 
-  const url = `https://www.npmjs.com/package/${o.remotePath}`;
+  let packageName;
+
+  if( !o.remotePath.includes( '/' ) )
+  packageName = o.remotePath;
+  else
+  {
+    let parsed = self.pathParse( o.remotePath );
+    packageName = parsed.remoteVcsPath;
+  }
+
+  const url = `https://www.npmjs.com/package/${packageName}`;
 
   https.get( url, ( res ) =>
   {
