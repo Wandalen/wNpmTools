@@ -433,7 +433,9 @@ function dependantsRertive( o )
   let packageName;
 
   if( !o.remotePath.includes( '/' ) )
-  packageName = o.remotePath;
+  {
+    packageName = o.remotePath;
+  }
   else
   {
     let parsed = self.pathParse( o.remotePath );
