@@ -539,19 +539,25 @@ hasRemote.timeOut = 60000;
 async function dependantsRertive( test )
 {
   test.case = 'receive correct dependants number';
-  let got = await _.npm.dependantsRertive( 'wTools' );
-  let exp = 119;
+  let got = await _.npm.dependantsRertive( 'wTesting' );
+  let exp = 1;
   test.identical( got, exp );
 
   test.case = 'receive correct dependants number';
-  got = await _.npm.dependantsRertive( 'wTesting' );
-  exp = 1;
+  got = await _.npm.dependantsRertive( 'wtest' );
+  exp = 0;
   test.identical( got, exp );
 
-  test.case = 'return "-" as a dependants number if wrong package name';
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( 'request' );
+  exp = isNaN( got );
+  test.identical( false, exp );
+
+  test.case = 'invoke with wrong package name';
   got = await _.npm.dependantsRertive( 'unknownPackageName' );
   exp = '-';
   test.identical( got, exp );
+
 }
 
 dependantsRertive.description =
