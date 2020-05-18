@@ -449,7 +449,7 @@ function dependantsRertive( npmPackageName )
 
       if ( !strWithDep )
       {
-        ready.take( '-' );
+        ready.take( NaN );
         return;
       }
 
