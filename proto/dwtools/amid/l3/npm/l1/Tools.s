@@ -423,34 +423,46 @@ function dependantsRertive( npmPackageName )
   const https = require( 'https' );
   const url = `https://www.npmjs.com/package/${npmPackageName}`;
 
-  return new Promise( ( resoleve, reject ) =>
+  let ready = new _.Consequence();
+
+  https.get( url, ( res ) =>
   {
-    https.get( url, ( res ) =>
+    res.setEncoding( 'utf8' );
+    let html = '';
+
+    res.on( 'error', ( err ) => {
+      console.log( err );
+      ready.take( '-' );
+    } );
+
+    res.on( 'data', ( data ) =>
     {
-      res.setEncoding( 'utf8' );
-      let html = '';
+      html += data;
+    } );
 
-      res.on( 'error', ( err ) => reject( err ) );
+    res.on( 'end', () =>
+    {
+      let dependants = '';
+      const strWithDep = html.match( /[1-9]*,?[1-9]*<\/span>Dependents/ );
 
-      res.on( 'data', ( data ) =>
+      if ( !strWithDep )
       {
-        html += data;
-      } );
+        ready.take( '-' );
+        return;
+      }
 
-      res.on( 'end', () =>
-      {
-        let dependants = '';
-        const idx = html.match( /[1-9]*,?[1-9]*<\/span>Dependents/ ).index;
+      const idx = strWithDep.index;
 
-        for ( let i = idx; html[ i ] !== '<'; i++ )
-        dependants += html[ i ];
+      for ( let i = idx; html[ i ] !== '<'; i++ )
+      dependants += html[ i ];
 
-        resoleve( Number( dependants.split( ',' ).join( '' ) ) );
-      } );
-    } )
-
+      ready.take( Number( dependants.split( ',' ).join( '' ) ) );
+    } );
   } )
+
+  return ready;
 }
+dependantsRertive( 'unknownPackageName' )
 
 // --
 // path
