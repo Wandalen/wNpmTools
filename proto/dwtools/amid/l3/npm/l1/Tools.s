@@ -463,6 +463,12 @@ function dependantsRertive( o )
     } );
   } )
 
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
   return ready;
 }
 dependantsRertive.defaults =
