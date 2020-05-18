@@ -418,15 +418,16 @@ _readChangeWrite.defaults =
 
 //
 
-function dependantsRertive( npmPackageName )
+function dependantsRertive( o )
 {
   const https = require( 'https' );
 
+  _.routineOptions( dependantsRertive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( typeof arguments[ 0 ] === 'string', 'Expects string as a package name' );
-  _.assert( arguments[ 0 ].length !== 0, 'Expects not empty string as a package name' );
+  _.assert( typeof arguments[ 0 ][ 'npmPackageName' ] === 'string', 'Expects string as a package name' );
+  _.assert( arguments[ 0 ][ 'npmPackageName' ].length !== 0, 'Expects not empty string as a package name' );
 
-  const url = `https://www.npmjs.com/package/${npmPackageName}`;
+  const url = `'https://www.npmjs.com/package'/${o.npmPackageName}`;
 
   let ready = new _.Consequence();
 
@@ -467,7 +468,8 @@ function dependantsRertive( npmPackageName )
 dependantsRertive.defaults =
 {
   sync : 0,
-  remotePath : null
+  remotePath : null,
+  npmPackageName : 'nonexistent package name'
 }
 
 // --

@@ -539,22 +539,22 @@ hasRemote.timeOut = 60000;
 async function dependantsRertive( test )
 {
   test.case = 'receive correct dependants number';
-  let got = await _.npm.dependantsRertive( 'wTesting' );
+  let got = await _.npm.dependantsRertive( { npmPackageName : 'wTesting' } );
   let exp = 1;
   test.identical( got, exp );
 
   test.case = 'receive correct dependants number';
-  got = await _.npm.dependantsRertive( 'wtest' );
+  got = await _.npm.dependantsRertive( { npmPackageName : 'wtest' } );
   exp = 0;
   test.identical( got, exp );
 
   test.case = 'if number of dependants is more than one thousand';
-  got = await _.npm.dependantsRertive( 'express' );
+  got = await _.npm.dependantsRertive( { npmPackageName : 'express' } );
   test.is( _.numberIs( got ) );
   test.gt( got, 10000 );
 
   test.case = 'invoke with wrong package name';
-  got = await _.npm.dependantsRertive( 'unknownPackageName' );
+  got = await _.npm.dependantsRertive( { npmPackageName : 'unknownPackageName' } );
   exp = NaN;
   test.identical( got, exp );
 
