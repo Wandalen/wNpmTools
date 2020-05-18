@@ -435,7 +435,6 @@ isRepository.timeOut = 20000;
 
 //
 
-
 function hasRemote( test )
 {
   let self = this;
@@ -535,6 +534,37 @@ function hasRemote( test )
 
 hasRemote.timeOut = 60000;
 
+//
+
+async function dependantsRertive( test )
+{
+  test.case = 'receive correct dependants number';
+  let got = await _.npm.dependantsRertive( 'wTesting' );
+  let exp = 1;
+  test.identical( got, exp );
+
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( 'wtest' );
+  exp = 0;
+  test.identical( got, exp );
+
+  test.case = 'if number of dependants is more than one thousand';
+  got = await _.npm.dependantsRertive( 'express' );
+  test.is( _.numberIs( got ) );
+  test.gt( got, 999 );
+
+  test.case = 'invoke with wrong package name';
+  got = await _.npm.dependantsRertive( 'unknownPackageName' );
+  exp = NaN;
+  test.identical( got, exp );
+
+}
+
+dependantsRertive.description =
+`
+should retrieve number of package dependants
+`
+
 // --
 // declare
 // --
@@ -544,6 +574,7 @@ var Proto =
 
   name : 'Tools.mid.NpmTools',
   silencing : 1,
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,
@@ -569,6 +600,8 @@ var Proto =
     isUpToDate,
     isRepository,
     hasRemote,
+
+    dependantsRertive,
 
   },
 
