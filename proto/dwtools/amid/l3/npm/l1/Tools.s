@@ -418,17 +418,31 @@ _readChangeWrite.defaults =
 
 //
 
-function dependantsRertive( npmPackageName )
+function dependantsRertive( o )
 {
+  const self = this;
   const https = require( 'https' );
 
+  _.routineOptions( dependantsRertive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( typeof arguments[ 0 ] === 'string', 'Expects string as a package name' );
-  _.assert( arguments[ 0 ].length !== 0, 'Expects not empty string as a package name' );
-
-  const url = `https://www.npmjs.com/package/${npmPackageName}`;
+  _.assert( typeof arguments[ 0 ][ 'remotePath' ] === 'string', 'Expects string as a package name' );
+  _.assert( arguments[ 0 ][ 'remotePath' ].length !== 0, 'Expects not empty string as a package name' );
 
   let ready = new _.Consequence();
+
+  let packageName;
+
+  if( !o.remotePath.includes( '/' ) )
+  {
+    packageName = o.remotePath;
+  }
+  else
+  {
+    let parsed = self.pathParse( o.remotePath );
+    packageName = parsed.remoteVcsPath;
+  }
+
+  const url = `https://www.npmjs.com/package/${packageName}`;
 
   https.get( url, ( res ) =>
   {
@@ -447,7 +461,7 @@ function dependantsRertive( npmPackageName )
       let dependants = '';
       const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
-      if ( !strWithDep )
+      if( !strWithDep )
       {
         ready.take( NaN );
         return;
@@ -455,14 +469,25 @@ function dependantsRertive( npmPackageName )
 
       const idx = strWithDep.index;
 
-      for ( let i = idx; html[ i ] !== '<'; i++ )
+      for( let i = idx; html[ i ] !== '<'; i++ )
       dependants += html[ i ];
 
       ready.take( Number( dependants.split( ',' ).join( '' ) ) );
     } );
   } )
 
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
   return ready;
+}
+dependantsRertive.defaults =
+{
+  sync : 0,
+  remotePath : null
 }
 
 // --
