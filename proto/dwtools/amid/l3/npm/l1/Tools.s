@@ -420,9 +420,49 @@ _readChangeWrite.defaults =
 
 function dependantsRertive( npmPackageName )
 {
-  let dependants = 0;
+  const https = require( 'https' );
 
-  return dependants;
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( typeof arguments[ 0 ] === 'string', 'Expects string as a package name' );
+  _.assert( arguments[ 0 ].length !== 0, 'Expects not empty string as a package name' );
+
+  const url = `https://www.npmjs.com/package/${npmPackageName}`;
+
+  let ready = new _.Consequence();
+
+  https.get( url, ( res ) =>
+  {
+    res.setEncoding( 'utf8' );
+    let html = '';
+
+    res.on( 'error', ( err ) => err );
+
+    res.on( 'data', ( data ) =>
+    {
+      html += data;
+    } );
+
+    res.on( 'end', () =>
+    {
+      let dependants = '';
+      const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+
+      if ( !strWithDep )
+      {
+        ready.take( NaN );
+        return;
+      }
+
+      const idx = strWithDep.index;
+
+      for ( let i = idx; html[ i ] !== '<'; i++ )
+      dependants += html[ i ];
+
+      ready.take( Number( dependants.split( ',' ).join( '' ) ) );
+    } );
+  } )
+
+  return ready;
 }
 
 // --
@@ -506,16 +546,13 @@ function pathParse( remotePath )
   return result
 
 /*
-
   remotePath : 'npm:///wColor/out/wColor#0.3.100'
-
   protocol : 'npm',
   hash : '0.3.100',
   longPath : '/wColor/out/wColor',
   localVcsPath : 'out/wColor',
   remoteVcsPath : 'wColor',
   remoteVcsLongerPath : 'wColor@0.3.100'
-
 */
 
   /* */

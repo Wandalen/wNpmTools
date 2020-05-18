@@ -536,24 +536,33 @@ hasRemote.timeOut = 60000;
 
 //
 
-function dependantsRertive( test )
+async function dependantsRertive( test )
 {
-
-  test.case = 'does not exist';
-  var got = _.npm.dependantsRertive( 'somethingasdnasjfasjdfsld' );
-  var exp = 0;
+  test.case = 'receive correct dependants number';
+  let got = await _.npm.dependantsRertive( 'wTesting' );
+  let exp = 1;
   test.identical( got, exp );
 
-  test.case = 'wmodulefortesting12ab - 0 dependants';
-  var got = _.npm.dependantsRertive( 'wmodulefortesting12ab' );
-  var exp = 0;
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( 'wtest' );
+  exp = 0;
+  test.identical( got, exp );
+
+  test.case = 'if number of dependants is more than one thousand';
+  got = await _.npm.dependantsRertive( 'express' );
+  test.is( _.numberIs( got ) );
+  test.gt( got, 999 );
+
+  test.case = 'invoke with wrong package name';
+  got = await _.npm.dependantsRertive( 'unknownPackageName' );
+  exp = NaN;
   test.identical( got, exp );
 
 }
 
 dependantsRertive.description =
 `
-should ...
+should retrieve number of package dependants
 `
 
 // --
