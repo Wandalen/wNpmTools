@@ -626,6 +626,17 @@ dependantsRertive.description =
 Retrieves the number of dependent packages
 `
 
+//
+async function retrieveDependantsWithArr( test )
+{
+  
+}
+
+retrieveDependantsWithArr.description =
+`
+Retrieves dependants of each package in array
+`
+
 // --
 // declare
 // --
