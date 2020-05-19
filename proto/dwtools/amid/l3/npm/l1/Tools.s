@@ -432,14 +432,14 @@ function dependantsRertive( o )
 
   let packageName;
 
-  if( !o.remotePath.includes( '/' ) )
+  if( _.uri.isGlobal( o.remotePath ) )
   {
-    packageName = o.remotePath;
+    let parsed = self.pathParse( o.remotePath );
+    packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
   }
   else
   {
-    let parsed = self.pathParse( o.remotePath );
-    packageName = parsed.remoteVcsPath;
+    packageName = o.remotePath;
   }
 
   const url = `https://www.npmjs.com/package/${packageName}`;

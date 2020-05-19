@@ -568,6 +568,18 @@ async function dependantsRertive( test )
   exp = 0;
   test.identical( got, exp );
 
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : '@tensorflow/tfjs' } );
+  test.gt( got, 100 );
+
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm://@tensorflow/tfjs' } );
+  test.gt( got, 100 );
+
+  test.case = 'receive correct dependants number';
+  got = await _.npm.dependantsRertive( { remotePath : 'npm:///@tensorflow/tfjs' } );
+  test.gt( got, 100 );
+
   test.case = 'if number of dependants is more than one thousand';
   got = await _.npm.dependantsRertive( { remotePath : 'express' } );
   test.is( _.numberIs( got ) );
