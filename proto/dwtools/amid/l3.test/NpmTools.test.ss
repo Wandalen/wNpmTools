@@ -539,7 +539,6 @@ hasRemote.timeOut = 60000;
 async function dependantsRertive( test )
 {
   test.open('0 dependants');
-
     test.case = 'local relative';
     let got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting12ab' } );
     let exp = 0;
@@ -554,11 +553,9 @@ async function dependantsRertive( test )
     got = await _.npm.dependantsRertive( { remotePath : 'npm:///wmodulefortesting12ab' } );
     exp = 0;
     test.identical( got, exp );
-
   test.close('0 dependants');
 
   test.open('not 0 dependants');
-
     test.case = 'local relative';
     got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting1a' } );
     exp = 1;
@@ -573,11 +570,9 @@ async function dependantsRertive( test )
     got = await _.npm.dependantsRertive( { remotePath : 'npm:///wmodulefortesting1a' } );
     exp = 1;
     test.identical( got, exp );
-
   test.close('not 0 dependants');
 
   test.open('pakage name has "/"');
-
     test.case = 'local relative';
     got = await _.npm.dependantsRertive( { remotePath : '@tensorflow/tfjs' } );
     test.gt( got, 100 );
@@ -589,11 +584,9 @@ async function dependantsRertive( test )
     test.case = 'global absolute';
     got = await _.npm.dependantsRertive( { remotePath : 'npm:///@tensorflow/tfjs' } );
     test.gt( got, 100 );
-
   test.close('pakage name has "/"');
 
   test.open('dependants > 999');
-
     test.case = 'local relative';
     got = await _.npm.dependantsRertive( { remotePath : 'express' } );
     test.is( _.numberIs( got ) );
@@ -608,11 +601,9 @@ async function dependantsRertive( test )
     got = await _.npm.dependantsRertive( { remotePath : 'npm:///express' } );
     test.is( _.numberIs( got ) );
     test.gt( got, 10000 );
-
   test.close('dependants > 999');
 
   test.open('nonexistent package name');
-
     test.case = 'local relative';
     got = await _.npm.dependantsRertive( { remotePath : 'nonexistentPackageName' } );
     exp = NaN;
@@ -627,7 +618,6 @@ async function dependantsRertive( test )
     got = await _.npm.dependantsRertive( { remotePath : 'npm:///nonexistentPackageName' } );
     exp = NaN;
     test.identical( got, exp );
-
   test.close('nonexistent package name');
 }
 
