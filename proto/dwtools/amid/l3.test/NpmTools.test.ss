@@ -630,7 +630,23 @@ Retrieves the number of dependent packages
 
 async function dependantsRetrieveMultipleRequests( test )
 {
-  
+  const packages = [
+    '@tensorflow/tfjs', 'vectorious', 'vectorious-plus', 'blasjs', 'nlapack',
+    'nblas-plus', 'eigenjs', 'node-julia', '@stdlib/stdlib', 'node-hperformance',
+    'cwise', 'gl-matrix', 'mathjs', 'lalg', 'eigen', 'compute-cosine-similarity',
+    'compute.io', 'lalgebra', 'nblas', 'linear-algebra', 'numjs',
+    'numbers', 'dstructs-matrix', 'math2d', 'matrix', 'ubique',
+    'vec-la', 'vec-la-fp', 'lapack', 'nd4js', 't-matrix',
+    'ndarray-linear-solve', 'add', 'ndarray', 'qminer', 'nclblast',
+    '@yaffle/expression', 'algebrite', 'mathjs', 'solve-tridiagonal',
+    'solve-periodic-tridiagonal', 'theorem.js', 'algebra.js', 'nsolvejs', 
+    'metadelta', 'coffeequate', 'nerdamer', 'solve-banded', 'tdma'
+  ];
+
+  test.case = 'local relative';
+  let got = await _.npm.dependantsRetrieve( { remotePath : packages } );
+  // let exp = 0;
+  // test.identical( got, exp );
 }
 
 dependantsRetrieveMultipleRequests.description =
