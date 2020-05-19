@@ -538,74 +538,74 @@ hasRemote.timeOut = 60000;
 
 async function dependantsRertive( test )
 {
-  test.case = 'returns correct dependants number';
+  test.case = 'relative package path';
   let got = await _.npm.dependantsRertive( { remotePath : 'wTesting' } );
   let exp = 1;
   test.identical( got, exp );
 
-  test.case = 'returns correct dependants number';
+  test.case = 'absolute package path';
   got = await _.npm.dependantsRertive( { remotePath : 'npm://wTesting' } );
   exp = 1;
   test.identical( got, exp );
 
-  test.case = 'returns correct dependants number';
+  test.case = 'absolute package path';
   got = await _.npm.dependantsRertive( { remotePath : 'npm:///wTesting' } );
   exp = 1;
   test.identical( got, exp );
 
-  test.case = 'returns correct dependants number';
+  test.case = 'relative package path';
   got = await _.npm.dependantsRertive( { remotePath : 'wtest' } );
   exp = 0;
   test.identical( got, exp );
 
-  test.case = 'returns correct dependants number';
+  test.case = 'absolute package path';
   got = await _.npm.dependantsRertive( { remotePath : 'npm://wtest' } );
   exp = 0;
   test.identical( got, exp );
 
-  test.case = 'returns correct dependants number';
+  test.case = 'absolute package path';
   got = await _.npm.dependantsRertive( { remotePath : 'npm:///wtest' } );
   exp = 0;
   test.identical( got, exp );
 
-  test.case = 'returns correct dependants number if package name contains "/"';
+  test.case = 'relative package path with "/"';
   got = await _.npm.dependantsRertive( { remotePath : '@tensorflow/tfjs' } );
   test.gt( got, 100 );
 
-  test.case = 'returns correct dependants number if package name contains "/"';
+  test.case = 'absolute package path with "/"';
   got = await _.npm.dependantsRertive( { remotePath : 'npm://@tensorflow/tfjs' } );
   test.gt( got, 100 );
 
-  test.case = 'returns correct dependants number if package name contains "/"';
+  test.case = 'absolute package path with "/"';
   got = await _.npm.dependantsRertive( { remotePath : 'npm:///@tensorflow/tfjs' } );
   test.gt( got, 100 );
 
-  test.case = 'returns correct dependants number if there are more than one thousand';
+  test.case = 'relative package path, dependants number > 999';
   got = await _.npm.dependantsRertive( { remotePath : 'express' } );
   test.is( _.numberIs( got ) );
   test.gt( got, 10000 );
 
-  test.case = 'returns correct dependants number if there are more than one thousand';
+  test.case = 'absolute package path, dependants number > 999';
   got = await _.npm.dependantsRertive( { remotePath : 'npm://express' } );
   test.is( _.numberIs( got ) );
   test.gt( got, 10000 );
 
-  test.case = 'returns correct dependants number if there are more than one thousand';
+  test.case = 'absolute package path, dependants number > 999';
   got = await _.npm.dependantsRertive( { remotePath : 'npm:///express' } );
   test.is( _.numberIs( got ) );
   test.gt( got, 10000 );
 
-  test.case = 'invocation with wrong package name';
+  test.case = 'relative nonexistent package path';
   got = await _.npm.dependantsRertive( { remotePath : 'unknownPackageName' } );
   exp = NaN;
   test.identical( got, exp );
 
-  test.case = 'invocation with wrong package name';
+  test.case = 'absolute nonexistent package path';
   got = await _.npm.dependantsRertive( { remotePath : 'npm://unknownPackageName' } );
   exp = NaN;
   test.identical( got, exp );
 
-  test.case = 'invocation with wrong package name';
+  test.case = 'absolute nonexistent package path';
   got = await _.npm.dependantsRertive( { remotePath : 'npm:///unknownPackageName' } );
   exp = NaN;
   test.identical( got, exp );
