@@ -418,12 +418,12 @@ _readChangeWrite.defaults =
 
 //
 
-function dependantsRertive( o )
+function dependantsRetrieve( o )
 {
   const self = this;
   const https = require( 'https' );
 
-  _.routineOptions( dependantsRertive, o );
+  _.routineOptions( dependantsRetrieve, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( typeof arguments[ 0 ][ 'remotePath' ] === 'string', 'Expects string as a package name' );
   _.assert( arguments[ 0 ][ 'remotePath' ].length !== 0, 'Expects not empty string as a package name' );
@@ -484,7 +484,7 @@ function dependantsRertive( o )
 
   return ready;
 }
-dependantsRertive.defaults =
+dependantsRetrieve.defaults =
 {
   sync : 0,
   remotePath : null
@@ -1126,7 +1126,7 @@ let Extend =
 
   _readChangeWrite,
 
-  dependantsRertive,
+  dependantsRetrieve,
 
   // vcs
 
