@@ -538,20 +538,22 @@ hasRemote.timeOut = 60000;
 
 async function dependantsRertive( test )
 {
-  test.case = 'local relative';
-  let got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting12ab' } );
-  let exp = 0;
-  test.identical( got, exp );
+  test.open('0 dependants')
+    test.case = 'local relative';
+    let got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting12ab' } );
+    let exp = 0;
+    test.identical( got, exp );
 
-  test.case = 'global relative';
-  got = await _.npm.dependantsRertive( { remotePath : 'npm://wmodulefortesting12ab' } );
-  exp = 0;
-  test.identical( got, exp );
+    test.case = 'global relative';
+    got = await _.npm.dependantsRertive( { remotePath : 'npm://wmodulefortesting12ab' } );
+    exp = 0;
+    test.identical( got, exp );
 
-  test.case = 'global absolute';
-  got = await _.npm.dependantsRertive( { remotePath : 'npm:///wmodulefortesting12ab' } );
-  exp = 0;
-  test.identical( got, exp );
+    test.case = 'global absolute';
+    got = await _.npm.dependantsRertive( { remotePath : 'npm:///wmodulefortesting12ab' } );
+    exp = 0;
+    test.identical( got, exp );
+  test.close('0 dependants')
 
   test.case = 'local relative';
   got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting1a' } );
