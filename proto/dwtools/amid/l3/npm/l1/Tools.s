@@ -430,7 +430,7 @@ function dependantsRetrieve( o )
   function checkIfAllRequestEnded( numberOfRequests, answer )
   {
     counter += 1;
-    console.log( 'Data uploaded for packages: ', counter );
+    // console.log( 'Data uploaded for packages: ', counter );
     if( counter === numberOfRequests )
     {
       console.log( 'Data uploaded!' );
