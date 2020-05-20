@@ -716,7 +716,7 @@ Retrieves the number of dependent packages
 
 async function dependantsRetrieveMultipleRequests( test )
 {
-    let localRelative = [
+  let packages = [
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
@@ -729,36 +729,14 @@ async function dependantsRetrieveMultipleRequests( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-  ];
-
-  let globalRelative = [
-    'npm://wmodulefortesting1', 'npm://wmodulefortesting1a', 'npm://wmodulefortesting1b',
-    'npm://wmodulefortesting12', 'npm://wmodulefortesting12ab', 'npm://nonexistentPackageName',
-    'npm://wmodulefortesting1', 'npm://wmodulefortesting1a', 'npm://wmodulefortesting1b',
-    'npm://wmodulefortesting12', 'npm://wmodulefortesting12ab', 'npm://nonexistentPackageName',
-    'npm://wmodulefortesting1', 'npm://wmodulefortesting1a', 'npm://wmodulefortesting1b',
-    'npm://wmodulefortesting12', 'npm://wmodulefortesting12ab', 'npm://nonexistentPackageName',
-    'npm://wmodulefortesting1', 'npm://wmodulefortesting1a', 'npm://wmodulefortesting1b',
-    'npm://wmodulefortesting12', 'npm://wmodulefortesting12ab', 'npm://nonexistentPackageName',
-    'npm://wmodulefortesting1', 'npm://wmodulefortesting1a', 'npm://wmodulefortesting1b',
-    'npm://wmodulefortesting12', 'npm://wmodulefortesting12ab', 'npm://nonexistentPackageName',
-    'npm://wmodulefortesting1', 'npm://wmodulefortesting1a', 'npm://wmodulefortesting1b',
-    'npm://wmodulefortesting12', 'npm://wmodulefortesting12ab', 'npm://nonexistentPackageName',
-  ];
-
-  let globalAbsolute = [
-    'npm:///wmodulefortesting1', 'npm:///wmodulefortesting1a', 'npm:///wmodulefortesting1b',
-    'npm:///wmodulefortesting12', 'npm:///wmodulefortesting12ab', 'npm:///nonexistentPackageName',
-    'npm:///wmodulefortesting1', 'npm:///wmodulefortesting1a', 'npm:///wmodulefortesting1b',
-    'npm:///wmodulefortesting12', 'npm:///wmodulefortesting12ab', 'npm:///nonexistentPackageName',
-    'npm:///wmodulefortesting1', 'npm:///wmodulefortesting1a', 'npm:///wmodulefortesting1b',
-    'npm:///wmodulefortesting12', 'npm:///wmodulefortesting12ab', 'npm:///nonexistentPackageName',
-    'npm:///wmodulefortesting1', 'npm:///wmodulefortesting1a', 'npm:///wmodulefortesting1b',
-    'npm:///wmodulefortesting12', 'npm:///wmodulefortesting12ab', 'npm:///nonexistentPackageName',
-    'npm:///wmodulefortesting1', 'npm:///wmodulefortesting1a', 'npm:///wmodulefortesting1b',
-    'npm:///wmodulefortesting12', 'npm:///wmodulefortesting12ab', 'npm:///nonexistentPackageName',
-    'npm:///wmodulefortesting1', 'npm:///wmodulefortesting1a', 'npm:///wmodulefortesting1b',
-    'npm:///wmodulefortesting12', 'npm:///wmodulefortesting12ab', 'npm:///nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
 
   let dependants = [
@@ -768,41 +746,21 @@ async function dependantsRetrieveMultipleRequests( test )
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
   ];
 
-  test.open( 'string as a parameter' );
-    test.case = 'local relative';
-    let got = await _.npm.dependantsRetrieve( localRelative );
-    let exp = dependants;
-    test.identical( got, exp );
+  test.case = 'array as a parameter';
+  let got = await _.npm.dependantsRetrieve( packages );
+  let exp = dependants;
+  test.identical( got, exp );
 
-    test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( globalRelative );
-    exp = dependants;
-    test.identical( got, exp );
-
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( globalAbsolute );
-    exp = dependants;
-    test.identical( got, exp );
-  test.close( 'string as a parameter' );
-
-  test.open( 'object as a parameter' );
-    test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : localRelative } );
-    exp = dependants;
-    test.identical( got, exp );
-
-    test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : globalRelative } );
-    exp = dependants;
-    test.identical( got, exp );
-
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( { remotePath : globalAbsolute } );
-    exp = dependants;
-    test.identical( got, exp );
-  test.close( 'object as a parameter' );
+  test.case = 'object as a parameter';
+  got = await _.npm.dependantsRetrieve( { remotePath : packages } );
+  exp = dependants;
+  test.identical( got, exp );
 }
 
 dependantsRetrieveMultipleRequests.description =

@@ -424,35 +424,7 @@ function dependantsRetrieve( o )
   const https = require( 'https' );
 
   let ready = new _.Consequence();
-
   let counter = 0;
-
-  function checkIfAllRequestEnded( numberOfRequests, answer )
-  {
-    counter += 1;
-    // console.log( 'Data uploaded for packages: ', counter );
-    if( counter === numberOfRequests )
-    {
-      console.log( 'Data uploaded!' );
-      ready.take( answer );
-    }
-  }
-
-  function checkArrayElementsType( arr )
-  {
-    let result = true;
-
-    for( let i = 0; i < arr.length; i++ )
-    {
-      if( typeof arr[ i ] !== 'string' )
-      {
-        result = false;
-        break;
-      }
-    }
-
-    return result;
-  }
 
   if( o instanceof Array || ( o instanceof Object && o.remotePath instanceof Array ) )
   {
@@ -487,43 +459,78 @@ function dependantsRetrieve( o )
 
       let url = `https://www.npmjs.com/package/${packageName}`;
 
-      setTimeout( () =>
+      https.get( url, ( res ) =>
       {
-        https.get( url, ( res ) =>
+        res.setEncoding( 'utf8' );
+        let html = '';
+
+        res.on( 'error', ( err ) => err );
+
+        res.on( 'data', ( data ) =>
         {
-          res.setEncoding( 'utf8' );
-          let html = '';
+          html += data;
+        } );
 
-          res.on( 'error', ( err ) => err );
+        res.on( 'end', () =>
+        {
+          let dependants = '';
+          const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
-          res.on( 'data', ( data ) =>
+          if( !strWithDep )
           {
-            html += data;
-          } );
-
-          res.on( 'end', () =>
-          {
-            let dependants = '';
-            const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
-
-            if( !strWithDep )
-            {
-              dependantsArr[ i ] = NaN;
-
-              checkIfAllRequestEnded( packages.length, dependantsArr );
-              return;
-            }
-
-            const idx = strWithDep.index;
-
-            for( let j = idx; html[ j ] !== '<'; j++ )
-            dependants += html[ j ];
-            dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
+            dependantsArr[ i ] = NaN;
 
             checkIfAllRequestEnded( packages.length, dependantsArr );
-          } );
-        } )
-      }, step )
+            return;
+          }
+
+          const idx = strWithDep.index;
+
+          for( let j = idx; html[ j ] !== '<'; j++ )
+          dependants += html[ j ];
+          dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
+
+          checkIfAllRequestEnded( packages.length, dependantsArr );
+        } );
+      } )
+
+      // setTimeout( () =>
+      // {
+      //   https.get( url, ( res ) =>
+      //   {
+      //     res.setEncoding( 'utf8' );
+      //     let html = '';
+
+      //     res.on( 'error', ( err ) => err );
+
+      //     res.on( 'data', ( data ) =>
+      //     {
+      //       html += data;
+      //     } );
+
+      //     res.on( 'end', () =>
+      //     {
+      //       let dependants = '';
+      //       const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+
+      //       if( !strWithDep )
+      //       {
+      //         dependantsArr[ i ] = NaN;
+
+      //         checkIfAllRequestEnded( packages.length, dependantsArr );
+      //         return;
+      //       }
+
+      //       const idx = strWithDep.index;
+
+      //       for( let j = idx; html[ j ] !== '<'; j++ )
+      //       dependants += html[ j ];
+      //       dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
+
+      //       checkIfAllRequestEnded( packages.length, dependantsArr );
+      //     } );
+      //   } )
+      // }, step )
     }
   }
   else
@@ -581,6 +588,33 @@ function dependantsRetrieve( o )
         ready.take( Number( dependants.split( ',' ).join( '' ) ) );
       } );
     } )
+  }
+
+  function checkIfAllRequestEnded( numberOfRequests, answer )
+  {
+    counter += 1;
+    // console.log( 'Data uploaded for packages: ', counter );
+    if( counter === numberOfRequests )
+    {
+      console.log( 'Data uploaded!' );
+      ready.take( answer );
+    }
+  }
+
+  function checkArrayElementsType( arr )
+  {
+    let result = true;
+
+    for( let i = 0; i < arr.length; i++ )
+    {
+      if( typeof arr[ i ] !== 'string' )
+      {
+        result = false;
+        break;
+      }
+    }
+
+    return result;
   }
 
   if( o.sync )
