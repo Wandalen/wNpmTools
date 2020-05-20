@@ -716,23 +716,55 @@ Retrieves the number of dependent packages
 
 async function dependantsRetrieveMultipleRequests( test )
 {
-  const packages = [
-    '@tensorflow/tfjs', 'vectorious', 'vectorious-plus', 'blasjs', 'nlapack',
-    'nblas-plus', 'eigenjs', 'node-julia', '@stdlib/stdlib', 'node-hperformance',
-    'cwise', 'gl-matrix', 'mathjs', 'lalg', 'eigen', 'compute-cosine-similarity',
-    'compute.io', 'lalgebra', 'nblas', 'linear-algebra', 'numjs',
-    'numbers', 'dstructs-matrix', 'math2d', 'matrix', 'ubique',
-    'vec-la', 'vec-la-fp', 'lapack', 'nd4js', 't-matrix',
-    'ndarray-linear-solve', 'add', 'ndarray', 'qminer', 'nclblast',
-    '@yaffle/expression', 'algebrite', 'mathjs', 'solve-tridiagonal',
-    'solve-periodic-tridiagonal', 'theorem.js', 'algebra.js', 'nsolvejs', 
-    'metadelta', 'coffeequate', 'nerdamer', 'solve-banded', 'tdma'
+  // const packages = [
+  //   '@tensorflow/tfjs', 'vectorious', 'vectorious-plus', 'blasjs', 'nlapack',
+  //   'nblas-plus', 'eigenjs', 'node-julia', '@stdlib/stdlib', 'node-hperformance',
+  //   'cwise', 'gl-matrix', 'mathjs', 'lalg', 'eigen', 'compute-cosine-similarity',
+  //   'compute.io', 'lalgebra', 'nblas', 'linear-algebra', 'numjs',
+  //   'numbers', 'dstructs-matrix', 'math2d', 'matrix', 'ubique',
+  //   'vec-la', 'vec-la-fp', 'lapack', 'nd4js', 't-matrix',
+  //   'ndarray-linear-solve', 'add', 'ndarray', 'qminer', 'nclblast',
+  //   '@yaffle/expression', 'algebrite', 'mathjs', 'solve-tridiagonal',
+  //   'solve-periodic-tridiagonal', 'theorem.js', 'algebra.js', 'nsolvejs',
+  //   'metadelta', 'coffeequate', 'nerdamer', 'solve-banded', 'tdma'
+  // ];
+
+  let packages = [
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
 
-  test.case = 'local relative';
-  let got = await _.npm.dependantsRetrieve( { remotePath : packages } );
-  // let exp = 0;
-  // test.identical( got, exp );
+  let dependants = [
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+  ];
+
+  test.open( 'string as a package name' );
+    test.case = 'local relative';
+    let got = await _.npm.dependantsRetrieve( packages );
+    let exp = dependants;
+    test.identical( got, exp );
+  test.close( 'string as a package name' );
 }
 
 dependantsRetrieveMultipleRequests.description =
