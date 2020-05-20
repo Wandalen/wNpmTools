@@ -759,12 +759,19 @@ async function dependantsRetrieveMultipleRequests( test )
     4, 1, 1, 1, 0, NaN,
   ];
 
-  test.open( 'string as a package name' );
+  test.open( 'string as a parameter' );
     test.case = 'local relative';
     let got = await _.npm.dependantsRetrieve( packages );
     let exp = dependants;
     test.identical( got, exp );
-  test.close( 'string as a package name' );
+  test.close( 'string as a parameter' );
+
+  test.open( 'object as a parameter' );
+    test.case = 'local relative';
+    got = await _.npm.dependantsRetrieve( { remotePath : packages } );
+    exp = dependants;
+    test.identical( got, exp );
+  test.close( 'object as a parameter' );
 }
 
 dependantsRetrieveMultipleRequests.description =
