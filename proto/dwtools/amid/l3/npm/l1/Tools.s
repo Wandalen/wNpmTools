@@ -423,58 +423,71 @@ function dependantsRetrieve( o )
   const self = this;
   const https = require( 'https' );
 
-  _.routineOptions( dependantsRetrieve, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( typeof arguments[ 0 ][ 'remotePath' ] === 'string', 'Expects string as a package name' );
-  _.assert( arguments[ 0 ][ 'remotePath' ].length !== 0, 'Expects not empty string as a package name' );
-
   let ready = new _.Consequence();
 
-  let packageName;
-
-  if( _.uri.isGlobal( o.remotePath ) )
+  if( o instanceof Array )
   {
-    let parsed = self.pathParse( o.remotePath );
-    packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
+    
   }
   else
   {
-    packageName = o.remotePath;
-  }
-
-  const url = `https://www.npmjs.com/package/${packageName}`;
-
-  https.get( url, ( res ) =>
-  {
-    res.setEncoding( 'utf8' );
-    let html = '';
-
-    res.on( 'error', ( err ) => err );
-
-    res.on( 'data', ( data ) =>
+    if( !( o instanceof Object ) )
     {
-      html += data;
-    } );
+      o = { remotePath : o };
+      arguments[ 0 ] = o;
+    }
 
-    res.on( 'end', () =>
+    _.routineOptions( dependantsRetrieve, o );
+    _.assert( arguments.length === 1, 'Expects single argument' );
+    _.assert( typeof arguments[ 0 ][ 'remotePath' ] === 'string', 'Expects string as a package name' );
+    _.assert( arguments[ 0 ][ 'remotePath' ].length !== 0, 'Expects not empty string as a package name' );
+
+    let packageName;
+
+    if( _.uri.isGlobal( o.remotePath ) )
     {
-      let dependants = '';
-      const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+      let parsed = self.pathParse( o.remotePath );
+      packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
+    }
+    else
+    {
+      packageName = o.remotePath;
+    }
 
-      if( !strWithDep )
+    const url = `https://www.npmjs.com/package/${packageName}`;
+
+    https.get( url, ( res ) =>
+    {
+      res.setEncoding( 'utf8' );
+      let html = '';
+
+      res.on( 'error', ( err ) => err );
+
+      res.on( 'data', ( data ) =>
       {
-        ready.take( NaN );
-        return;
-      }
+        html += data;
+      } );
 
-      const idx = strWithDep.index;
+      res.on( 'end', () =>
+      {
+        let dependants = '';
+        const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
-      for( let i = idx; html[ i ] !== '<'; i++ )
-      dependants += html[ i ];
+        if( !strWithDep )
+        {
+          ready.take( NaN );
+          return;
+        }
 
-      ready.take( Number( dependants.split( ',' ).join( '' ) ) );
-    } );
-  } )
+        const idx = strWithDep.index;
+
+        for( let i = idx; html[ i ] !== '<'; i++ )
+        dependants += html[ i ];
+
+        ready.take( Number( dependants.split( ',' ).join( '' ) ) );
+      } );
+    } )
+  }
 
   if( o.sync )
   {
