@@ -747,6 +747,29 @@ async function dependantsRetrieveMultipleRequests( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
 
+  let wrongNames = [
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+  ]
+
   let dependants = [
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
@@ -760,12 +783,29 @@ async function dependantsRetrieveMultipleRequests( test )
     4, 1, 1, 1, 0, NaN,
   ];
 
+  let wrongNamesResult = [
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+  ];
+
   try
   {
-    test.case = 'array as a parameter';
-    let got = await _.npm.dependantsRetrieve( packages );
-    let exp = dependants;
+    test.case = 'wrong names';
+    let got = await _.npm.dependantsRetrieve( wrongNames );
+    let exp = wrongNamesResult;
     test.identical( got, exp );
+    // test.case = 'array as a parameter';
+    // let got = await _.npm.dependantsRetrieve( packages );
+    // let exp = dependants;
+    // test.identical( got, exp );
 
     // test.case = 'object as a parameter';
     // got = await _.npm.dependantsRetrieve( { remotePath : packages } );

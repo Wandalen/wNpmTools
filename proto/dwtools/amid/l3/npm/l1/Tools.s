@@ -438,15 +438,13 @@ function dependantsRetrieve( o )
     _.assert( checkArrayElementsType( arguments[ 0 ][ 'remotePath' ] ), 'Expects only strings in array' );
 
     const dependantsArr = [];
-    let step = 0;
     const packages = o.remotePath;
 
-    console.log( 'Loading data, wait...' );
+    console.log( 'Loading data, wait... Total requests: ' + packages.length );
 
     for( let i = 0; i < packages.length; i++ )
     {
       let packageName;
-      step += 200;
 
       if( _.uri.isGlobal( packages[ i ] ) )
       {
@@ -458,9 +456,7 @@ function dependantsRetrieve( o )
         packageName = packages[ i ];
       }
 
-      url += packageName;
-      console.log( 'making request: ', i );
-      https.get( url, ( res ) =>
+      https.get( url + packageName, ( res ) =>
       {
         res.setEncoding( 'utf8' );
         let html = '';
@@ -472,7 +468,6 @@ function dependantsRetrieve( o )
 
         res.on( 'end', () =>
         {
-          console.log( 'Data uploaded for request: ', counter );
           let dependants = '';
           const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
@@ -488,6 +483,7 @@ function dependantsRetrieve( o )
 
           for( let j = idx; html[ j ] !== '<'; j++ )
           dependants += html[ j ];
+
           dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
 
           checkIfAllRequestEnded( packages.length, dependantsArr );
@@ -496,44 +492,6 @@ function dependantsRetrieve( o )
       {
         ready.error( err );
       } );
-
-      // setTimeout( () =>
-      // {
-      //   https.get( url, ( res ) =>
-      //   {
-      //     res.setEncoding( 'utf8' );
-      //     let html = '';
-
-      //     res.on( 'error', ( err ) => err );
-
-      //     res.on( 'data', ( data ) =>
-      //     {
-      //       html += data;
-      //     } );
-
-      //     res.on( 'end', () =>
-      //     {
-      //       let dependants = '';
-      //       const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
-
-      //       if( !strWithDep )
-      //       {
-      //         dependantsArr[ i ] = NaN;
-
-      //         checkIfAllRequestEnded( packages.length, dependantsArr );
-      //         return;
-      //       }
-
-      //       const idx = strWithDep.index;
-
-      //       for( let j = idx; html[ j ] !== '<'; j++ )
-      //       dependants += html[ j ];
-      //       dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
-
-      //       checkIfAllRequestEnded( packages.length, dependantsArr );
-      //     } );
-      //   } )
-      // }, step )
     }
   }
   else
@@ -558,9 +516,7 @@ function dependantsRetrieve( o )
       packageName = o.remotePath;
     }
 
-    url += packageName;
-
-    https.get( url, ( res ) =>
+    https.get( url + packageName, ( res ) =>
     {
       res.setEncoding( 'utf8' );
       let html = '';
@@ -597,6 +553,7 @@ function dependantsRetrieve( o )
   function checkIfAllRequestEnded( numberOfRequests, answer )
   {
     counter += 1;
+    console.log( 'Data uploaded for request: ', counter );
     if( counter === numberOfRequests )
     {
       console.log( 'Data uploaded!' );
