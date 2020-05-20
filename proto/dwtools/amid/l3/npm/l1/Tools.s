@@ -425,6 +425,7 @@ function dependantsRetrieve( o )
 
   let ready = new _.Consequence();
   let counter = 0;
+  let url = 'https://www.npmjs.com/package/';
 
   if( o instanceof Array || ( o instanceof Object && o.remotePath instanceof Array ) )
   {
@@ -457,14 +458,12 @@ function dependantsRetrieve( o )
         packageName = packages[ i ];
       }
 
-      let url = `https://www.npmjs.com/package/${packageName}`;
-
+      url += packageName;
+      console.log( 'making request: ', i );
       https.get( url, ( res ) =>
       {
         res.setEncoding( 'utf8' );
         let html = '';
-
-        res.on( 'error', ( err ) => err );
 
         res.on( 'data', ( data ) =>
         {
@@ -473,6 +472,7 @@ function dependantsRetrieve( o )
 
         res.on( 'end', () =>
         {
+          console.log( 'Data uploaded for request: ', counter );
           let dependants = '';
           const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
@@ -492,7 +492,10 @@ function dependantsRetrieve( o )
 
           checkIfAllRequestEnded( packages.length, dependantsArr );
         } );
-      } )
+      } ).on( 'error', ( err ) =>
+      {
+        ready.error( err );
+      } );
 
       // setTimeout( () =>
       // {
@@ -555,14 +558,12 @@ function dependantsRetrieve( o )
       packageName = o.remotePath;
     }
 
-    const url = `https://www.npmjs.com/package/${packageName}`;
+    url += packageName;
 
     https.get( url, ( res ) =>
     {
       res.setEncoding( 'utf8' );
       let html = '';
-
-      res.on( 'error', ( err ) => err );
 
       res.on( 'data', ( data ) =>
       {
@@ -587,13 +588,15 @@ function dependantsRetrieve( o )
 
         ready.take( Number( dependants.split( ',' ).join( '' ) ) );
       } );
-    } )
+    } ).on( 'error', ( err ) =>
+    {
+      ready.error( err );
+    } );
   }
 
   function checkIfAllRequestEnded( numberOfRequests, answer )
   {
     counter += 1;
-    // console.log( 'Data uploaded for packages: ', counter );
     if( counter === numberOfRequests )
     {
       console.log( 'Data uploaded!' );
