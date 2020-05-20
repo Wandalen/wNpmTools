@@ -767,7 +767,7 @@ async function dependantsRetrieveMultipleRequests( test )
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
-    4, 1, 1, 1, 0, NaN
+    4, 1, 1, 1, 0, NaN,
   ];
 
   test.open( 'string as a parameter' );

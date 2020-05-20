@@ -430,7 +430,7 @@ function dependantsRetrieve( o )
   function checkIfAllRequestEnded( numberOfRequests, answer )
   {
     counter += 1;
-
+    console.log( 'Data uploaded for packages: ', counter );
     if( counter === numberOfRequests )
     {
       console.log( 'Data uploaded!' );
@@ -473,7 +473,7 @@ function dependantsRetrieve( o )
     for( let i = 0; i < packages.length; i++ )
     {
       let packageName;
-      step += 500;
+      step += 200;
 
       if( _.uri.isGlobal( packages[ i ] ) )
       {
