@@ -585,6 +585,7 @@ function dependantsRetrieve( o )
 
   return ready;
 }
+
 dependantsRetrieve.defaults =
 {
   sync : 0,
