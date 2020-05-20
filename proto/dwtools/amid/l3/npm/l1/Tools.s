@@ -425,16 +425,124 @@ function dependantsRetrieve( o )
 
   let ready = new _.Consequence();
 
-  if( o instanceof Array )
+  let counter = 0;
+
+  function checkIfAllRequestEnded( numberOfRequests, answer )
   {
-    
+    counter += 1;
+
+    if( counter === numberOfRequests )
+    ready.take( answer );
+  }
+
+  if( o instanceof Array || ( o instanceof Object && o.remotePath instanceof Array ) )
+  {
+    console.log( 'from true' );
+    if( o instanceof Array )
+    {
+      o = { remotePath : o };
+      arguments[ 0 ] = { remotePath : o };
+    }
+
+    const dependantsArr = [];
+    let step = 0;
+    const packages = o.remotePath;
+
+    for( let i = 0; i < packages.length; i++ )
+    {
+      let packageName;
+      step += 500;
+
+      if( _.uri.isGlobal( packages[ i ] ) )
+      {
+        let parsed = self.pathParse( packages[ i ] );
+        packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
+      }
+      else
+      {
+        packageName = packages[ i ];
+      }
+
+      let url = `https://www.npmjs.com/package/${packageName}`;
+
+      https.get( url, ( res ) =>
+      {
+        res.setEncoding( 'utf8' );
+        let html = '';
+
+        res.on( 'error', ( err ) => err );
+
+        res.on( 'data', ( data ) =>
+        {
+          html += data;
+        } );
+
+        res.on( 'end', () =>
+        {
+          let dependants = '';
+          const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+
+          if( !strWithDep )
+          {
+            dependantsArr[ i ] = NaN;
+            checkIfAllRequestEnded( packages.length, dependantsArr );
+            return;
+          }
+
+          const idx = strWithDep.index;
+
+          for( let j = idx; html[ j ] !== '<'; j++ )
+          dependants += html[ j ];
+
+          dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
+          checkIfAllRequestEnded( packages.length, dependantsArr );
+        } );
+      } )
+
+      setTimeout( () =>
+      {
+        https.get( url, ( res ) =>
+        {
+          res.setEncoding( 'utf8' );
+          let html = '';
+
+          res.on( 'error', ( err ) => err );
+
+          res.on( 'data', ( data ) =>
+          {
+            html += data;
+          } );
+
+          res.on( 'end', () =>
+          {
+            let dependants = '';
+            const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+
+            if( !strWithDep )
+            {
+              dependantsArr[ i ] = NaN;
+              checkIfAllRequestEnded( packages.length, dependantsArr );
+              return;
+            }
+
+            const idx = strWithDep.index;
+
+            for( let j = idx; html[ j ] !== '<'; j++ )
+            dependants += html[ j ];
+
+            dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
+            checkIfAllRequestEnded( packages.length, dependantsArr );
+          } );
+        } )
+      }, step )
+    }
   }
   else
   {
     if( !( o instanceof Object ) )
     {
+      arguments[ 0 ] = { remotePath : o };
       o = { remotePath : o };
-      arguments[ 0 ] = o;
     }
 
     _.routineOptions( dependantsRetrieve, o );
