@@ -536,105 +536,293 @@ hasRemote.timeOut = 60000;
 
 //
 
-async function dependantsRertive( test )
+async function dependantsRetrieve( test )
 {
-  test.open('0 dependants');
+  try
+  {
+    test.open( 'string as a parameter' );
 
-    test.case = 'local relative';
-    let got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting12ab' } );
-    let exp = 0;
-    test.identical( got, exp );
+      test.open( '0 dependants' );
+        test.case = 'local relative';
+        let got = await _.npm.dependantsRetrieve( 'wmodulefortesting12ab' );
+        let exp = 0;
+        test.identical( got, exp );
+    
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( 'npm://wmodulefortesting12ab' );
+        exp = 0;
+        test.identical( got, exp );
 
-    test.case = 'global relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm://wmodulefortesting12ab' } );
-    exp = 0;
-    test.identical( got, exp );
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( 'npm:///wmodulefortesting12ab' );
+        exp = 0;
+        test.identical( got, exp );
+      test.close( '0 dependants' );
 
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm:///wmodulefortesting12ab' } );
-    exp = 0;
-    test.identical( got, exp );
+      test.open( 'not 0 dependants' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( 'wmodulefortesting1a' );
+        exp = 1;
+        test.identical( got, exp );
 
-  test.close('0 dependants');
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( 'npm://wmodulefortesting1a' );
+        exp = 1;
+        test.identical( got, exp );
 
-  test.open('not 0 dependants');
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( 'npm:///wmodulefortesting1a' );
+        exp = 1;
+        test.identical( got, exp );
+      test.close( 'not 0 dependants' );
 
-    test.case = 'local relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'wmodulefortesting1a' } );
-    exp = 1;
-    test.identical( got, exp );
+      test.open( 'pakage name has "/"' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( '@tensorflow/tfjs' );
+        test.gt( got, 100 );
 
-    test.case = 'global relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm://wmodulefortesting1a' } );
-    exp = 1;
-    test.identical( got, exp );
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( 'npm://@tensorflow/tfjs' );
+        test.gt( got, 100 );
 
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm:///wmodulefortesting1a' } );
-    exp = 1;
-    test.identical( got, exp );
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( 'npm:///@tensorflow/tfjs' );
+        test.gt( got, 100 );
+      test.close( 'pakage name has "/"' );
 
-  test.close('not 0 dependants');
+      test.open( 'dependants > 999' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( 'express' );
+        test.is( _.numberIs( got ) );
+        test.gt( got, 10000 );
 
-  test.open('pakage name has "/"');
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( 'npm://express' );
+        test.is( _.numberIs( got ) );
+        test.gt( got, 10000 );
 
-    test.case = 'local relative';
-    got = await _.npm.dependantsRertive( { remotePath : '@tensorflow/tfjs' } );
-    test.gt( got, 100 );
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( 'npm:///express' );
+        test.is( _.numberIs( got ) );
+        test.gt( got, 10000 );
+      test.close( 'dependants > 999' );
 
-    test.case = 'global relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm://@tensorflow/tfjs' } );
-    test.gt( got, 100 );
+      test.open( 'nonexistent package name' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( 'nonexistentPackageName' );
+        exp = NaN;
+        test.identical( got, exp );
 
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm:///@tensorflow/tfjs' } );
-    test.gt( got, 100 );
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( 'npm://nonexistentPackageName' );
+        exp = NaN;
+        test.identical( got, exp );
 
-  test.close('pakage name has "/"');
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( 'npm:///nonexistentPackageName' );
+        exp = NaN;
+        test.identical( got, exp );
+      test.close( 'nonexistent package name' );
+    test.close( 'string as a parameter' );
 
-  test.open('dependants > 999');
+    test.open( 'object as a parameter' );
+      test.open( '0 dependants' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'wmodulefortesting12ab' } );
+        exp = 0;
+        test.identical( got, exp );
 
-    test.case = 'local relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'express' } );
-    test.is( _.numberIs( got ) );
-    test.gt( got, 10000 );
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm://wmodulefortesting12ab' } );
+        exp = 0;
+        test.identical( got, exp );
 
-    test.case = 'global relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm://express' } );
-    test.is( _.numberIs( got ) );
-    test.gt( got, 10000 );
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///wmodulefortesting12ab' } );
+        exp = 0;
+        test.identical( got, exp );
+      test.close( '0 dependants' );
 
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm:///express' } );
-    test.is( _.numberIs( got ) );
-    test.gt( got, 10000 );
+      test.open( 'not 0 dependants' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'wmodulefortesting1a' } );
+        exp = 1;
+        test.identical( got, exp );
 
-  test.close('dependants > 999');
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm://wmodulefortesting1a' } );
+        exp = 1;
+        test.identical( got, exp );
 
-  test.open('nonexistent package name');
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///wmodulefortesting1a' } );
+        exp = 1;
+        test.identical( got, exp );
+      test.close( 'not 0 dependants' );
 
-    test.case = 'local relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'nonexistentPackageName' } );
-    exp = NaN;
-    test.identical( got, exp );
+      test.open( 'pakage name has "/"' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : '@tensorflow/tfjs' } );
+        test.gt( got, 100 );
 
-    test.case = 'global relative';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm://nonexistentPackageName' } );
-    exp = NaN;
-    test.identical( got, exp );
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm://@tensorflow/tfjs' } );
+        test.gt( got, 100 );
 
-    test.case = 'global absolute';
-    got = await _.npm.dependantsRertive( { remotePath : 'npm:///nonexistentPackageName' } );
-    exp = NaN;
-    test.identical( got, exp );
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///@tensorflow/tfjs' } );
+        test.gt( got, 100 );
+      test.close( 'pakage name has "/"' );
 
-  test.close('nonexistent package name');
+      test.open( 'dependants > 999' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'express' } );
+        test.is( _.numberIs( got ) );
+        test.gt( got, 10000 );
+
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm://express' } );
+        test.is( _.numberIs( got ) );
+        test.gt( got, 10000 );
+
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///express' } );
+        test.is( _.numberIs( got ) );
+        test.gt( got, 10000 );
+      test.close( 'dependants > 999' );
+
+      test.open( 'nonexistent package name' );
+        test.case = 'local relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'nonexistentPackageName' } );
+        exp = NaN;
+        test.identical( got, exp );
+
+        test.case = 'global relative';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm://nonexistentPackageName' } );
+        exp = NaN;
+        test.identical( got, exp );
+
+        test.case = 'global absolute';
+        got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///nonexistentPackageName' } );
+        exp = NaN;
+        test.identical( got, exp );
+      test.close( 'nonexistent package name' );
+    test.close( 'object as a parameter' );
+  }
+  catch( error )
+  {
+    console.log( error );
+  }
 }
 
-dependantsRertive.description =
+dependantsRetrieve.description =
 `
 Retrieves the number of dependent packages
 `
+
+//
+
+async function dependantsRetrieveMultipleRequests( test )
+{
+  let packages = [
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+  ];
+
+  let wrongNames = [
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+  ]
+
+  let dependants = [
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+    4, 1, 1, 1, 0, NaN,
+  ];
+
+  let wrongNamesResult = [
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+  ];
+
+  try
+  {
+    test.case = 'wrong names';
+    let got = await _.npm.dependantsRetrieve( wrongNames );
+    let exp = wrongNamesResult;
+    test.identical( got, exp );
+    // test.case = 'array as a parameter';
+    // let got = await _.npm.dependantsRetrieve( packages );
+    // let exp = dependants;
+    // test.identical( got, exp );
+
+    // test.case = 'object as a parameter';
+    // got = await _.npm.dependantsRetrieve( { remotePath : packages } );
+    // exp = dependants;
+    // test.identical( got, exp );
+  }
+  catch( error )
+  {
+    console.log( error );
+  }
+}
+
+dependantsRetrieveMultipleRequests.description =
+`
+Retrieves dependants of each package in array
+`
+dependantsRetrieveMultipleRequests.timeOut = 120000;
 
 // --
 // declare
@@ -672,7 +860,8 @@ var Proto =
     isRepository,
     hasRemote,
 
-    dependantsRertive,
+    dependantsRetrieve,
+    dependantsRetrieveMultipleRequests,
 
   },
 
