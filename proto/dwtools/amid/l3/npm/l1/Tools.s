@@ -435,14 +435,31 @@ function dependantsRetrieve( o )
     ready.take( answer );
   }
 
+  function checkArrayElementsType( arr )
+  {
+    let result = true;
+
+    for( let i = 0; i < arr.length; i++ )
+    {
+      if( typeof arr[ i ] !== 'string' )
+      {
+        result = false;
+        break;
+      }
+    }
+
+    return result;
+  }
+
   if( o instanceof Array || ( o instanceof Object && o.remotePath instanceof Array ) )
   {
-    console.log( 'from true' );
     if( o instanceof Array )
-    {
-      o = { remotePath : o };
-      arguments[ 0 ] = { remotePath : o };
-    }
+    o = arguments[ 0 ] = { remotePath : o };
+
+    _.routineOptions( dependantsRetrieve, o );
+    _.assert( arguments.length === 1, 'Expects single argument' );
+    _.assert( arguments[ 0 ][ 'remotePath' ].length, 'Expects not empty array' );
+    _.assert( checkArrayElementsType( arguments[ 0 ][ 'remotePath' ] ), 'Expects only strings in array' );
 
     const dependantsArr = [];
     let step = 0;
@@ -540,10 +557,7 @@ function dependantsRetrieve( o )
   else
   {
     if( !( o instanceof Object ) )
-    {
-      arguments[ 0 ] = { remotePath : o };
-      o = { remotePath : o };
-    }
+    o = arguments[ 0 ] = { remotePath : o };
 
     _.routineOptions( dependantsRetrieve, o );
     _.assert( arguments.length === 1, 'Expects single argument' );
