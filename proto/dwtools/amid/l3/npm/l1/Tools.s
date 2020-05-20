@@ -432,7 +432,10 @@ function dependantsRetrieve( o )
     counter += 1;
 
     if( counter === numberOfRequests )
-    ready.take( answer );
+    {
+      console.log( 'Data uploaded!' );
+      ready.take( answer );
+    }
   }
 
   function checkArrayElementsType( arr )
@@ -465,6 +468,8 @@ function dependantsRetrieve( o )
     let step = 0;
     const packages = o.remotePath;
 
+    console.log( 'Loading data, wait...' );
+
     for( let i = 0; i < packages.length; i++ )
     {
       let packageName;
@@ -481,40 +486,6 @@ function dependantsRetrieve( o )
       }
 
       let url = `https://www.npmjs.com/package/${packageName}`;
-
-      https.get( url, ( res ) =>
-      {
-        res.setEncoding( 'utf8' );
-        let html = '';
-
-        res.on( 'error', ( err ) => err );
-
-        res.on( 'data', ( data ) =>
-        {
-          html += data;
-        } );
-
-        res.on( 'end', () =>
-        {
-          let dependants = '';
-          const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
-
-          if( !strWithDep )
-          {
-            dependantsArr[ i ] = NaN;
-            checkIfAllRequestEnded( packages.length, dependantsArr );
-            return;
-          }
-
-          const idx = strWithDep.index;
-
-          for( let j = idx; html[ j ] !== '<'; j++ )
-          dependants += html[ j ];
-
-          dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
-          checkIfAllRequestEnded( packages.length, dependantsArr );
-        } );
-      } )
 
       setTimeout( () =>
       {
@@ -538,6 +509,7 @@ function dependantsRetrieve( o )
             if( !strWithDep )
             {
               dependantsArr[ i ] = NaN;
+
               checkIfAllRequestEnded( packages.length, dependantsArr );
               return;
             }
@@ -546,8 +518,8 @@ function dependantsRetrieve( o )
 
             for( let j = idx; html[ j ] !== '<'; j++ )
             dependants += html[ j ];
-
             dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
+
             checkIfAllRequestEnded( packages.length, dependantsArr );
           } );
         } )
