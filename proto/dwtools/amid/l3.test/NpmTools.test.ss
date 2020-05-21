@@ -801,15 +801,15 @@ async function dependantsRetrieveMultipleRequests( test )
   let exp = namesResult;
   test.identical( got, exp );
 
-  // test.case = 'map as a parameter';
-  // got = await _.npm.dependantsRetrieve( { remotePath : names } );
-  // exp = namesResult;
-  // test.identical( got, exp );
+  test.case = 'map as a parameter';
+  got = await _.npm.dependantsRetrieve( { remotePath : names } );
+  exp = namesResult;
+  test.identical( got, exp );
 
-  // test.case = 'wrong names array';
-  // got = await _.npm.dependantsRetrieve( wrongNames );
-  // exp = wrongNamesResult;
-  // test.identical( got, exp );
+  test.case = 'wrong names array';
+  got = await _.npm.dependantsRetrieve( wrongNames );
+  exp = wrongNamesResult;
+  test.identical( got, exp );
 
 }
 
@@ -821,13 +821,28 @@ dependantsRetrieveMultipleRequests.timeOut = 120000;
 
 //
 
-// async function dependantsRetrieveMultipleRequestsNonExistentPackages( test )
-// {
-// }
-// dependantsRetrieveMultipleRequestsNonExistentPackages.description =
-// `
-// Retrieves dependants of each package in array
-// `
+async function dependantsRetrieveStressTest( test )
+{
+  const temp = [
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+  ];
+
+  const names = [];
+
+  for( let i = 0; i < 2000; i++ )
+  names.push( ... temp );
+
+  test.case = 'packages > 10000';
+  got = await _.npm.dependantsRetrieve( names );
+  exp = NaN;
+  test.identical( got, exp );
+}
+
+dependantsRetrieveStressTest.description =
+`
+Makes testing for very large loads
+`
 
 // --
 // declare
@@ -867,7 +882,7 @@ var Proto =
 
     dependantsRetrieve,
     dependantsRetrieveMultipleRequests,
-    // dependantsRetrieveMultipleRequestsNonExistentPackages,
+    dependantsRetrieveStressTest,
 
   },
 
