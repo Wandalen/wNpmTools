@@ -621,8 +621,8 @@ async function dependantsRetrieve( test )
     exp = NaN;
     test.identical( got, exp );
     test.close( 'nonexistent package name' );
-    test.close( 'string as a parameter' );
   }
+  test.close( 'string as a parameter' );
 
   test.open( 'map as a parameter' );
   {
