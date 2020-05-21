@@ -801,15 +801,15 @@ async function dependantsRetrieveMultipleRequests( test )
   let exp = namesResult;
   test.identical( got, exp );
 
-  // test.case = 'map as a parameter';
-  // got = await _.npm.dependantsRetrieve( { remotePath : names } );
-  // exp = namesResult;
-  // test.identical( got, exp );
+  test.case = 'map as a parameter';
+  got = await _.npm.dependantsRetrieve( { remotePath : names } );
+  exp = namesResult;
+  test.identical( got, exp );
 
-  // test.case = 'wrong names array';
-  // got = await _.npm.dependantsRetrieve( wrongNames );
-  // exp = wrongNamesResult;
-  // test.identical( got, exp );
+  test.case = 'wrong names array';
+  got = await _.npm.dependantsRetrieve( wrongNames );
+  exp = wrongNamesResult;
+  test.identical( got, exp );
 
 }
 
