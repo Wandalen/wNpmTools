@@ -421,8 +421,8 @@ _readChangeWrite.defaults =
 function dependantsRetrieve( o )
 {
   const https = require( 'https' );
-
   const self = this;
+  const dependantsArr = [];
   let ready = new _.Consequence();
   let counter = 0;
   let url = 'https://www.npmjs.com/package/';
@@ -430,37 +430,36 @@ function dependantsRetrieve( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
   _.routineOptions( dependantsRetrieve, o );
+
+  o.remotePath = _.arrayAs( o.remotePath );
+
   _.assert( arguments.length === 1, 'Expects single argument' );
-
-  if( !( o.remotePath instanceof Array ) )
-  o.remotePath = [ o.remotePath ];
   _.assert( o.remotePath.length, 'Expects not empty array' );
-  _.assert( hasCorrectPackageNames( o.remotePath ), 'Expects only not empty string as a package name' );
+  _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
 
-  const dependantsArr = [];
-  const packages = o.remotePath;
+  // _.assert( hasCorrectPackageNames( o.remotePath ), 'Expects only not empty string as a package name' );
 
-  if( packages.length > 1 )
-  console.log( 'Loading data, wait... Total requests: ' + packages.length );
+  if( o.remotePath.length > 1 )
+  console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
 
-  for( let i = 0; i < packages.length; i++ )
+  for( let i = 0; i < o.remotePath.length; i++ )
   {
     let packageName;
 
-    if( _.uri.isGlobal( packages[ i ] ) )
+    if( _.uri.isGlobal( o.remotePath[ i ] ) )
     {
-      let parsed = self.pathParse( packages[ i ] );
+      let parsed = self.pathParse( o.remotePath[ i ] );
       packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
     }
     else
     {
-      packageName = packages[ i ];
+      packageName = o.remotePath[ i ];
     }
 
-    if( packages.length === 1 )
-    makeRequest( url + packageName, true );
+    if( o.remotePath.length === 1 )
+    request( url + packageName, true );
     else
-    makeRequest( url + packageName, false, i );
+    request( url + packageName, false, i );
   }
 
   if( o.sync )
@@ -471,9 +470,10 @@ function dependantsRetrieve( o )
 
   return ready;
 
-  function makeRequest( url, isSingleRequest, index )
+  function request( url, isSingleRequest, index )
   {
-    https.get( url, ( res ) =>
+    https
+    .get( url, ( res ) =>
     {
       res.setEncoding( 'utf8' );
       let html = '';
@@ -498,7 +498,7 @@ function dependantsRetrieve( o )
           else
           {
             dependantsArr[ index ] = NaN;
-            checkIfAllRequestEnded( packages.length, dependantsArr );
+            checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
             return;
           }
         }
@@ -515,7 +515,7 @@ function dependantsRetrieve( o )
         else
         {
           dependantsArr[ index ] = Number( dependants.split( ',' ).join( '' ) );
-          checkIfAllRequestEnded( packages.length, dependantsArr );
+          checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
         }
       } );
     } )
@@ -533,21 +533,21 @@ function dependantsRetrieve( o )
     }
   }
 
-  function hasCorrectPackageNames( arr )
-  {
-    let result = true;
-
-    for( let i = 0; i < arr.length; i++ )
-    {
-      if( typeof arr[ i ] !== 'string' || arr[ i ].length === 0 )
-      {
-        result = false;
-        break;
-      }
-    }
-
-    return result;
-  }
+  // function hasCorrectPackageNames( arr )
+  // {
+  //   let result = true;
+  //
+  //   for( let i = 0; i < arr.length; i++ )
+  //   {
+  //     if( typeof arr[ i ] !== 'string' || arr[ i ].length === 0 )
+  //     {
+  //       result = false;
+  //       break;
+  //     }
+  //   }
+  //
+  //   return result;
+  // }
 }
 
 dependantsRetrieve.defaults =
