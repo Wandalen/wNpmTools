@@ -420,103 +420,60 @@ _readChangeWrite.defaults =
 
 function dependantsRetrieve( o )
 {
-  const self = this;
   const https = require( 'https' );
 
+  const self = this;
   let ready = new _.Consequence();
   let counter = 0;
   let url = 'https://www.npmjs.com/package/';
 
-  if( o instanceof Array || ( o instanceof Object && o.remotePath instanceof Array ) )
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+  _.routineOptions( dependantsRetrieve, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !( o.remotePath instanceof Array ) )
+  o.remotePath = [ o.remotePath ];
+  _.assert( o.remotePath.length, 'Expects not empty array' );
+  _.assert( hasCorrectPackageNames( o.remotePath ), 'Expects only not empty string as a package name' );
+
+  const dependantsArr = [];
+  const packages = o.remotePath;
+
+  if( packages.length > 1 )
+  console.log( 'Loading data, wait... Total requests: ' + packages.length );
+
+  for( let i = 0; i < packages.length; i++ )
   {
-    if( o instanceof Array )
-    o = arguments[ 0 ] = { remotePath : o };
-
-    _.routineOptions( dependantsRetrieve, o );
-    _.assert( arguments.length === 1, 'Expects single argument' );
-    _.assert( arguments[ 0 ][ 'remotePath' ].length, 'Expects not empty array' );
-    _.assert( checkArrayElementsType( arguments[ 0 ][ 'remotePath' ] ), 'Expects only strings in array' );
-
-    const dependantsArr = [];
-    const packages = o.remotePath;
-
-    console.log( 'Loading data, wait... Total requests: ' + packages.length );
-
-    for( let i = 0; i < packages.length; i++ )
-    {
-      let packageName;
-
-      if( _.uri.isGlobal( packages[ i ] ) )
-      {
-        let parsed = self.pathParse( packages[ i ] );
-        packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
-      }
-      else
-      {
-        packageName = packages[ i ];
-      }
-
-      https.get( url + packageName, ( res ) =>
-      {
-        res.setEncoding( 'utf8' );
-        let html = '';
-
-        res.on( 'data', ( data ) =>
-        {
-          html += data;
-        } );
-
-        res.on( 'end', () =>
-        {
-          let dependants = '';
-          const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
-
-          if( !strWithDep )
-          {
-            dependantsArr[ i ] = NaN;
-
-            checkIfAllRequestEnded( packages.length, dependantsArr );
-            return;
-          }
-
-          const idx = strWithDep.index;
-
-          for( let j = idx; html[ j ] !== '<'; j++ )
-          dependants += html[ j ];
-
-          dependantsArr[ i ] = Number( dependants.split( ',' ).join( '' ) );
-
-          checkIfAllRequestEnded( packages.length, dependantsArr );
-        } );
-      } ).on( 'error', ( err ) =>
-      {
-        ready.error( err );
-      } );
-    }
-  }
-  else
-  {
-    if( !( o instanceof Object ) )
-    o = arguments[ 0 ] = { remotePath : o };
-
-    _.routineOptions( dependantsRetrieve, o );
-    _.assert( arguments.length === 1, 'Expects single argument' );
-    _.assert( typeof arguments[ 0 ][ 'remotePath' ] === 'string', 'Expects string as a package name' );
-    _.assert( arguments[ 0 ][ 'remotePath' ].length !== 0, 'Expects not empty string as a package name' );
-
     let packageName;
 
-    if( _.uri.isGlobal( o.remotePath ) )
+    if( _.uri.isGlobal( packages[ i ] ) )
     {
-      let parsed = self.pathParse( o.remotePath );
+      let parsed = self.pathParse( packages[ i ] );
       packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
     }
     else
     {
-      packageName = o.remotePath;
+      packageName = packages[ i ];
     }
 
-    https.get( url + packageName, ( res ) =>
+    if( packages.length === 1 )
+    makeRequest( url + packageName, true );
+    else
+    makeRequest( url + packageName, false, i );
+  }
+
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
+  return ready;
+
+  function makeRequest( url, isSingleRequest, index )
+  {
+    https.get( url, ( res ) =>
     {
       res.setEncoding( 'utf8' );
       let html = '';
@@ -533,8 +490,17 @@ function dependantsRetrieve( o )
 
         if( !strWithDep )
         {
-          ready.take( NaN );
-          return;
+          if( isSingleRequest )
+          {
+            ready.take( NaN );
+            return;
+          }
+          else
+          {
+            dependantsArr[ index ] = NaN;
+            checkIfAllRequestEnded( packages.length, dependantsArr );
+            return;
+          }
         }
 
         const idx = strWithDep.index;
@@ -542,12 +508,18 @@ function dependantsRetrieve( o )
         for( let i = idx; html[ i ] !== '<'; i++ )
         dependants += html[ i ];
 
-        ready.take( Number( dependants.split( ',' ).join( '' ) ) );
+        if( isSingleRequest )
+        {
+          ready.take( Number( dependants.split( ',' ).join( '' ) ) );
+        }
+        else
+        {
+          dependantsArr[ index ] = Number( dependants.split( ',' ).join( '' ) );
+          checkIfAllRequestEnded( packages.length, dependantsArr );
+        }
       } );
-    } ).on( 'error', ( err ) =>
-    {
-      ready.error( err );
-    } );
+    } )
+    .on( 'error', ( err ) => ready.error( err ) );
   }
 
   function checkIfAllRequestEnded( numberOfRequests, answer )
@@ -561,13 +533,13 @@ function dependantsRetrieve( o )
     }
   }
 
-  function checkArrayElementsType( arr )
+  function hasCorrectPackageNames( arr )
   {
     let result = true;
 
     for( let i = 0; i < arr.length; i++ )
     {
-      if( typeof arr[ i ] !== 'string' )
+      if( typeof arr[ i ] !== 'string' || arr[ i ].length === 0 )
       {
         result = false;
         break;
@@ -576,14 +548,6 @@ function dependantsRetrieve( o )
 
     return result;
   }
-
-  if( o.sync )
-  {
-    ready.deasync();
-    return ready.sync();
-  }
-
-  return ready;
 }
 
 dependantsRetrieve.defaults =
