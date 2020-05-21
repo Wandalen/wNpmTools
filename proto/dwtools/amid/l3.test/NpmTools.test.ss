@@ -838,6 +838,8 @@ async function dependantsRetrieveStressTest( test )
   exp = NaN;
   test.identical( got, exp );
 }
+
+dependantsRetrieveStressTest.description =
 `
 Makes testing for very large loads
 `
