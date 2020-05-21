@@ -585,6 +585,7 @@ function dependantsRetrieve( o )
 
   return ready;
 }
+
 dependantsRetrieve.defaults =
 {
   sync : 0,
@@ -1251,7 +1252,7 @@ _.mapExtend( Self, Extend );
 
 //
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = _global_.wTools;
 
 })();

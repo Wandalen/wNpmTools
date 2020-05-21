@@ -547,7 +547,7 @@ async function dependantsRetrieve( test )
         let got = await _.npm.dependantsRetrieve( 'wmodulefortesting12ab' );
         let exp = 0;
         test.identical( got, exp );
-    
+
         test.case = 'global relative';
         got = await _.npm.dependantsRetrieve( 'npm://wmodulefortesting12ab' );
         exp = 0;
@@ -724,7 +724,8 @@ Retrieves the number of dependent packages
 
 async function dependantsRetrieveMultipleRequests( test )
 {
-  let packages = [
+  let names =
+  [
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
@@ -747,7 +748,32 @@ async function dependantsRetrieveMultipleRequests( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
 
-  let dependants = [
+  let wrongNames =
+  [
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+    'nonexistentPackageName', 'nonexistentPackageName', 'nonexistentPackageName',
+  ]
+
+  let dependants =
+  [
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
     4, 1, 1, 1, 0, NaN,
@@ -760,22 +786,35 @@ async function dependantsRetrieveMultipleRequests( test )
     4, 1, 1, 1, 0, NaN,
   ];
 
-  try
-  {
-    test.case = 'array as a parameter';
-    let got = await _.npm.dependantsRetrieve( packages );
-    let exp = dependants;
-    test.identical( got, exp );
+  let wrongNamesResult =
+  [
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+    NaN, NaN, NaN, NaN, NaN, NaN,
+  ];
 
-    test.case = 'object as a parameter';
-    got = await _.npm.dependantsRetrieve( { remotePath : packages } );
-    exp = dependants;
-    test.identical( got, exp );
-  }
-  catch( error )
-  {
-    console.log( error );
-  }
+  // test.case = 'wrong names';
+  // let got = await _.npm.dependantsRetrieve( wrongNames );
+  // let exp = wrongNamesResult;
+  // test.identical( got, exp );
+
+  test.case = 'array as a parameter';
+  let got = await _.npm.dependantsRetrieve( names );
+  let exp = dependants;
+  test.identical( got, exp );
+
+  // test.case = 'object as a parameter';
+  // got = await _.npm.dependantsRetrieve( { remotePath : packages } );
+  // exp = dependants;
+  // test.identical( got, exp );
+
 }
 
 dependantsRetrieveMultipleRequests.description =
@@ -786,13 +825,13 @@ dependantsRetrieveMultipleRequests.timeOut = 120000;
 
 //
 
-async function dependantsRetrieveMultipleRequestsNonExistentPackages( test )
-{
-}
-dependantsRetrieveMultipleRequestsNonExistentPackages.description =
-`
-Retrieves dependants of each package in array
-`
+// async function dependantsRetrieveMultipleRequestsNonExistentPackages( test )
+// {
+// }
+// dependantsRetrieveMultipleRequestsNonExistentPackages.description =
+// `
+// Retrieves dependants of each package in array
+// `
 
 // --
 // declare
@@ -832,7 +871,7 @@ var Proto =
 
     dependantsRetrieve,
     dependantsRetrieveMultipleRequests,
-    dependantsRetrieveMultipleRequestsNonExistentPackages,
+    // dependantsRetrieveMultipleRequestsNonExistentPackages,
 
   },
 

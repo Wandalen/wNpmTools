@@ -17,7 +17,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = _global_.wTools;
 
 })();
