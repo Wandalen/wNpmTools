@@ -483,71 +483,57 @@ function dependantsRetrieve( o )
         html += data;
       } );
 
-      res.on( 'end', () =>
-      {
-        let dependants = '';
-        const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
-
-        if( !strWithDep )
-        {
-          if( isSingleRequest )
-          {
-            ready.take( NaN );
-            return;
-          }
-          else
-          {
-            dependantsArr[ index ] = NaN;
-            checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
-            return;
-          }
-        }
-
-        const idx = strWithDep.index;
-
-        for( let i = idx; html[ i ] !== '<'; i++ )
-        dependants += html[ i ];
-
-        if( isSingleRequest )
-        {
-          ready.take( Number( dependants.split( ',' ).join( '' ) ) );
-        }
-        else
-        {
-          dependantsArr[ index ] = Number( dependants.split( ',' ).join( '' ) );
-          checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
-        }
-      } );
+      res.on( 'end', () => handleReceivedData( html, isSingleRequest, index ) );
     } )
     .on( 'error', ( err ) => ready.error( err ) );
+  }
+
+  function handleReceivedData( html, isSingleRequest, index )
+  {
+    let dependants = '';
+    const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+
+    if( !strWithDep )
+    {
+      if( isSingleRequest )
+      {
+        ready.take( NaN );
+        return;
+      }
+      else
+      {
+        dependantsArr[ index ] = NaN;
+        checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
+        return;
+      }
+    }
+
+    const idx = strWithDep.index;
+
+    for( let i = idx; html[ i ] !== '<'; i++ )
+    dependants += html[ i ];
+
+    if( isSingleRequest )
+    {
+      ready.take( Number( dependants.split( ',' ).join( '' ) ) );
+    }
+    else
+    {
+      dependantsArr[ index ] = Number( dependants.split( ',' ).join( '' ) );
+      checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
+    }
   }
 
   function checkIfAllRequestEnded( numberOfRequests, answer )
   {
     counter += 1;
-    console.log( 'Data uploaded for request: ', counter );
+    // console.log( 'Data uploaded for request: ', counter );
     if( counter === numberOfRequests )
     {
       console.log( 'Data uploaded!' );
       ready.take( answer );
     }
   }
-
-  // function hasCorrectPackageNames( arr )
-  // {
-  //   let result = true;
-  //
-  //   for( let i = 0; i < arr.length; i++ )
-  //   {
-  //     if( typeof arr[ i ] !== 'string' || arr[ i ].length === 0 )
-  //     {
-  //       result = false;
-  //       break;
-  //     }
-  //   }
-  //
-  //   return result;
-  // }
 }
 
 dependantsRetrieve.defaults =
