@@ -820,7 +820,7 @@ dependantsRetrieveMultipleRequests.timeOut = 120000;
 
 //
 
-async function dependantsRetrieveStressTest( test )
+async function dependantsRetrieveStressExperiment( test )
 {
   const temp = [
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
@@ -838,10 +838,11 @@ async function dependantsRetrieveStressTest( test )
   test.identical( got, exp );
 }
 
-dependantsRetrieveStressTest.description =
+dependantsRetrieveStressExperiment.description =
 `
 Makes testing for very large loads
 `
+dependantsRetrieveStressExperiment.experimental = 1;
 
 // --
 // declare
@@ -881,7 +882,7 @@ var Proto =
 
     dependantsRetrieve,
     dependantsRetrieveMultipleRequests,
-    dependantsRetrieveStressTest,
+    dependantsRetrieveStressExperiment,
 
   },
 
