@@ -822,20 +822,22 @@ dependantsRetrieveMultipleRequests.timeOut = 120000;
 
 async function dependantsRetrieveStressExperiment( test )
 {
-  const temp = [
+  const temp =
+  [
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
+  const remotePath = [];
+  const l = 50;
 
-  const names = [];
+  for( let i = 0; i < l; i++ )
+  remotePath.push( ... temp );
 
-  for( let i = 0; i < 2000; i++ )
-  names.push( ... temp );
-
-  test.case = 'packages > 10000';
-  got = await _.npm.dependantsRetrieve( names );
+  test.case = `${remotePath.length} packages`;
+  got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3 });
   exp = NaN;
   test.identical( got, exp );
+
 }
 
 dependantsRetrieveStressExperiment.description =
