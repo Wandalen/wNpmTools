@@ -420,9 +420,10 @@ _readChangeWrite.defaults =
 
 /**
  * @summary Retrieves package dependants number from npm storage.
- * @param {String} o.remotePath Array of package names(name on npm storage).
- * @param {Boolean} [o.sync=1] Controls sync/async execution mode.
- * @param {Number} o.verbosity Verbosity control.
+ * @param {(string|string[])} o.remotePath Package name or array of names(the same as on npm storage).
+ * @param {boolean} [o.sync=0] Controls sync/async execution mode.
+ * @param {number} [o.verbosity=0] Verbosity control.
+ * @returns {(number|number[])} Dependanst number for one package and array of dependants for array of packages.
  * @function dependantsRetrieve
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
