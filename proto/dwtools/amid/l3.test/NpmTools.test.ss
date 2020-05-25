@@ -57,13 +57,15 @@ function trivial( test )
 
 function bump( test )
 {
-  test.case = ( '' );
-  var got = _.npm.bump( { localPath : '/wTools' } );
-  var exp = 'wTools';
+  test.case = ( 'test one' );
+  let localPath = '/node_modules/wTools';
+  let configPath = { filePath : '/node_modules/wTools/package.json' };
+  var got = _.npm.bump( { localPath, configPath } );
+  var exp = {};
   test.identical( got, exp );
 }
 bump.description = `
-
+Bumps package version
 `;
 //
 
