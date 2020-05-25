@@ -418,6 +418,16 @@ _readChangeWrite.defaults =
 
 //
 
+/**
+ * @summary Retrieves package dependants number from npm storage.
+ * @param {String} o.remotePath Array of package names(name on npm storage).
+ * @param {Boolean} [o.sync=1] Controls sync/async execution mode.
+ * @param {Number} o.verbosity Verbosity control.
+ * @function dependantsRetrieve
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
 function dependantsRetrieve( o )
 {
   const https = require( 'https' );
