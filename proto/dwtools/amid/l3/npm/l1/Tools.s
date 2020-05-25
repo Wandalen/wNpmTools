@@ -422,45 +422,34 @@ function dependantsRetrieve( o )
 {
   const https = require( 'https' );
   const self = this;
-  const dependantsArr = [];
-  let ready = new _.Consequence();
-  let counter = 0;
-  let url = 'https://www.npmjs.com/package/';
+  let ready = new _.Consequence().take( null );
+  let prefixUri = 'https://www.npmjs.com/package/';
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
   _.routineOptions( dependantsRetrieve, o );
 
+  let isSingle = !_.arrayIs( o.remotePath );
   o.remotePath = _.arrayAs( o.remotePath );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.remotePath.length, 'Expects not empty array' );
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
 
-  // _.assert( hasCorrectPackageNames( o.remotePath ), 'Expects only not empty string as a package name' );
-
   if( o.remotePath.length > 1 )
   console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
 
   for( let i = 0; i < o.remotePath.length; i++ )
+  ready.also( () => request( uriNormalize( o.remotePath[ i ] ) ) );
+
+  ready.then( ( result ) =>
   {
-    let packageName;
-
-    if( _.uri.isGlobal( o.remotePath[ i ] ) )
-    {
-      let parsed = self.pathParse( o.remotePath[ i ] );
-      packageName = parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath;
-    }
-    else
-    {
-      packageName = o.remotePath[ i ];
-    }
-
-    if( o.remotePath.length === 1 )
-    request( url + packageName, true );
-    else
-    request( url + packageName, false, i );
-  }
+    /* remove heading null */
+    result.splice( 0, 1 )
+    if( isSingle )
+    return result[ 0 ];
+    return result;
+  } );
 
   if( o.sync )
   {
@@ -470,76 +459,68 @@ function dependantsRetrieve( o )
 
   return ready;
 
-  function request( url, isSingleRequest, index )
+  /* */
+
+  function uriNormalize( filePath )
   {
-    https
-    .get( url, ( res ) =>
+    let result;
+    if( _.uri.isGlobal( filePath ) )
     {
-      res.setEncoding( 'utf8' );
-      let html = '';
-
-      res.on( 'data', ( data ) =>
-      {
-        html += data;
-      } );
-
-      res.on( 'end', () => handleReceivedData( html, isSingleRequest, index ) );
-    } )
-    .on( 'error', ( err ) => ready.error( err ) );
+      let parsed = self.pathParse( filePath );
+      result = prefixUri + ( parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath );
+    }
+    else
+    {
+      result = prefixUri + filePath;
+    }
+    return result;
   }
 
-  function handleReceivedData( html, isSingleRequest, index )
+  /* */
+
+  function request( uri )
+  {
+    let ready2 = new _.Consequence();
+    if( o.verbosity >= 3 )
+    console.log( ` . Retrieving ${uri}..` );
+    https
+    .get( uri, ( res ) =>
+    {
+      let html = '';
+      res.setEncoding( 'utf8' );
+      res.on( 'data', ( data ) => html += data );
+      res.on( 'end', () => handleEnd( ready2, html, uri ) );
+    } )
+    .on( 'error', ( err ) => ready2.error( err ) );
+    return ready2;
+  }
+
+  /* */
+
+  function handleEnd( ready2, html, uri )
   {
     let dependants = '';
     const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
+    if( o.verbosity >= 3 )
+    console.log( ` + Retrieved ${uri}.` );
+
     if( !strWithDep )
-    {
-      if( isSingleRequest )
-      {
-        ready.take( NaN );
-        return;
-      }
-      else
-      {
-        dependantsArr[ index ] = NaN;
-        checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
-        return;
-      }
-    }
+    return ready2.take( NaN );
 
-    const idx = strWithDep.index;
-
-    for( let i = idx; html[ i ] !== '<'; i++ )
+    for( let i = strWithDep.index; html[ i ] !== '<'; i++ )
     dependants += html[ i ];
 
-    if( isSingleRequest )
-    {
-      ready.take( Number( dependants.split( ',' ).join( '' ) ) );
-    }
-    else
-    {
-      dependantsArr[ index ] = Number( dependants.split( ',' ).join( '' ) );
-      checkIfAllRequestEnded( o.remotePath.length, dependantsArr );
-    }
+    ready2.take( Number( dependants.split( ',' ).join( '' ) ) );
   }
 
-  function checkIfAllRequestEnded( numberOfRequests, answer )
-  {
-    counter += 1;
-    console.log( 'Data uploaded for request: ', counter );
-    if( counter === numberOfRequests )
-    {
-      console.log( 'Data uploaded!' );
-      ready.take( answer );
-    }
-  }
 }
 
 dependantsRetrieve.defaults =
 {
   sync : 0,
-  remotePath : null
+  remotePath : null,
+  verbosity : 0,
 }
 
 // --
