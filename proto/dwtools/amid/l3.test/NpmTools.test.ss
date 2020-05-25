@@ -42,6 +42,7 @@ function onSuiteEnd( test )
 // tests
 // --
 
+
 function trivial( test )
 {
 
@@ -52,6 +53,18 @@ function trivial( test )
 
 }
 
+//
+
+function bump( test )
+{
+  test.case = ( '' );
+  var got = _.npm.bump( { localPath : '/wTools' } );
+  var exp = 'wTools';
+  test.identical( got, exp );
+}
+bump.description = `
+
+`;
 //
 
 function pathParse( test )
@@ -828,16 +841,14 @@ async function dependantsRetrieveStressExperiment( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
   const remotePath = [];
-  const l = 50;
+  const l = 1e7;
 
   for( let i = 0; i < l; i++ )
   remotePath.push( ... temp );
 
-  // console.log(remotePath.length);
-
   test.case = `${remotePath.length} packages`;
-  got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3 });
-  exp = NaN;
+  let got = await _.npm.dependantsRetrieve( { remotePath, verbosity : 3 } );
+  let exp = NaN;
   test.identical( got, exp );
 
 }
@@ -847,6 +858,7 @@ dependantsRetrieveStressExperiment.description =
 Makes testing for very large loads
 `
 dependantsRetrieveStressExperiment.experimental = 1;
+dependantsRetrieveStressExperiment.timeOut = 300000;
 
 // --
 // declare
@@ -870,6 +882,8 @@ var Proto =
 
   tests :
   {
+
+    bump,
 
     trivial,
     pathParse,
