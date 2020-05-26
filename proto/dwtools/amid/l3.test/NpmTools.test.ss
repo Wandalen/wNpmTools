@@ -55,6 +55,23 @@ function trivial( test )
 
 //
 
+function fixate( test )
+{
+
+  test.case = ( 'test one' );
+  let localPath = '/node_modules/package-json/package.json';
+  let configPath = { filePath : '/node_modules/package-json/package.json' };
+  var got = _.npm.bump( { localPath, configPath } );
+  var exp = {};
+  test.identical( got, exp );
+
+}
+fixate.description = `
+Fixates versions of the dependecies in provided package
+`;
+
+//
+
 function bump( test )
 {
   test.case = ( 'test one' );
@@ -885,6 +902,7 @@ var Proto =
   tests :
   {
 
+    fixate,
     bump,
 
     trivial,
