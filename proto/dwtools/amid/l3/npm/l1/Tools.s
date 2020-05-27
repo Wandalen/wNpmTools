@@ -155,6 +155,8 @@ function structureFixate( o )
   o = _.routineOptions( structureFixate, o );
   o.changed = false;
 
+  debugger;
+
   if( !o.onDependency )
   o.onDependency = function onDependency( dep )
   {
@@ -162,6 +164,8 @@ function structureFixate( o )
   }
 
   _.assert( _.strDefined( o.tag ) );
+
+  debugger;
 
   dependencySectionsNames.forEach( ( s ) =>
   {
@@ -397,8 +401,6 @@ function _readChangeWrite( o )
 
   if( o.dry )
   return o;
-
-  debugger;
 
   if( str )
   _.fileProvider.fileWrite( o.configPath, str );

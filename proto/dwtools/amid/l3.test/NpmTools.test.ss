@@ -57,14 +57,63 @@ function trivial( test )
 
 function fixate( test )
 {
-  // fixate фіксує версії залежностей
-  test.case = ( 'test one' );
-  let localPath = _.path.join( __dirname, '../../../../sample/bump_fixate' );
-  let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump_fixate/package.json' ) };
-  var got = _.npm.fixate( { localPath } );
-  var exp = {};
+  const _ = require( 'wTools' );
+  require( 'wFiles' );
+
+  test.case = 'dependency versions are specified';
+
+  let comparisonConfig = _.fileProvider.fileRead
+  ( {
+    filePath : abs( 'notEmptyVersions/forComparison.json' ),
+    encoding : 'json'
+  } );
+
+  let localPath = abs( 'notEmptyVersions' );
+  // let configPath = { filePath : abs( 'notEmptyVersions/package.json' ) };
+  let tag = '=';
+  let got = _.npm.fixate( { localPath, tag } ).config;
+  let exp = comparisonConfig;
   test.identical( got, exp );
 
+  rewriteInitialConfig( 'notEmptyVersions' );
+
+  //
+
+  test.case = 'dependency versions are not specified';
+
+  comparisonConfig = _.fileProvider.fileRead
+  ( {
+    filePath : abs( 'emptyVersions/forComparison.json' ),
+    encoding : 'json'
+  } );
+
+  localPath = abs( 'fixate/emptyVersions' );
+  // let configPath = { filePath : abs( 'emptyVersions/package.json' ) };
+  tag = '=';
+  got = _.npm.fixate( { localPath, tag } ).config;
+  exp = comparisonConfig;
+  test.identical( got, exp );
+
+  rewriteInitialConfig( 'emptyVersions' );
+
+  //
+
+  function abs() { return _.path.s.join( __dirname, '../../../../sample/fixate/', ... arguments ) }
+
+  function rewriteInitialConfig( folder )
+  {
+    initialConfig = _.fileProvider.fileRead
+    ( {
+      filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/forRewriting.json` ),
+      encoding : 'json'
+    } );
+    _.fileProvider.fileWrite
+    ( {
+      filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/package.json` ),
+      data : initialConfig,
+      encoding : 'json'
+    } );
+  }
 }
 fixate.description = `
 Fixates versions of the dependecies in provided package
@@ -79,14 +128,14 @@ function bump( test )
 
   let config = _.fileProvider.fileRead
   ( {
-    filePath : _.path.join( __dirname, '../../../../sample/bump_fixate/package.json' ),
+    filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
     encoding : 'json'
   } );
   let versionBeforeBump = config.version.split( '.' );
   versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
 
-  let localPath = _.path.join( __dirname, '../../../../sample/bump_fixate' );
-  // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump_fixate/package.json' ) };
+  let localPath = _.path.join( __dirname, '../../../../sample/bump' );
+  // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
   let got = _.npm.bump( { localPath } ).config.version;
   let exp = versionBeforeBump.join( '.' );
   test.identical( got, exp );
