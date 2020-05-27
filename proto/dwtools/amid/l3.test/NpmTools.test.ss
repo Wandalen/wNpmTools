@@ -138,34 +138,39 @@ function fixate( test )
     } );
   }
 }
-fixate.description = `
+
+fixate.description =
+`
 Fixates versions of the dependecies in provided package
 `;
 
+// //
 //
+// function bump( test )
+// {
+//   const _ = require( 'wTools' );
+//   require( 'wFiles' );
+//
+//   let config = _.fileProvider.fileRead
+//   ( {
+//     filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
+//     encoding : 'json'
+//   } );
+//   let versionBeforeBump = config.version.split( '.' );
+//   versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
+//
+//   let localPath = _.path.join( __dirname, '../../../../sample/bump' );
+//   // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
+//   let got = _.npm.bump( { localPath } ).config.version;
+//   let exp = versionBeforeBump.join( '.' );
+//   test.identical( got, exp );
+// }
+//
+// bump.description =
+// `
+// Bumps package version
+// `;
 
-function bump( test )
-{
-  const _ = require( 'wTools' );
-  require( 'wFiles' );
-
-  let config = _.fileProvider.fileRead
-  ( {
-    filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
-    encoding : 'json'
-  } );
-  let versionBeforeBump = config.version.split( '.' );
-  versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
-
-  let localPath = _.path.join( __dirname, '../../../../sample/bump' );
-  // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
-  let got = _.npm.bump( { localPath } ).config.version;
-  let exp = versionBeforeBump.join( '.' );
-  test.identical( got, exp );
-}
-bump.description = `
-Bumps package version
-`;
 //
 
 function pathParse( test )
@@ -281,6 +286,8 @@ function pathIsFixated( test )
   test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
 }
 
+//
+
 function pathFixate( test )
 {
   var remotePath = 'npm:///wpathbasic'
@@ -300,6 +307,8 @@ function pathFixate( test )
   var remotePath = 'npm:///wpathbasic#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
+
+//
 
 function versionLocalRetrive( test )
 {
@@ -383,6 +392,7 @@ function versionRemoteCurrentRetrive( test )
 
 versionRemoteCurrentRetrive.timeOut = 30000;
 
+//
 
 function isUpToDate( test )
 {
@@ -926,11 +936,11 @@ async function dependantsRetrieveMultipleRequests( test )
 
 }
 
+dependantsRetrieveMultipleRequests.timeOut = 120000;
 dependantsRetrieveMultipleRequests.description =
 `
 Retrieves dependants of each package in array
 `
-dependantsRetrieveMultipleRequests.timeOut = 120000;
 
 //
 
@@ -954,12 +964,12 @@ async function dependantsRetrieveStressExperiment( test )
 
 }
 
+dependantsRetrieveStressExperiment.experimental = 1;
+dependantsRetrieveStressExperiment.timeOut = 300000;
 dependantsRetrieveStressExperiment.description =
 `
 Makes testing for very large loads
 `
-dependantsRetrieveStressExperiment.experimental = 1;
-dependantsRetrieveStressExperiment.timeOut = 300000;
 
 // --
 // declare
@@ -984,8 +994,8 @@ var Proto =
   tests :
   {
 
-    fixate,
-    bump,
+    // fixate,
+    // bump,
 
     trivial,
     pathParse,
