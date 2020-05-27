@@ -952,14 +952,18 @@ async function dependantsRetrieveStressExperiment( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
   const remotePath = [];
-  const l = 10;
+  const result = [];
+  const l = 3;
 
   for( let i = 0; i < l; i++ )
-  remotePath.push( ... temp );
+  {
+    remotePath.push( ... temp );
+    result.push( ... [ 4, 1, 1, 1, 0, NaN ] )
+  }
 
   test.case = `${remotePath.length} packages`;
   let got = await _.npm.dependantsRetrieve( { remotePath, verbosity : 3 } );
-  let exp = NaN;
+  let exp = result;
   test.identical( got, exp );
 
 }
