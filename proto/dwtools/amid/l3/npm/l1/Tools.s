@@ -218,7 +218,6 @@ function bump( o )
   o = _.routineOptions( bump, o );
   if( !o.verbosity || o.verbosity < 0 )
   o.verbosity = 0;
-
   try
   {
     let o2 = _.mapOnly( _.mapExtend( null, o ), self._readChangeWrite.defaults );
@@ -398,6 +397,8 @@ function _readChangeWrite( o )
 
   if( o.dry )
   return o;
+
+  debugger;
 
   if( str )
   _.fileProvider.fileWrite( o.configPath, str );

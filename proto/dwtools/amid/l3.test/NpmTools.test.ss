@@ -57,11 +57,11 @@ function trivial( test )
 
 function fixate( test )
 {
-
+  // fixate фіксує версії залежностей
   test.case = ( 'test one' );
-  let localPath = '/node_modules/package-json/package.json';
-  let configPath = { filePath : '/node_modules/package-json/package.json' };
-  var got = _.npm.bump( { localPath, configPath } );
+  let localPath = _.path.join( __dirname, '../../../../node_modules/package-json/' );
+  let configPath = { filePath : `${_.path.join( __dirname, '../../../../node_modules/package-json/' )}/package.json` };
+  var got = _.npm.fixate( { localPath } );
   var exp = {};
   test.identical( got, exp );
 
@@ -74,12 +74,14 @@ Fixates versions of the dependecies in provided package
 
 function bump( test )
 {
+  // bump збільшує версію білда в файлі package.json
   test.case = ( 'test one' );
-  let localPath = '/node_modules/wTools';
-  let configPath = { filePath : '/node_modules/wTools/package.json' };
-  var got = _.npm.bump( { localPath, configPath } );
+  let localPath = _.path.join( __dirname, '../../../../node_modules/package-json/' );
+  let configPath = { filePath : `${_.path.join( __dirname, '../../../../node_modules/package-json/' )}/package.json` };
+  var got = _.npm.bump( { localPath } );
   var exp = {};
   test.identical( got, exp );
+
 }
 bump.description = `
 Bumps package version
@@ -860,7 +862,7 @@ async function dependantsRetrieveStressExperiment( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
   const remotePath = [];
-  const l = 1e7;
+  const l = 5;
 
   for( let i = 0; i < l; i++ )
   remotePath.push( ... temp );
