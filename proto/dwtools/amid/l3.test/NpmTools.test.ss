@@ -942,7 +942,7 @@ async function dependantsRetrieveStressExperiment( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
   const remotePath = [];
-  const l = 5;
+  const l = 10;
 
   for( let i = 0; i < l; i++ )
   remotePath.push( ... temp );
