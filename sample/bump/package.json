@@ -1,6 +1,6 @@
 {
   "name" : "test package.json",
-  "version" : "1.0.9",
+  "version" : "1.0.12",
   "description" : "for testing bump and fixate routines",
   "main" : "index.js",
   "dependencies" : {},
