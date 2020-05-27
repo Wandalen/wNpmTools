@@ -59,8 +59,8 @@ function fixate( test )
 {
   // fixate фіксує версії залежностей
   test.case = ( 'test one' );
-  let localPath = _.path.join( __dirname, '../../../../node_modules/package-json/' );
-  let configPath = { filePath : `${_.path.join( __dirname, '../../../../node_modules/package-json/' )}/package.json` };
+  let localPath = _.path.join( __dirname, '../../../../sample/bump_fixate' );
+  let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump_fixate/package.json' ) };
   var got = _.npm.fixate( { localPath } );
   var exp = {};
   test.identical( got, exp );
@@ -74,14 +74,22 @@ Fixates versions of the dependecies in provided package
 
 function bump( test )
 {
-  // bump збільшує версію білда в файлі package.json
-  test.case = ( 'test one' );
-  let localPath = _.path.join( __dirname, '../../../../node_modules/package-json/' );
-  let configPath = { filePath : `${_.path.join( __dirname, '../../../../node_modules/package-json/' )}/package.json` };
-  var got = _.npm.bump( { localPath } );
-  var exp = {};
-  test.identical( got, exp );
+  const _ = require( 'wTools' );
+  require( 'wFiles' );
 
+  let config = _.fileProvider.fileRead
+  ( {
+    filePath : _.path.join( __dirname, '../../../../sample/bump_fixate/package.json' ),
+    encoding : 'json'
+  } );
+  let versionBeforeBump = config.version.split( '.' );
+  versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
+
+  let localPath = _.path.join( __dirname, '../../../../sample/bump_fixate' );
+  // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump_fixate/package.json' ) };
+  let got = _.npm.bump( { localPath } ).config.version;
+  let exp = versionBeforeBump.join( '.' );
+  test.identical( got, exp );
 }
 bump.description = `
 Bumps package version
