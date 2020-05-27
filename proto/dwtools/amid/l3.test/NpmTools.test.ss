@@ -42,6 +42,7 @@ function onSuiteEnd( test )
 // tests
 // --
 
+
 function trivial( test )
 {
 
@@ -52,6 +53,119 @@ function trivial( test )
 
 }
 
+//
+
+function fixate( test )
+{
+  const _ = require( 'wTools' );
+  require( 'wFiles' );
+
+  test.case = 'dependency versions are specified';
+
+  var comparisonConfig = _.fileProvider.fileRead
+  ( {
+    filePath : abs( 'notEmptyVersions/forComparison.json' ),
+    encoding : 'json'
+  } );
+
+  var localPath = abs( 'notEmptyVersions' );
+  // let configPath = { filePath : abs( 'notEmptyVersions/package.json' ) };
+  var tag = '=';
+  var got = _.npm.fixate( { localPath, tag } ).config;
+  var exp = comparisonConfig;
+  test.identical( got, exp );
+
+  rewriteInitialConfig( 'notEmptyVersions' );
+
+  //
+
+  test.case = 'dependency versions are not specified';
+
+  var comparisonConfig = _.fileProvider.fileRead
+  ( {
+    filePath : abs( 'emptyVersions/forComparison.json' ),
+    encoding : 'json'
+  } );
+
+  var localPath = abs( 'emptyVersions' );
+  // let configPath = { filePath : abs( 'emptyVersions/package.json' ) };
+  var tag = '=';
+  var o = { localPath, tag, onDependency }
+  var got = _.npm.fixate( o ).config;
+  var exp = comparisonConfig;
+  test.identical( got, exp );
+
+  rewriteInitialConfig( 'emptyVersions' );
+
+  function onDependency( dep )
+  {
+    const depVersionsToFixate = {
+      'package1' : '1.1.1',
+      'package2' : '2.2.2',
+      'package3' : '3.3.3',
+      'package4' : '4.4.4',
+      'package5' : '5.5.5',
+      'package6' : '6.6.6',
+      'package7' : '7.7.7',
+      'package8' : '8.8.8',
+      'package9' : '9.9.9',
+      'package10' : '10.10.10',
+    }
+
+    for( let depName in depVersionsToFixate )
+    {
+      if( dep.name === depName )
+      dep.version = o.tag + depVersionsToFixate[ depName ];
+    }
+  }
+
+  //
+
+  function abs() { return _.path.s.join( __dirname, '../../../../sample/fixate/', ... arguments ) }
+
+  function rewriteInitialConfig( folder )
+  {
+    var initialConfig = _.fileProvider.fileRead
+    ( {
+      filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/forRewriting.json` ),
+      encoding : 'json'
+    } );
+    _.fileProvider.fileWrite
+    ( {
+      filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/package.json` ),
+      data : initialConfig,
+      encoding : 'json'
+    } );
+  }
+}
+fixate.description = `
+Fixates versions of the dependecies in provided package
+`;
+
+//
+
+function bump( test )
+{
+  const _ = require( 'wTools' );
+  require( 'wFiles' );
+
+  let config = _.fileProvider.fileRead
+  ( {
+    filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
+    encoding : 'json'
+  } );
+  let versionBeforeBump = config.version.split( '.' );
+  versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
+
+  let localPath = _.path.join( __dirname, '../../../../sample/bump' );
+  // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
+  let got = _.npm.bump( { localPath } ).config.version;
+  let exp = versionBeforeBump.join( '.' );
+  test.identical( got, exp );
+}
+bump.description = `
+Bumps package version
+`;
 //
 
 function pathParse( test )
@@ -828,14 +942,14 @@ async function dependantsRetrieveStressExperiment( test )
     'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
   ];
   const remotePath = [];
-  const l = 50;
+  const l = 5;
 
   for( let i = 0; i < l; i++ )
   remotePath.push( ... temp );
 
   test.case = `${remotePath.length} packages`;
-  got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3 });
-  exp = NaN;
+  let got = await _.npm.dependantsRetrieve( { remotePath, verbosity : 3 } );
+  let exp = NaN;
   test.identical( got, exp );
 
 }
@@ -845,6 +959,7 @@ dependantsRetrieveStressExperiment.description =
 Makes testing for very large loads
 `
 dependantsRetrieveStressExperiment.experimental = 1;
+dependantsRetrieveStressExperiment.timeOut = 300000;
 
 // --
 // declare
@@ -868,6 +983,9 @@ var Proto =
 
   tests :
   {
+
+    fixate,
+    bump,
 
     trivial,
     pathParse,

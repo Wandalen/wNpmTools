@@ -218,7 +218,6 @@ function bump( o )
   o = _.routineOptions( bump, o );
   if( !o.verbosity || o.verbosity < 0 )
   o.verbosity = 0;
-
   try
   {
     let o2 = _.mapOnly( _.mapExtend( null, o ), self._readChangeWrite.defaults );
@@ -418,6 +417,17 @@ _readChangeWrite.defaults =
 
 //
 
+/**
+ * @summary Retrieves package dependants number from npm storage.
+ * @param {(string|string[])} o.remotePath Package name or array of names(the same as on npm storage).
+ * @param {boolean} [o.sync=0] Controls sync/async execution mode.
+ * @param {number} [o.verbosity=0] Verbosity control.
+ * @returns {(number|number[])} Dependanst number for one package or array of dependants for array of packages.
+ * @function dependantsRetrieve
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
 function dependantsRetrieve( o )
 {
   const https = require( 'https' );
@@ -449,7 +459,7 @@ function dependantsRetrieve( o )
     if( isSingle )
     return result[ 0 ];
     return result;
-  });
+  } );
 
   if( o.sync )
   {
