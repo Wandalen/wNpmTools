@@ -62,17 +62,17 @@ function fixate( test )
 
   test.case = 'dependency versions are specified';
 
-  let comparisonConfig = _.fileProvider.fileRead
+  var comparisonConfig = _.fileProvider.fileRead
   ( {
     filePath : abs( 'notEmptyVersions/forComparison.json' ),
     encoding : 'json'
   } );
 
-  let localPath = abs( 'notEmptyVersions' );
+  var localPath = abs( 'notEmptyVersions' );
   // let configPath = { filePath : abs( 'notEmptyVersions/package.json' ) };
-  let tag = '=';
-  let got = _.npm.fixate( { localPath, tag } ).config;
-  let exp = comparisonConfig;
+  var tag = '=';
+  var got = _.npm.fixate( { localPath, tag } ).config;
+  var exp = comparisonConfig;
   test.identical( got, exp );
 
   rewriteInitialConfig( 'notEmptyVersions' );
@@ -81,20 +81,43 @@ function fixate( test )
 
   test.case = 'dependency versions are not specified';
 
-  comparisonConfig = _.fileProvider.fileRead
+  var comparisonConfig = _.fileProvider.fileRead
   ( {
     filePath : abs( 'emptyVersions/forComparison.json' ),
     encoding : 'json'
   } );
 
-  localPath = abs( 'fixate/emptyVersions' );
+  var localPath = abs( 'emptyVersions' );
   // let configPath = { filePath : abs( 'emptyVersions/package.json' ) };
-  tag = '=';
-  got = _.npm.fixate( { localPath, tag } ).config;
-  exp = comparisonConfig;
+  var tag = '=';
+  var o = { localPath, tag, onDependency }
+  var got = _.npm.fixate( o ).config;
+  var exp = comparisonConfig;
   test.identical( got, exp );
 
   rewriteInitialConfig( 'emptyVersions' );
+
+  function onDependency( dep )
+  {
+    const depVersionsToFixate = {
+      'package1' : '1.1.1',
+      'package2' : '2.2.2',
+      'package3' : '3.3.3',
+      'package4' : '4.4.4',
+      'package5' : '5.5.5',
+      'package6' : '6.6.6',
+      'package7' : '7.7.7',
+      'package8' : '8.8.8',
+      'package9' : '9.9.9',
+      'package10' : '10.10.10',
+    }
+
+    for( let depName in depVersionsToFixate )
+    {
+      if( dep.name === depName )
+      dep.version = o.tag + depVersionsToFixate[ depName ];
+    }
+  }
 
   //
 
@@ -102,7 +125,7 @@ function fixate( test )
 
   function rewriteInitialConfig( folder )
   {
-    initialConfig = _.fileProvider.fileRead
+    var initialConfig = _.fileProvider.fileRead
     ( {
       filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/forRewriting.json` ),
       encoding : 'json'
