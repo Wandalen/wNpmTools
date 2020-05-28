@@ -434,6 +434,8 @@ function dependantsRetrieve( o )
   const self = this;
   let ready = new _.Consequence().take( null );
   let prefixUri = 'https://www.npmjs.com/package/';
+  let started = [];
+  let finished = [];
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
@@ -445,12 +447,14 @@ function dependantsRetrieve( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.remotePath.length, 'Expects not empty array' );
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
+  _.assert( o.attempts > 0 );
 
-  if( o.remotePath.length > 1 )
-  console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
+  // if( o.verbosity >= 3 )
+  // if( o.remotePath.length > 1 )
+  // console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
 
   for( let i = 0; i < o.remotePath.length; i++ )
-  ready.also( () => request( uriNormalize( o.remotePath[ i ] ) ) );
+  ready.also( () => request( uriNormalize( o.remotePath[ i ] ), 0, i ) );
 
   ready.then( ( result ) =>
   {
@@ -458,6 +462,15 @@ function dependantsRetrieve( o )
     result.splice( 0, 1 )
     if( isSingle )
     return result[ 0 ];
+    return result;
+  } );
+
+  ready.finally( ( err, result ) =>
+  {
+    if( err )
+    console.log( err );
+    if( err )
+    throw _.err( err );
     return result;
   } );
 
@@ -488,41 +501,70 @@ function dependantsRetrieve( o )
 
   /* */
 
-  function request( uri )
+  function request( uri, attempt, i )
   {
     let ready2 = new _.Consequence();
+
+    if( attempt >= o.attempts )
+    throw _.err( `Faiteld to retrieve ${uri}, made ${attempt} attempts` );
+
+    started.push({ uri, i });
     if( o.verbosity >= 3 )
-    console.log( ` . Retrieving ${uri}..` );
+    console.log( ` . Attempt ${attempt} to retrieve ${i || 0} ${uri}..` );
+
     https
     .get( uri, ( res ) =>
     {
+      if( res.statusCode === 404 )
+      {
+        handleEnd( ready2, uri, i, NaN );
+        return;
+      }
+      if( res.statusCode !== 200 )
+      {
+        request( uri, attempt+1, i );
+        return;
+      }
       let html = '';
       res.setEncoding( 'utf8' );
       res.on( 'data', ( data ) => html += data );
-      res.on( 'end', () => handleEnd( ready2, html, uri ) );
+      res.on( 'end', () => handleHtml( ready2, uri, i, html ) );
+      res.on( 'error', ( err ) => ready2.error( _.err( err ) ) );
     } )
-    .on( 'error', ( err ) => ready2.error( err ) );
+    .on( 'error', ( err ) => ready2.error( _.err( err ) ) );
     return ready2;
   }
 
   /* */
 
-  function handleEnd( ready2, html, uri )
+  function handleHtml( ready2, uri, i, html )
   {
     let dependants = '';
     const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
-    if( o.verbosity >= 3 )
-    console.log( ` + Retrieved ${uri}.` );
-
     if( !strWithDep )
-    return ready2.take( NaN );
+    return handleEnd( ready2, uri, i, NaN );
 
     for( let i = strWithDep.index; html[ i ] !== '<'; i++ )
     dependants += html[ i ];
+    dependants = Number( dependants.split( ',' ).join( '' ) );
 
-    ready2.take( Number( dependants.split( ',' ).join( '' ) ) );
+    handleEnd( ready2, uri, i, dependants );
   }
+
+  /* */
+
+  function handleEnd( ready2, uri, i, dependants )
+  {
+    finished.push({ uri, i });
+
+    if( o.verbosity >= 3 )
+    console.log( ` + Retrieved ${i || 0} ${finished.length} / ${started.length} ${uri}.` );
+
+    ready2.take( dependants );
+  }
+
+  /* */
 
 }
 
@@ -531,6 +573,7 @@ dependantsRetrieve.defaults =
   sync : 0,
   remotePath : null,
   verbosity : 0,
+  attempts : 3,
 }
 
 // --
