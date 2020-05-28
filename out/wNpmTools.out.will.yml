@@ -113,7 +113,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: ../proto/dwtools/amid/l3/npm/IncludeMid.s
+        path: ../proto/dwtools/amid/l3/npm/Include.ss
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -123,13 +123,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/IncludeMid.s'
+        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/IncludeMid.s'
+        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug
@@ -162,7 +162,7 @@ module:
           - ../proto/dwtools/amid/l3
           - ../proto/dwtools/amid/l3/npm
           - ../proto/dwtools/amid/l3/npm/IncludeBase.s
-          - ../proto/dwtools/amid/l3/npm/IncludeMid.s
+          - ../proto/dwtools/amid/l3/npm/Include.ss
           - ../proto/dwtools/amid/l3/npm/l1
           - ../proto/dwtools/amid/l3/npm/l1/Tools.s
           - ../proto/dwtools/amid/l3.test
@@ -925,7 +925,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: proto/dwtools/amid/l3/npm/IncludeMid.s
+        path: proto/dwtools/amid/l3/npm/Include.ss
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -935,13 +935,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/IncludeMid.s'
+        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/IncludeMid.s'
+        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug

@@ -1,13 +1,6 @@
-( function _Tools_s_( ) {
+( function _Basic_ss_( ) {
 
 'use strict';
-
-if( typeof module !== 'undefined' )
-{
-
-  require( '../IncludeBase.s' );
-
-}
 
 let _ = _global_.wTools;
 let Self = _.npm = _.npm || Object.create( null );
@@ -430,49 +423,32 @@ _readChangeWrite.defaults =
 
 function dependantsRetrieve( o )
 {
-  const https = require( 'https' );
   const self = this;
-  let ready = new _.Consequence().take( null );
-  let prefixUri = 'https://www.npmjs.com/package/';
-  let started = [];
-  let finished = [];
+  const prefixUri = 'https://www.npmjs.com/package/';
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
   _.routineOptions( dependantsRetrieve, o );
 
-  let isSingle = !_.arrayIs( o.remotePath );
-  o.remotePath = _.arrayAs( o.remotePath );
-
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( o.remotePath.length, 'Expects not empty array' );
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
-  _.assert( o.attempts > 0 );
 
-  // if( o.verbosity >= 3 )
-  // if( o.remotePath.length > 1 )
-  // console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
+  let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
 
-  for( let i = 0; i < o.remotePath.length; i++ )
-  ready.also( () => request( uriNormalize( o.remotePath[ i ] ), 0, i ) );
+  let ready = _.http.retrieve
+  ({
+    uri,
+    sync : 0,
+    verbosity : o.verbosity,
+    attemptLimit : o.attemptLimit,
+    attemptDelay : o.attemptDelay,
+    successStatus : [ 200, 404 ],
+  });
 
-  ready.then( ( result ) =>
+  ready.then( ( responses ) =>
   {
-    /* remove heading null */
-    result.splice( 0, 1 )
-    if( isSingle )
-    return result[ 0 ];
-    return result;
-  } );
-
-  ready.finally( ( err, result ) =>
-  {
-    if( err )
-    console.log( err );
-    if( err )
-    throw _.err( err );
-    return result;
-  } );
+    return responses.map( ( response ) => responsesHandle( response ) );
+  });
 
   if( o.sync )
   {
@@ -501,67 +477,23 @@ function dependantsRetrieve( o )
 
   /* */
 
-  function request( uri, attempt, i )
-  {
-    let ready2 = new _.Consequence();
-
-    if( attempt >= o.attempts )
-    throw _.err( `Faiteld to retrieve ${uri}, made ${attempt} attempts` );
-
-    started.push({ uri, i });
-    if( o.verbosity >= 3 )
-    console.log( ` . Attempt ${attempt} to retrieve ${i || 0} ${uri}..` );
-
-    https
-    .get( uri, ( res ) =>
-    {
-      if( res.statusCode === 404 )
-      {
-        handleEnd( ready2, uri, i, NaN );
-        return;
-      }
-      if( res.statusCode !== 200 )
-      {
-        request( uri, attempt+1, i );
-        return;
-      }
-      let html = '';
-      res.setEncoding( 'utf8' );
-      res.on( 'data', ( data ) => html += data );
-      res.on( 'end', () => handleHtml( ready2, uri, i, html ) );
-      res.on( 'error', ( err ) => ready2.error( _.err( err ) ) );
-    } )
-    .on( 'error', ( err ) => ready2.error( _.err( err ) ) );
-    return ready2;
-  }
-
-  /* */
-
-  function handleHtml( ready2, uri, i, html )
+  function responsesHandle( op )
   {
     let dependants = '';
+    if( op.response.statusCode !== 200 )
+    return NaN;
+
+    const html = op.response.body;
     const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
     if( !strWithDep )
-    return handleEnd( ready2, uri, i, NaN );
+    return NaN;
 
     for( let i = strWithDep.index; html[ i ] !== '<'; i++ )
     dependants += html[ i ];
     dependants = Number( dependants.split( ',' ).join( '' ) );
 
-    handleEnd( ready2, uri, i, dependants );
-  }
-
-  /* */
-
-  function handleEnd( ready2, uri, i, dependants )
-  {
-    finished.push({ uri, i });
-
-    if( o.verbosity >= 3 )
-    console.log( ` + Retrieved ${i || 0} ${finished.length} / ${started.length} ${uri}.` );
-
-    ready2.take( dependants );
+    return dependants;
   }
 
   /* */
@@ -570,10 +502,11 @@ function dependantsRetrieve( o )
 
 dependantsRetrieve.defaults =
 {
-  sync : 0,
   remotePath : null,
+  sync : 0,
   verbosity : 0,
-  attempts : 3,
+  attemptLimit : 3,
+  attemptDelay : 0,
 }
 
 // --
