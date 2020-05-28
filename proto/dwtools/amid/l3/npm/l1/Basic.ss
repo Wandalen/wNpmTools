@@ -433,6 +433,9 @@ function dependantsRetrieve( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
 
+  let isSingle = !_.arrayIs( o.remotePath );
+  o.remotePath = _.arrayAs( o.remotePath );
+
   let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
 
   let ready = _.http.retrieve
@@ -447,7 +450,10 @@ function dependantsRetrieve( o )
 
   ready.then( ( responses ) =>
   {
-    return responses.map( ( response ) => responsesHandle( response ) );
+    let result = responses.map( ( response ) => responsesHandle( response ) );
+    if( isSingle )
+    return result[ 0 ];
+    return result;
   });
 
   if( o.sync )

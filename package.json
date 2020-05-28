@@ -1,29 +1,36 @@
 {
-  "name" : "wnpmtools",
-  "version" : "0.3.85",
-  "description" : "Collection of tools to use npm programmatically.",
-  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
-  "license" : "MIT",
-  "main" : "proto/dwtools/amid/l3/npm/Include.ss",
-  "files" : [ "proto/dwtools/amid/l3", "proto/dwtools/Tools.s" ],
-  "scripts" : { "test" : "wtest .run proto", "docgen" : "wdocgen .build proto" },
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/Wandalen/wNpmTools.git"
+  "name": "wnpmtools",
+  "version": "0.3.85",
+  "description": "Collection of tools to use npm programmatically.",
+  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "license": "MIT",
+  "main": "proto/dwtools/amid/l3/npm/Include.ss",
+  "files": [
+    "proto/dwtools/amid/l3",
+    "proto/dwtools/Tools.s"
+  ],
+  "scripts": {
+    "test": "wtest .run proto",
+    "docgen": "wdocgen .build proto"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wNpmTools/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wNpmTools.git"
   },
-  "dependencies" :
-  {
-    "package-json" : "6.5.0",
-    "wTools" : "alpha",
-    "whttp" : "alpha",
-    "wFiles" : "alpha",
-    "wappbasic" : "alpha"
+  "bugs": {
+    "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
-  "devDependencies" : { "wTesting" : "alpha" },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "package-json": "6.5.0",
+    "wTools": "alpha",
+    "whttp": "alpha",
+    "wFiles": "alpha",
+    "wappbasic": "alpha"
+  },
+  "devDependencies": {
+    "wTesting": "alpha"
+  },
+  "keywords": [
+    "wTools"
+  ]
 }
