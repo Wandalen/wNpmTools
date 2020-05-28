@@ -953,12 +953,12 @@ async function dependantsRetrieveStressExperiment( test )
   ];
   const remotePath = [];
   const result = [];
-  const l = 3;
+  const l = 2;
 
   for( let i = 0; i < l; i++ )
   {
     remotePath.push( ... temp );
-    result.push( ... [ 4, 1, 1, 1, 0, NaN ] )
+    result.push( 4, 1, 1, 1, 0, NaN );
   }
 
   test.case = `${remotePath.length} packages`;

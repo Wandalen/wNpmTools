@@ -448,7 +448,7 @@ function dependantsRetrieve( o )
 
   if( o.remotePath.length > 1 )
   console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
-
+  // debugger;
   for( let i = 0; i < o.remotePath.length; i++ )
   ready.also( () => request( uriNormalize( o.remotePath[ i ] ) ) );
 
@@ -466,6 +466,8 @@ function dependantsRetrieve( o )
     ready.deasync();
     return ready.sync();
   }
+
+  // debugger;
 
   return ready;
 
