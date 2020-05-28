@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wNpmTools.out
 consistency:
-  wNpmTools.out.will.yml: &ref_0
-    hash: 662f55774dfbac27621010e43d6d8c9e
-    size: 39134
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: 7a8f7d5e4489bf9cdc32adf70a6c2eb3
     size: 1710
-  ../.im.will.yml: &ref_2
-    hash: 92e790b794241babde21cb866657f7c3
-    size: 4962
+  ../.im.will.yml: &ref_1
+    hash: 584187b746e32fbbc54f7c18b4cc9b7b
+    size: 4950
 module:
   wNpmTools.out:
     about:
@@ -19,19 +16,19 @@ module:
       description: Collection of tools to use npm programmatically.
       enabled: 1
       version: 0.9.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 8.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - tools
         - wTools
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
       npm.name: wnpmtools
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -161,20 +158,36 @@ module:
           - ../proto/dwtools/amid
           - ../proto/dwtools/amid/l3
           - ../proto/dwtools/amid/l3/npm
-          - ../proto/dwtools/amid/l3/npm/IncludeBase.s
           - ../proto/dwtools/amid/l3/npm/Include.ss
+          - ../proto/dwtools/amid/l3/npm/include
+          - ../proto/dwtools/amid/l3/npm/include/Basic.ss
+          - ../proto/dwtools/amid/l3/npm/include/Mid.ss
           - ../proto/dwtools/amid/l3/npm/l1
-          - ../proto/dwtools/amid/l3/npm/l1/Tools.s
+          - ../proto/dwtools/amid/l3/npm/l1/Basic.ss
           - ../proto/dwtools/amid/l3.test
           - ../proto/dwtools/amid/l3.test/NpmTools.test.ss
+          - ../proto/dwtools/amid/l3.test/_assets
+          - ../proto/dwtools/amid/l3.test/_assets/bump
+          - ../proto/dwtools/amid/l3.test/_assets/bump/package.json
+          - ../proto/dwtools/amid/l3.test/_assets/fixate
+          - ../proto/dwtools/amid/l3.test/_assets/fixate/emptyVersions
+          - >-
+            ../proto/dwtools/amid/l3.test/_assets/fixate/emptyVersions/forComparison.json
+          - >-
+            ../proto/dwtools/amid/l3.test/_assets/fixate/emptyVersions/forRewriting.json
+          - >-
+            ../proto/dwtools/amid/l3.test/_assets/fixate/emptyVersions/package.json
+          - ../proto/dwtools/amid/l3.test/_assets/fixate/notEmptyVersions
+          - >-
+            ../proto/dwtools/amid/l3.test/_assets/fixate/notEmptyVersions/forComparison.json
+          - >-
+            ../proto/dwtools/amid/l3.test/_assets/fixate/notEmptyVersions/forRewriting.json
+          - >-
+            ../proto/dwtools/amid/l3.test/_assets/fixate/notEmptyVersions/package.json
           - ../proto/dwtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
-        autoExporting: 0
-        enabled: 0
-      wCopyable:
-        path: 'npm:///wCopyable'
         autoExporting: 0
         enabled: 0
       wFiles:
@@ -183,6 +196,10 @@ module:
         enabled: 0
       wAppBasic:
         path: 'npm:///wappbasic'
+        autoExporting: 0
+        enabled: 0
+      wHttp:
+        path: 'npm:///whttp'
         autoExporting: 0
         enabled: 0
       package-json:
@@ -621,7 +638,7 @@ module:
           debug: release
       reflect.proto.debug.raw:
         opts:
-          reflector: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto*'
         criterion:
           tests: no.tests
           debug: debug
@@ -631,7 +648,7 @@ module:
           - files.reflect
       reflect.proto.release.raw:
         opts:
-          reflector: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto*'
         criterion:
           tests: no.tests
           debug: release
@@ -641,7 +658,7 @@ module:
           - files.reflect
       reflect.proto.debug.compiled:
         opts:
-          reflector: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto*'
         criterion:
           tests: no.tests
           debug: debug
@@ -651,7 +668,7 @@ module:
           - files.reflect
       reflect.proto.release.compiled:
         opts:
-          reflector: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto*'
         criterion:
           tests: no.tests
           debug: release
@@ -662,7 +679,7 @@ module:
       transpile.proto.raw:
         opts:
           entry: 'path::entry.proto.no.tests'
-          reflector: 'reflector::transpile.proto.raw*'
+          filePath: 'reflector::transpile.proto.raw*'
         criterion:
           raw: raw
           debug: release
@@ -672,7 +689,7 @@ module:
       transpile.proto.no.tests.compiled.debug:
         opts:
           entry: 'path::entry.proto.*=1'
-          reflector: 'reflector::transpile.proto.no.tests.compiled*'
+          filePath: 'reflector::transpile.proto.no.tests.compiled*'
         criterion:
           tests: no.tests
           raw: compiled
@@ -683,7 +700,7 @@ module:
       transpile.proto.no.tests.compiled.release:
         opts:
           entry: 'path::entry.proto.*=1'
-          reflector: 'reflector::transpile.proto.no.tests.compiled*'
+          filePath: 'reflector::transpile.proto.no.tests.compiled*'
         criterion:
           tests: no.tests
           raw: compiled
@@ -695,7 +712,7 @@ module:
         opts:
           entry: 'path::entry.proto.*=1'
           external.before: '{path::out.*=1}/Main.s'
-          reflector: 'reflector::transpile.proto.only.tests.compiled*'
+          filePath: 'reflector::transpile.proto.only.tests.compiled*'
         criterion:
           tests: only.tests
           raw: compiled
@@ -707,7 +724,7 @@ module:
         opts:
           entry: 'path::entry.proto.*=1'
           external.before: '{path::out.*=1}/Main.s'
-          reflector: 'reflector::transpile.proto.only.tests.compiled*'
+          filePath: 'reflector::transpile.proto.only.tests.compiled*'
         criterion:
           tests: only.tests
           raw: compiled
@@ -715,24 +732,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          reflector: 'reflector::exported.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          reflector: 'reflector::exported.files.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -821,9 +820,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wNpmTools.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wNpmTools
@@ -831,21 +829,13 @@ module:
       description: Collection of tools to use npm programmatically.
       enabled: 1
       version: 0.9.0
-      interpreters:
-        - njs >= 8.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - tools
-        - wTools
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
+      contributors: *ref_4
       npm.name: wnpmtools
-      npm.scripts:
-        test: wtest .run proto/**
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -959,16 +949,16 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wCopyable:
-        path: 'npm:///wCopyable'
-        autoExporting: 0
-        enabled: 0
       wFiles:
         path: 'npm:///wFiles'
         autoExporting: 0
         enabled: 0
       wAppBasic:
         path: 'npm:///wappbasic'
+        autoExporting: 0
+        enabled: 0
+      wHttp:
+        path: 'npm:///whttp'
         autoExporting: 0
         enabled: 0
       package-json:
@@ -1528,6 +1518,5 @@ module:
         hash: 7a8f7d5e4489bf9cdc32adf70a6c2eb3
         size: 1710
       ../.im.will.yml:
-        hash: 92e790b794241babde21cb866657f7c3
-        size: 4962
-      wNpmTools.out.will.yml: *ref_0
+        hash: 584187b746e32fbbc54f7c18b4cc9b7b
+        size: 4950
