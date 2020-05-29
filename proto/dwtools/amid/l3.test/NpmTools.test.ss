@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   let _ = require( '../../../dwtools/Tools.s' );
   _.include( 'wTesting' );
-  require( '../l3/npm/IncludeMid.s' );
+  require( '../l3/npm/Include.ss' );
 }
 
 //
@@ -953,7 +953,7 @@ async function dependantsRetrieveStressExperiment( test )
   ];
   const remotePath = [];
   const result = [];
-  const l = 10;
+  const l = 100;
 
   for( let i = 0; i < l; i++ )
   {

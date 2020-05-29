@@ -1,10 +1,10 @@
 {
   "name" : "wnpmtools",
-  "version" : "0.3.84",
+  "version" : "0.3.86",
   "description" : "Collection of tools to use npm programmatically.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "license" : "MIT",
-  "main" : "proto/dwtools/amid/l3/npm/IncludeMid.s",
+  "main" : "proto/dwtools/amid/l3/npm/Include.ss",
   "files" : [ "proto/dwtools/amid/l3", "proto/dwtools/Tools.s" ],
   "scripts" : { "test" : "wtest .run proto", "docgen" : "wdocgen .build proto" },
   "repository" :
@@ -19,7 +19,7 @@
   "dependencies" :
   {
     "wTools" : "",
-    "wCopyable" : "",
+    "whttp" : "",
     "wFiles" : "",
     "wappbasic" : "",
     "package-json" : "6.5.0"

@@ -1,13 +1,6 @@
-( function _Tools_s_( ) {
+( function _Basic_ss_( ) {
 
 'use strict';
-
-if( typeof module !== 'undefined' )
-{
-
-  require( '../IncludeBase.s' );
-
-}
 
 let _ = _global_.wTools;
 let Self = _.npm = _.npm || Object.create( null );
@@ -430,10 +423,8 @@ _readChangeWrite.defaults =
 
 function dependantsRetrieve( o )
 {
-  const https = require( 'https' );
   const self = this;
-  let ready = new _.Consequence().take( null );
-  let prefixUri = 'https://www.npmjs.com/package/';
+  const prefixUri = 'https://www.npmjs.com/package/';
 
   let counter = 0;
 
@@ -441,27 +432,31 @@ function dependantsRetrieve( o )
   o = { remotePath : o }
   _.routineOptions( dependantsRetrieve, o );
 
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
+
   let isSingle = !_.arrayIs( o.remotePath );
   o.remotePath = _.arrayAs( o.remotePath );
 
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( o.remotePath.length, 'Expects not empty array' );
-  _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
+  let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
 
-  if( o.remotePath.length > 1 )
-  console.log( 'Loading data, wait... Total requests: ' + o.remotePath.length );
-  // debugger;
-  for( let i = 0; i < o.remotePath.length; i++ )
-  ready.also( () => request( uriNormalize( o.remotePath[ i ] ) ) );
+  let ready = _.http.retrieve
+  ({
+    uri,
+    sync : 0,
+    verbosity : o.verbosity,
+    attemptLimit : o.attemptLimit,
+    attemptDelay : o.attemptDelay,
+    successStatus : [ 200, 404 ],
+  });
 
-  ready.then( ( result ) =>
+  ready.then( ( responses ) =>
   {
-    /* remove heading null */
-    result.splice( 0, 1 )
+    let result = responses.map( ( response ) => responsesHandle( response ) );
     if( isSingle )
     return result[ 0 ];
     return result;
-  } );
+  });
 
   if( o.sync )
   {
@@ -492,55 +487,36 @@ function dependantsRetrieve( o )
 
   /* */
 
-  function request( uri )
-  {
-    let ready2 = new _.Consequence();
-    // if( o.verbosity >= 3 )
-    // console.log( ` . Retrieving ${uri}..` );
-    https
-    .get( uri, ( res ) =>
-    {
-      let html = '';
-      res.setEncoding( 'utf8' );
-      res.on( 'data', ( data ) => html += data );
-      res.on( 'end', () => handleEnd( ready2, html, uri ) );
-    } )
-    .on( 'error', ( err ) => ready2.error( err ) );
-    return ready2;
-  }
-
-  /* */
-
-  function handleEnd( ready2, html, uri )
+  function responsesHandle( op )
   {
     let dependants = '';
+    if( op.response.statusCode !== 200 )
+    return NaN;
+
+    const html = op.response.body;
     const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
-    // if( o.verbosity >= 3 )
-    // console.log( ` + Retrieved ${uri}.` );
-
-    if( o.verbosity >= 3 )
-    {
-      counter += 1;
-      console.log( ` + Retrieved ${counter} / total ${o.remotePath.length}` );
-    }
-
     if( !strWithDep )
-    return ready2.take( NaN );
+    return NaN;
 
     for( let i = strWithDep.index; html[ i ] !== '<'; i++ )
     dependants += html[ i ];
+    dependants = Number( dependants.split( ',' ).join( '' ) );
 
-    ready2.take( Number( dependants.split( ',' ).join( '' ) ) );
+    return dependants;
   }
+
+  /* */
 
 }
 
 dependantsRetrieve.defaults =
 {
-  sync : 0,
   remotePath : null,
+  sync : 0,
   verbosity : 0,
+  attemptLimit : 3,
+  attemptDelay : 0,
 }
 
 // --
