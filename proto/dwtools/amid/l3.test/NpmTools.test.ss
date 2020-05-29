@@ -1,4 +1,5 @@
-( function _NpmTools_test_ss_( ) {
+( function _NpmTools_test_ss_()
+{
 
 'use strict';
 
@@ -23,7 +24,7 @@ function onSuiteBegin( test )
   let context = this;
   context.provider = _.fileProvider;
   let path = context.provider.path;
-  context.suitePath = context.provider.path.pathDirTempOpen( path.join( __dirname, '../..'  ),'NpmTools' );
+  context.suitePath = context.provider.path.pathDirTempOpen( path.join( __dirname, '../..' ), 'NpmTools' );
   context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
 }
