@@ -435,6 +435,8 @@ function dependantsRetrieve( o )
   let ready = new _.Consequence().take( null );
   let prefixUri = 'https://www.npmjs.com/package/';
 
+  let counter = 0;
+
   if( !_.mapIs( o ) )
   o = { remotePath : o }
   _.routineOptions( dependantsRetrieve, o );
@@ -493,8 +495,8 @@ function dependantsRetrieve( o )
   function request( uri )
   {
     let ready2 = new _.Consequence();
-    if( o.verbosity >= 3 )
-    console.log( ` . Retrieving ${uri}..` );
+    // if( o.verbosity >= 3 )
+    // console.log( ` . Retrieving ${uri}..` );
     https
     .get( uri, ( res ) =>
     {
@@ -514,8 +516,14 @@ function dependantsRetrieve( o )
     let dependants = '';
     const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
 
+    // if( o.verbosity >= 3 )
+    // console.log( ` + Retrieved ${uri}.` );
+
     if( o.verbosity >= 3 )
-    console.log( ` + Retrieved ${uri}.` );
+    {
+      counter += 1;
+      console.log( ` + Retrieved ${counter} / total ${o.remotePath.length}` );
+    }
 
     if( !strWithDep )
     return ready2.take( NaN );
