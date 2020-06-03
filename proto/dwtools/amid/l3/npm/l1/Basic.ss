@@ -573,8 +573,8 @@ function pathParse( remotePath )
   parsed2.longPath = name;
   result.remoteVcsPath = path.str( parsed2 );
 
-  parsed2.hash = parsed1.hash;
-  parsed2.tag = parsed1.tag;
+  // parsed2.hash = parsed1.hash;
+  // parsed2.tag = parsed1.tag;
   result.remoteVcsLongerPath = path.str( parsed2 );
 
   // /* */
