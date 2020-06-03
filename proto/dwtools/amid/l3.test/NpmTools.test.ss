@@ -214,20 +214,20 @@ function bump( test )
     return null;
   } )
 
-  a.shellNonThrowing( { args : [ 'node', 'Hello.test.js', 'beeping:0' ] } )
-  .then( ( op ) =>
-  {
-    test.ni( op.exitCode, 0 );
+  // a.shellNonThrowing( { args : [ 'node', 'Hello.test.js', 'beeping:0' ] } )
+  // .then( ( op ) =>
+  // {
+  //   test.ni( op.exitCode, 0 );
 
-    test.identical( _.strCount( op.output, 'Passed TestSuite::Hello / TestRoutine::routine1' ), 1 );
-    test.identical( _.strCount( op.output, 'Failed TestSuite::Hello / TestRoutine::routine2' ), 1 );
-    test.identical( _.strCount( op.output, /Passed.*test checks 2 \/ 3/ ), 2 );
-    test.identical( _.strCount( op.output, /Passed.*test cases 1 \/ 2/ ), 2 );
-    test.identical( _.strCount( op.output, /Passed.*test routines 1 \/ 2/ ), 2 );
-    test.identical( _.strCount( op.output, /Test suite.*\(.*Hello.*\).*failed/ ), 1 );
+  //   test.identical( _.strCount( op.output, 'Passed TestSuite::Hello / TestRoutine::routine1' ), 1 );
+  //   test.identical( _.strCount( op.output, 'Failed TestSuite::Hello / TestRoutine::routine2' ), 1 );
+  //   test.identical( _.strCount( op.output, /Passed.*test checks 2 \/ 3/ ), 2 );
+  //   test.identical( _.strCount( op.output, /Passed.*test cases 1 \/ 2/ ), 2 );
+  //   test.identical( _.strCount( op.output, /Passed.*test routines 1 \/ 2/ ), 2 );
+  //   test.identical( _.strCount( op.output, /Test suite.*\(.*Hello.*\).*failed/ ), 1 );
 
-    return null;
-  } )
+  //   return null;
+  // } )
 
   /* - */
 
