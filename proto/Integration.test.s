@@ -26,7 +26,7 @@ function samples( test )
   let context = this;
   let ready = new _.Consequence().take( null );
 
-  let sampleDir = path.join( __dirname, '../../sample' );
+  let sampleDir = path.join( __dirname, '../sample' );
 
   let appStartNonThrowing = _.process.starter
   ( {
