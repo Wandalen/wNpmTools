@@ -27,6 +27,12 @@ function onSuiteBegin( test )
   context.suitePath = context.provider.path.pathDirTempOpen( path.join( __dirname, '../..' ), 'NpmTools' );
   context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
+
+  context.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'NpmTools' );
+  context.assetsOriginalSuitePath = _.path.join( __dirname, '_assets' );
+
+  // context.appJsPath = _.path.nativize( _.path.join( _.path.normalize( __dirname ), '../tester/entry/Exec' ) );
+  // context.toolsPath = _.path.nativize( _.path.join( _.path.normalize( __dirname ), '../../../dwtools/Tools.s' ) );
 }
 
 //
@@ -37,6 +43,47 @@ function onSuiteEnd( test )
   let path = context.provider.path;
   _.assert( _.strHas( context.suitePath, 'NpmTools' ), context.suitePath );
   path.pathDirTempClose( context.suitePath );
+
+  // _.assert( _.strHas( context.suiteTempPath, 'Tester' ) )
+  _.path.pathDirTempClose( context.suiteTempPath );
+}
+
+//
+
+function assetFor( test, asset )
+{
+  let self = this;
+  let a = test.assetFor( asset );
+
+  a.reflect = function reflect()
+  {
+
+    let reflected = a.fileProvider.filesReflect({ reflectMap : { [ a.originalAssetPath ] : a.routinePath }, onUp } );
+    debugger;
+    reflected.forEach( ( r ) =>
+    {
+      if( r.dst.ext !== 'js' && r.dst.ext !== 's' )
+      return;
+
+      var read = a.fileProvider.fileRead( r.dst.absolute );
+      // read = _.strReplace( read, `'wTesting'`, `'${_.strEscape( self.appJsPath )}'` );
+      // read = _.strReplace( read, `'wTools'`, `'${_.strEscape( self.toolsPath )}'` );
+      a.fileProvider.fileWrite( r.dst.absolute, read );
+    } );
+    debugger;
+  }
+
+  return a;
+
+  function onUp( r )
+  {
+    if( !_.strHas( r.dst.relative, '.atest.' ) )
+    return;
+    let relative = _.strReplace( r.dst.relative, '.atest.', '.test.' );
+    r.dst.relative = relative;
+    _.assert( _.strHas( r.dst.absolute, '.test.' ) );
+  }
+
 }
 
 // --
@@ -146,31 +193,63 @@ Fixates versions of the dependecies in provided package
 `;
 
 // //
-//
-// function bump( test )
-// {
-//   const _ = require( 'wTools' );
-//   require( 'wFiles' );
-//
-//   let config = _.fileProvider.fileRead
-//   ( {
-//     filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
-//     encoding : 'json'
-//   } );
-//   let versionBeforeBump = config.version.split( '.' );
-//   versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
-//
-//   let localPath = _.path.join( __dirname, '../../../../sample/bump' );
-//   // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
-//   let got = _.npm.bump( { localPath } ).config.version;
-//   let exp = versionBeforeBump.join( '.' );
-//   test.identical( got, exp );
-// }
-//
-// bump.description =
-// `
-// Bumps package version
-// `;
+
+function bump( test )
+{
+  // const _ = require( 'wTools' );
+  // require( 'wFiles' );
+  let self = this;
+  let a = self.assetFor( test, 'bump' );
+  debugger;
+  a.reflect();
+  debugger;
+  test.is( a.fileProvider.fileExists( a.abs( 'Hello.test.js' ) ) );
+  debugger;
+  /* - */
+
+  a.ready
+  .then( () =>
+  {
+    test.case = 'node Hello.test.js beeping:0'
+    return null;
+  } )
+
+  a.shellNonThrowing( { args : [ 'node', 'Hello.test.js', 'beeping:0' ] } )
+  .then( ( op ) =>
+  {
+    test.ni( op.exitCode, 0 );
+
+    test.identical( _.strCount( op.output, 'Passed TestSuite::Hello / TestRoutine::routine1' ), 1 );
+    test.identical( _.strCount( op.output, 'Failed TestSuite::Hello / TestRoutine::routine2' ), 1 );
+    test.identical( _.strCount( op.output, /Passed.*test checks 2 \/ 3/ ), 2 );
+    test.identical( _.strCount( op.output, /Passed.*test cases 1 \/ 2/ ), 2 );
+    test.identical( _.strCount( op.output, /Passed.*test routines 1 \/ 2/ ), 2 );
+    test.identical( _.strCount( op.output, /Test suite.*\(.*Hello.*\).*failed/ ), 1 );
+
+    return null;
+  } )
+
+  /* - */
+
+  // let config = _.fileProvider.fileRead
+  // ( {
+  //   filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
+  //   encoding : 'json'
+  // } );
+  // let versionBeforeBump = config.version.split( '.' );
+  // versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
+
+  // let localPath = _.path.join( __dirname, '../../../../sample/bump' );
+  // // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
+  // let got = _.npm.bump( { localPath } ).config.version;
+  // let exp = versionBeforeBump.join( '.' );
+  // test.identical( got, exp );
+}
+
+bump.description =
+`
+Bumps package version
+`;
 
 //
 
@@ -992,15 +1071,21 @@ var Proto =
 
   context :
   {
+    assetFor,
+
     provider : null,
     suitePath : null,
+
+    suiteTempPath : null,
+    assetsOriginalSuitePath : null,
+    appJsPath : null,
+    toolsPath : null,
   },
 
   tests :
   {
-
-    // fixate,
-    // bump,
+    fixate,
+    bump,
 
     trivial,
     pathParse,
