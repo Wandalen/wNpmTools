@@ -1024,7 +1024,7 @@ Retrieves dependants of each package in array
 
 //
 
-async function dependantsRetrieveStressExperiment( test )
+async function dependantsRetrieveStress( test )
 {
   const temp =
   [
@@ -1048,11 +1048,12 @@ async function dependantsRetrieveStressExperiment( test )
 
 }
 
-dependantsRetrieveStressExperiment.experimental = 1;
-dependantsRetrieveStressExperiment.timeOut = 300000;
-dependantsRetrieveStressExperiment.description =
+// dependantsRetrieveStress.experimental = 1;
+dependantsRetrieveStress.rapidity = -2;
+dependantsRetrieveStress.timeOut = 300000;
+dependantsRetrieveStress.description =
 `
-Makes testing for very large loads
+Stress testing
 `
 
 // --
@@ -1102,7 +1103,7 @@ var Proto =
 
     dependantsRetrieve,
     dependantsRetrieveMultipleRequests,
-    dependantsRetrieveStressExperiment,
+    dependantsRetrieveStress,
 
   },
 
