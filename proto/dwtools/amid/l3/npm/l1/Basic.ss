@@ -516,7 +516,7 @@ dependantsRetrieve.defaults =
   sync : 0,
   verbosity : 0,
   attemptLimit : 3,
-  attemptDelay : 0,
+  attemptDelay : 250,
 }
 
 // --
