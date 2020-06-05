@@ -163,7 +163,7 @@ function bump( test )
   // const _ = require( 'wTools' );
   // require( 'wFiles' );
   // let self = this;
-  // let a = self.assetFor( test, 'bump' );
+  // let a = test.assetFor( 'bump' );
   // debugger;
   // a.reflect();
   // debugger;
