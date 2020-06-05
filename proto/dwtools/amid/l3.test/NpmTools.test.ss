@@ -1036,8 +1036,6 @@ var Proto =
 
   context :
   {
-    assetFor,
-
     provider : null,
     suitePath : null,
 
@@ -1050,7 +1048,7 @@ var Proto =
   tests :
   {
     // fixate,
-    bump,
+    // bump,
 
     trivial,
     pathParse,
