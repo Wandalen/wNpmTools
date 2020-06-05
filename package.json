@@ -12,18 +12,24 @@
     "type" : "git",
     "url" : "https://github.com/Wandalen/wNpmTools.git"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wNpmTools/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wNpmTools.git"
   },
-  "dependencies" :
-  {
-    "package-json" : "6.5.0",
-    "wTools" : "alpha",
-    "whttp" : "alpha",
-    "wFiles" : "alpha",
-    "wappbasic" : "alpha"
+  "bugs": {
+    "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
-  "devDependencies" : { "wTesting" : "alpha" },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "package-json": "6.5.0",
+    "wTools": "alpha",
+    "whttp": "alpha",
+    "wFiles": "alpha",
+    "wappbasic": "alpha"
+  },
+  "devDependencies": {
+    "wTesting": "alpha"
+  },
+  "keywords": [
+    "wTools"
+  ]
 }

@@ -426,6 +426,8 @@ function dependantsRetrieve( o )
   const self = this;
   const prefixUri = 'https://www.npmjs.com/package/';
 
+  let counter = 0;
+
   if( !_.mapIs( o ) )
   o = { remotePath : o }
   _.routineOptions( dependantsRetrieve, o );
@@ -461,6 +463,8 @@ function dependantsRetrieve( o )
     ready.deasync();
     return ready.sync();
   }
+
+  // debugger;
 
   return ready;
 
