@@ -50,42 +50,6 @@ function onSuiteEnd( test )
 
 //
 
-function assetFor( test, asset )
-{
-  let self = this;
-  let a = test.assetFor( asset );
-
-  a.reflect = function reflect()
-  {
-
-    let reflected = a.fileProvider.filesReflect({ reflectMap : { [ a.originalAssetPath ] : a.routinePath }, onUp } );
-    debugger;
-    reflected.forEach( ( r ) =>
-    {
-      if( r.dst.ext !== 'js' && r.dst.ext !== 's' )
-      return;
-
-      var read = a.fileProvider.fileRead( r.dst.absolute );
-      // read = _.strReplace( read, `'wTesting'`, `'${_.strEscape( self.appJsPath )}'` );
-      // read = _.strReplace( read, `'wTools'`, `'${_.strEscape( self.toolsPath )}'` );
-      a.fileProvider.fileWrite( r.dst.absolute, read );
-    } );
-    debugger;
-  }
-
-  return a;
-
-  function onUp( r )
-  {
-    if( !_.strHas( r.dst.relative, '.atest.' ) )
-    return;
-    let relative = _.strReplace( r.dst.relative, '.atest.', '.test.' );
-    r.dst.relative = relative;
-    _.assert( _.strHas( r.dst.absolute, '.test.' ) );
-  }
-
-}
-
 // --
 // tests
 // --
@@ -198,21 +162,21 @@ function bump( test )
 {
   // const _ = require( 'wTools' );
   // require( 'wFiles' );
-  let self = this;
-  let a = self.assetFor( test, 'bump' );
-  debugger;
-  a.reflect();
-  debugger;
-  test.is( a.fileProvider.fileExists( a.abs( 'Hello.test.js' ) ) );
-  debugger;
-  /* - */
+  // let self = this;
+  // let a = self.assetFor( test, 'bump' );
+  // debugger;
+  // a.reflect();
+  // debugger;
+  // test.is( a.fileProvider.fileExists( a.abs( 'Hello.test.js' ) ) );
+  // debugger;
+  // /* - */
 
-  a.ready
-  .then( () =>
-  {
-    test.case = 'node Hello.test.js beeping:0'
-    return null;
-  } )
+  // a.ready
+  // .then( () =>
+  // {
+  //   test.case = 'node Hello.test.js beeping:0'
+  //   return null;
+  // } )
 
   // a.shellNonThrowing( { args : [ 'node', 'Hello.test.js', 'beeping:0' ] } )
   // .then( ( op ) =>
@@ -1085,7 +1049,7 @@ var Proto =
 
   tests :
   {
-    fixate,
+    // fixate,
     bump,
 
     trivial,
