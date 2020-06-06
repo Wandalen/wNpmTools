@@ -1,6 +1,6 @@
 {
   "name" : "wnpmtools",
-  "version" : "0.3.90",
+  "version" : "0.3.91",
   "description" : "Collection of tools to use npm programmatically.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "license" : "MIT",
@@ -12,24 +12,18 @@
     "type" : "git",
     "url" : "https://github.com/Wandalen/wNpmTools.git"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Wandalen/wNpmTools.git"
+  "bugs" :
+  {
+    "url" : "https://github.com/Wandalen/wNpmTools/issues"
   },
-  "bugs": {
-    "url": "https://github.com/Wandalen/wNpmTools/issues"
+  "dependencies" :
+  {
+    "package-json" : "6.5.0",
+    "wTools" : "alpha",
+    "whttp" : "alpha",
+    "wFiles" : "alpha",
+    "wappbasic" : "alpha"
   },
-  "dependencies": {
-    "package-json": "6.5.0",
-    "wTools": "alpha",
-    "whttp": "alpha",
-    "wFiles": "alpha",
-    "wappbasic": "alpha"
-  },
-  "devDependencies": {
-    "wTesting": "alpha"
-  },
-  "keywords": [
-    "wTools"
-  ]
+  "devDependencies" : { "wTesting" : "alpha" },
+  "keywords" : [ "wTools" ]
 }
