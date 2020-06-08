@@ -155,6 +155,7 @@ module:
           export: 1
         path:
           - ../proto
+          - ../proto/Integration.test.s
           - ../proto/dwtools
           - ../proto/dwtools/Tools.s
           - ../proto/dwtools/abase
@@ -171,6 +172,8 @@ module:
           - ../proto/dwtools/amid/l3.test/NpmTools.test.ss
           - ../proto/dwtools/amid/l3.test/_assets
           - ../proto/dwtools/amid/l3.test/_assets/bump
+          - ../proto/dwtools/amid/l3.test/_assets/bump/Hello.js
+          - ../proto/dwtools/amid/l3.test/_assets/bump/Hello.test.js
           - ../proto/dwtools/amid/l3.test/_assets/bump/package.json
           - ../proto/dwtools/amid/l3.test/_assets/fixateEmptyVersions
           - >-
