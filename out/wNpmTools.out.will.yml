@@ -199,8 +199,8 @@ module:
         path: 'npm:///wFiles'
         autoExporting: 0
         enabled: 0
-      wAppBasic:
-        path: 'npm:///wappbasic'
+      wProcess:
+        path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
       wHttp:
@@ -996,8 +996,8 @@ module:
         path: 'npm:///wFiles'
         autoExporting: 0
         enabled: 0
-      wAppBasic:
-        path: 'npm:///wappbasic'
+      wProcess:
+        path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
       wHttp:

@@ -21,7 +21,7 @@
     "wTools" : "",
     "whttp" : "",
     "wFiles" : "",
-    "wappbasic" : "",
+    "wprocess" : "",
     "package-json" : "6.5.0"
   },
   "devDependencies" : { "wTesting" : "" },

@@ -7,8 +7,8 @@ submodule :
   wFiles :
     path : npm:///wFiles
     enabled : 0 # submodule
-  wAppBasic :
-    path : npm:///wappbasic
+  wProcess :
+    path : npm:///wprocess
     enabled : 0 # submodule
   wHttp :
     path : npm:///whttp

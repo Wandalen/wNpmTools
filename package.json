@@ -22,7 +22,7 @@
     "wTools" : "alpha",
     "whttp" : "alpha",
     "wFiles" : "alpha",
-    "wappbasic" : "alpha"
+    "wprocess" : "alpha"
   },
   "devDependencies" : { "wTesting" : "alpha" },
   "keywords" : [ "wTools" ]
