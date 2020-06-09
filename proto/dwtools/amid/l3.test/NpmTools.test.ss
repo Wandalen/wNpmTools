@@ -160,38 +160,32 @@ Fixates versions of the dependecies in provided package
 
 function bump( test )
 {
-  // const _ = require( 'wTools' );
-  // require( 'wFiles' );
-  // let self = this;
-  // let a = test.assetFor( 'bump' );
-  // debugger;
-  // a.reflect();
-  // debugger;
-  // test.is( a.fileProvider.fileExists( a.abs( 'Hello.test.js' ) ) );
-  // debugger;
-  // /* - */
+  let self = this;
 
-  // a.ready
-  // .then( () =>
-  // {
-  //   test.case = 'node Hello.test.js beeping:0'
-  //   return null;
-  // } )
+  let a = test.assetFor( 'bump' );
+  a.reflect();
 
-  // a.shellNonThrowing( { args : [ 'node', 'Hello.test.js', 'beeping:0' ] } )
-  // .then( ( op ) =>
-  // {
-  //   test.ni( op.exitCode, 0 );
+  test.case = '`local path` option points to the config file';
+  var localPath = a.abs( '' );
+  var got = _.npm.bump( { localPath } ).config;
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.1',
+    'description' : 'for testing bump and fixate routines',
+    'main' : 'index.js',
+    'dependencies' : {},
+    'devDependencies' : {},
+    'scripts' :
+    {
+      'test' : 'echo "Error: no test specified" && exit 1'
+    },
+    'keywords' : [],
+    'author' : '',
+    'license' : 'ISC'
+  }
 
-  //   test.identical( _.strCount( op.output, 'Passed TestSuite::Hello / TestRoutine::routine1' ), 1 );
-  //   test.identical( _.strCount( op.output, 'Failed TestSuite::Hello / TestRoutine::routine2' ), 1 );
-  //   test.identical( _.strCount( op.output, /Passed.*test checks 2 \/ 3/ ), 2 );
-  //   test.identical( _.strCount( op.output, /Passed.*test cases 1 \/ 2/ ), 2 );
-  //   test.identical( _.strCount( op.output, /Passed.*test routines 1 \/ 2/ ), 2 );
-  //   test.identical( _.strCount( op.output, /Test suite.*\(.*Hello.*\).*failed/ ), 1 );
-
-  //   return null;
-  // } )
+  test.identical( got, exp );
 
   /* - */
 
@@ -1048,7 +1042,7 @@ var Proto =
   tests :
   {
     // fixate,
-    // bump,
+    bump,
 
     trivial,
     pathParse,
