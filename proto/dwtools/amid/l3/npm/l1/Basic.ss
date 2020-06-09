@@ -579,7 +579,7 @@ function pathParse( remotePath )
 
   // parsed2.hash = parsed1.hash;
   // parsed2.tag = parsed1.tag;
-  result.remoteVcsLongerPath = path.str( parsed2 );
+  result.remoteVcsLongerPath = result.remoteVcsPath + '@' + ( result.hash || result.tag );
 
   // /* */
   //
