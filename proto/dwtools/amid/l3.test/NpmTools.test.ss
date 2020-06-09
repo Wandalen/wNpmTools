@@ -30,9 +30,6 @@ function onSuiteBegin( test )
 
   context.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'NpmTools' );
   context.assetsOriginalSuitePath = _.path.join( __dirname, '_assets' );
-
-  // context.appJsPath = _.path.nativize( _.path.join( _.path.normalize( __dirname ), '../tester/entry/Exec' ) );
-  // context.toolsPath = _.path.nativize( _.path.join( _.path.normalize( __dirname ), '../../../dwtools/Tools.s' ) );
 }
 
 //
@@ -43,9 +40,6 @@ function onSuiteEnd( test )
   let path = context.provider.path;
   _.assert( _.strHas( context.suitePath, 'NpmTools' ), context.suitePath );
   path.pathDirTempClose( context.suitePath );
-
-  // _.assert( _.strHas( context.suiteTempPath, 'Tester' ) )
-  _.path.pathDirTempClose( context.suiteTempPath );
 }
 
 //
@@ -69,45 +63,92 @@ function trivial( test )
 
 function fixate( test )
 {
-  const _ = require( 'wTools' );
-  require( 'wFiles' );
+  let self = this;
+
+  var a = test.assetFor( 'fixateNotEmptyVersions' );
+  a.reflect();
 
   test.case = 'dependency versions are specified';
 
-  var comparisonConfig = _.fileProvider.fileRead
-  ( {
-    filePath : abs( 'notEmptyVersions/forComparison.json' ),
-    encoding : 'json'
-  } );
-
-  var localPath = abs( 'notEmptyVersions' );
-  // let configPath = { filePath : abs( 'notEmptyVersions/package.json' ) };
+  var localPath = a.abs( '' );
   var tag = '=';
   var got = _.npm.fixate( { localPath, tag } ).config;
-  var exp = comparisonConfig;
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'description' : 'for testing fixate routine',
+    'main' : 'index.js',
+    'dependencies' : {
+      'package1' : '1.0.0',
+      'package2' : '1.0.0'
+    },
+    'devDependencies' : {
+      'package3' : '1.0.0',
+      'package4' : '1.0.0'
+    },
+    'optionalDependencies' : {
+      'package5' : '1.0.0',
+      'package6' : '1.0.0'
+    },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : {
+      'package9' : '1.0.0',
+      'package10' : '1.0.0'
+    },
+    'scripts' : {
+      'test' : 'echo "Error: no test specified" && exit 1'
+    },
+    'keywords' : [],
+    'author' : '',
+    'license' : 'ISC'
+  }
+
   test.identical( got, exp );
 
-  rewriteInitialConfig( 'notEmptyVersions' );
+  /* */
 
-  //
+  var a = test.assetFor( 'fixateEmptyVersions' );
+  a.reflect();
 
   test.case = 'dependency versions are not specified';
 
-  var comparisonConfig = _.fileProvider.fileRead
-  ( {
-    filePath : abs( 'emptyVersions/forComparison.json' ),
-    encoding : 'json'
-  } );
-
-  var localPath = abs( 'emptyVersions' );
-  // let configPath = { filePath : abs( 'emptyVersions/package.json' ) };
+  var localPath = a.abs( '' );
   var tag = '=';
   var o = { localPath, tag, onDependency }
   var got = _.npm.fixate( o ).config;
-  var exp = comparisonConfig;
-  test.identical( got, exp );
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'description' : 'for testing fixate routine',
+    'main' : 'index.js',
+    'dependencies' : {
+      'package1' : '=1.1.1',
+      'package2' : '=2.2.2'
+    },
+    'devDependencies' : {
+      'package3' : '=3.3.3',
+      'package4' : '=4.4.4'
+    },
+    'optionalDependencies' : {
+      'package5' : '=5.5.5',
+      'package6' : '=6.6.6'
+    },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : {
+      'package9' : '=9.9.9',
+      'package10' : '=10.10.10'
+    },
+    'scripts' : {
+      'test' : 'echo "Error: no test specified" && exit 1'
+    },
+    'keywords' : [],
+    'author' : '',
+    'license' : 'ISC'
+  }
 
-  rewriteInitialConfig( 'emptyVersions' );
+  test.identical( got, exp );
 
   function onDependency( dep )
   {
@@ -129,25 +170,6 @@ function fixate( test )
       if( dep.name === depName )
       dep.version = o.tag + depVersionsToFixate[ depName ];
     }
-  }
-
-  //
-
-  function abs() { return _.path.s.join( __dirname, '../../../../sample/fixate/', ... arguments ) }
-
-  function rewriteInitialConfig( folder )
-  {
-    var initialConfig = _.fileProvider.fileRead
-    ( {
-      filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/forRewriting.json` ),
-      encoding : 'json'
-    } );
-    _.fileProvider.fileWrite
-    ( {
-      filePath : _.path.join( __dirname, `../../../../sample/fixate/${folder}/package.json` ),
-      data : initialConfig,
-      encoding : 'json'
-    } );
   }
 }
 
@@ -172,7 +194,7 @@ function bump( test )
   {
     'name' : 'test package.json',
     'version' : '1.0.1',
-    'description' : 'for testing bump and fixate routines',
+    'description' : 'for testing bump routine',
     'main' : 'index.js',
     'dependencies' : {},
     'devDependencies' : {},
@@ -186,22 +208,6 @@ function bump( test )
   }
 
   test.identical( got, exp );
-
-  /* - */
-
-  // let config = _.fileProvider.fileRead
-  // ( {
-  //   filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ),
-  //   encoding : 'json'
-  // } );
-  // let versionBeforeBump = config.version.split( '.' );
-  // versionBeforeBump[ 2 ] = Number( versionBeforeBump[ 2 ] ) + 1;
-
-  // let localPath = _.path.join( __dirname, '../../../../sample/bump' );
-  // // let configPath = { filePath : _.path.join( __dirname, '../../../../sample/bump/package.json' ) };
-  // let got = _.npm.bump( { localPath } ).config.version;
-  // let exp = versionBeforeBump.join( '.' );
-  // test.identical( got, exp );
 }
 
 bump.description =
@@ -1041,7 +1047,7 @@ var Proto =
 
   tests :
   {
-    // fixate,
+    fixate,
     bump,
 
     trivial,
