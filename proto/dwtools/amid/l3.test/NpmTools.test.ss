@@ -30,6 +30,7 @@ function onSuiteBegin( test )
 
   context.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'NpmTools' );
   context.assetsOriginalSuitePath = _.path.join( __dirname, '_assets' );
+  context.assetsOriginalPath = _.path.join( __dirname, '_assets' );
 }
 
 //
@@ -1041,6 +1042,7 @@ var Proto =
 
     suiteTempPath : null,
     assetsOriginalSuitePath : null,
+    assetsOriginalPath : null,
     appJsPath : null,
     toolsPath : null,
   },
