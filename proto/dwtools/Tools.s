@@ -22,4 +22,3 @@ if( typeof module !== 'undefined' )
   module[ 'exports' ] = _global_.wTools;
 
 }
-
