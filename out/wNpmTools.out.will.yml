@@ -6,8 +6,8 @@ consistency:
     hash: 7a8f7d5e4489bf9cdc32adf70a6c2eb3
     size: 1710
   ../.im.will.yml: &ref_1
-    hash: 6613b61f1465c5e7a66886b1d34a0667
-    size: 4948
+    hash: 7a2575128252457e39677ebcce90e6d1
+    size: 5018
 module:
   wNpmTools.out:
     about:
@@ -206,6 +206,10 @@ module:
         enabled: 0
       package-json:
         path: 'npm:///package-json#6.5.0'
+        autoExporting: 0
+        enabled: 0
+      eslint:
+        path: 'npm:///eslint#7.1.0'
         autoExporting: 0
         enabled: 0
     reflector:
@@ -948,6 +952,10 @@ module:
         path: 'npm:///package-json#6.5.0'
         autoExporting: 0
         enabled: 0
+      eslint:
+        path: 'npm:///eslint#7.1.0'
+        autoExporting: 0
+        enabled: 0
     reflector:
       reflect.proto.debug.raw:
         src:
@@ -1483,5 +1491,5 @@ module:
         hash: 7a8f7d5e4489bf9cdc32adf70a6c2eb3
         size: 1710
       ../.im.will.yml:
-        hash: 6613b61f1465c5e7a66886b1d34a0667
-        size: 4948
+        hash: 7a2575128252457e39677ebcce90e6d1
+        size: 5018
