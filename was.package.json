@@ -22,9 +22,8 @@
     "whttp" : "",
     "wFiles" : "",
     "wprocess" : "",
-    "package-json" : "6.5.0",
-    "eslint" : "7.1.0"
+    "package-json" : "6.5.0"
   },
-  "devDependencies" : { "wTesting" : "" },
+  "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0" },
   "keywords" : [ "wTools" ]
 }
