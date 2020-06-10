@@ -1,4 +1,4 @@
-( function _Basic_ss_()
+( function _Basic_ss_( )
 {
 
 'use strict';
@@ -580,7 +580,7 @@ function pathParse( remotePath )
 
   // parsed2.hash = parsed1.hash;
   // parsed2.tag = parsed1.tag;
-  result.remoteVcsLongerPath = path.str( parsed2 );
+  result.remoteVcsLongerPath = result.remoteVcsPath + '@' + ( result.hash || result.tag );
 
   // /* */
   //
@@ -601,14 +601,14 @@ function pathParse( remotePath )
   return result
 
   /*
-  remotePath : 'npm:///wColor/out/wColor#0.3.100'
-  protocol : 'npm',
-  hash : '0.3.100',
-  longPath : '/wColor/out/wColor',
-  localVcsPath : 'out/wColor',
-  remoteVcsPath : 'wColor',
-  remoteVcsLongerPath : 'wColor@0.3.100'
-*/
+    remotePath : 'npm:///wColor/out/wColor#0.3.100'
+    protocol : 'npm',
+    hash : '0.3.100',
+    longPath : '/wColor/out/wColor',
+    localVcsPath : 'out/wColor',
+    remoteVcsPath : 'wColor',
+    remoteVcsLongerPath : 'wColor@0.3.100'
+  */
 
   /* */
 

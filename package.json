@@ -1,6 +1,6 @@
 {
   "name" : "wnpmtools",
-  "version" : "0.3.91",
+  "version" : "0.3.93",
   "description" : "Collection of tools to use npm programmatically.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "license" : "MIT",
@@ -19,10 +19,11 @@
   "dependencies" :
   {
     "package-json" : "6.5.0",
+    "eslint" : "7.1.0",
     "wTools" : "alpha",
     "whttp" : "alpha",
     "wFiles" : "alpha",
-    "wappbasic" : "alpha"
+    "wprocess" : "alpha"
   },
   "devDependencies" : { "wTesting" : "alpha", "eslint": "7.1.0" },
   "keywords" : [ "wTools" ]

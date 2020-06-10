@@ -7,14 +7,17 @@ submodule :
   wFiles :
     path : npm:///wFiles
     enabled : 0 # submodule
-  wAppBasic :
-    path : npm:///wappbasic
+  wProcess :
+    path : npm:///wprocess
     enabled : 0 # submodule
   wHttp :
     path : npm:///whttp
     enabled : 0 # submodule
   'package-json' :
     path : npm:///package-json#6.5.0
+    enabled : 0 # submodule
+  eslint :
+    path : npm:///eslint#7.1.0
     enabled : 0 # submodule
 
 path :
