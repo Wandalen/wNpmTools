@@ -16,6 +16,9 @@ submodule :
   'package-json' :
     path : npm:///package-json#6.5.0
     enabled : 0 # submodule
+  eslint :
+    path : npm:///eslint#7.1.0
+    enabled : 0 # submodule
 
 path :
 

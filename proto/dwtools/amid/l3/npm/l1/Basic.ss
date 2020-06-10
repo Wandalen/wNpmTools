@@ -1,4 +1,5 @@
-( function _Basic_ss_( ) {
+( function _Basic_ss_( )
+{
 
 'use strict';
 
@@ -599,15 +600,15 @@ function pathParse( remotePath )
 
   return result
 
-/*
-  remotePath : 'npm:///wColor/out/wColor#0.3.100'
-  protocol : 'npm',
-  hash : '0.3.100',
-  longPath : '/wColor/out/wColor',
-  localVcsPath : 'out/wColor',
-  remoteVcsPath : 'wColor',
-  remoteVcsLongerPath : 'wColor@0.3.100'
-*/
+  /*
+    remotePath : 'npm:///wColor/out/wColor#0.3.100'
+    protocol : 'npm',
+    hash : '0.3.100',
+    longPath : '/wColor/out/wColor',
+    localVcsPath : 'out/wColor',
+    remoteVcsPath : 'wColor',
+    remoteVcsLongerPath : 'wColor@0.3.100'
+  */
 
   /* */
 
@@ -987,7 +988,7 @@ function hasFiles( o )
   _.routineOptions( hasFiles, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( !localProvider.isDir( o.localPath  ) )
+  if( !localProvider.isDir( o.localPath ) )
   return false;
   if( !localProvider.dirIsEmpty( o.localPath ) )
   return true;
