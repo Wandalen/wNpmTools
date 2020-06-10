@@ -1,4 +1,5 @@
-( function _Mid_ss_( ) {
+( function _Mid_ss_( )
+{
 
 'use strict';
 

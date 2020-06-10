@@ -230,7 +230,7 @@ function pathParse( test )
     'tag' : 'latest',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic',
+    'remoteVcsLongerPath' : 'wpathbasic@latest',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
@@ -246,7 +246,7 @@ function pathParse( test )
     'parametrizedPath' : '/wpathbasic#1.0.0',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic',
+    'remoteVcsLongerPath' : 'wpathbasic@1.0.0',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
@@ -262,7 +262,7 @@ function pathParse( test )
     'parametrizedPath' : '/wpathbasic@beta',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic',
+    'remoteVcsLongerPath' : 'wpathbasic@beta',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
@@ -278,7 +278,7 @@ function pathParse( test )
     'parametrizedPath' : '/wColor/out/wColor#0.3.100',
     'localVcsPath' : 'out/wColor',
     'remoteVcsPath' : 'wColor',
-    'remoteVcsLongerPath' : 'wColor',
+    'remoteVcsLongerPath' : 'wColor@0.3.100',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
