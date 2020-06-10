@@ -1,4 +1,4 @@
-( function _Include_ss_( )
+( function _Include_ss_()
 {
 
 'use strict';
@@ -14,4 +14,4 @@ if( typeof module !== 'undefined' )
   module[ 'exports' ] = _global_.wTools;
 }
 
-})();
+} )();
