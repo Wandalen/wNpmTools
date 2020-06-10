@@ -159,6 +159,8 @@ function eslint( test )
   return ready;
 }
 
+eslint.rapidity = -1;
+
 // --
 // declare
 // --

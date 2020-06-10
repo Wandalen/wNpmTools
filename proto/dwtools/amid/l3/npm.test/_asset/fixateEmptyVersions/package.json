@@ -4,26 +4,26 @@
   "description": "for testing fixate routine",
   "main": "index.js",
   "dependencies": {
-    "package1": "1.0.0",
-    "package2": "1.0.0"
+    "package1": "",
+    "package2": ""
   },
   "devDependencies": {
-    "package3": "1.0.0",
-    "package4": "1.0.0"
+    "package3": "",
+    "package4": ""
   },
   "optionalDependencies": {
-    "package5": "1.0.0",
-    "package6": "1.0.0"
+    "package5": "",
+    "package6": ""
   },
   "bundledDependencies": ["package7", "package8"],
   "peerDependencies": {
-    "package9": "1.0.0",
-    "package10": "1.0.0"
+    "package9": "",
+    "package10": ""
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }

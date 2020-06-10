@@ -5,13 +5,10 @@
 
 if( typeof module !== 'undefined' )
 {
-
-  let _ = require( '../../../dwtools/Tools.s' );
+  let _ = require( '../../../../dwtools/Tools.s' );
   _.include( 'wTesting' );
-  require( '../l3/npm/Include.ss' );
+  require( '../npm/Include.ss' );
 }
-
-//
 
 var _ = _global_.wTools;
 
@@ -22,15 +19,8 @@ var _ = _global_.wTools;
 function onSuiteBegin( test )
 {
   let context = this;
-  context.provider = _.fileProvider;
-  let path = context.provider.path;
-  context.suitePath = context.provider.path.pathDirTempOpen( path.join( __dirname, '../..' ), 'NpmTools' );
-  context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
-  context.suitePath = context.suitePath.absolutePath;
-
   context.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'NpmTools' );
-  context.assetsOriginalSuitePath = _.path.join( __dirname, '_assets' );
-  context.assetsOriginalPath = _.path.join( __dirname, '_assets' );
+  context.assetsOriginalPath = _.path.join( __dirname, '_asset' );
 }
 
 //
@@ -38,17 +28,13 @@ function onSuiteBegin( test )
 function onSuiteEnd( test )
 {
   let context = this;
-  let path = context.provider.path;
-  _.assert( _.strHas( context.suitePath, 'NpmTools' ), context.suitePath );
-  path.pathDirTempClose( context.suitePath );
+  _.assert( _.strHas( context.suiteTempPath, 'NpmTools' ), context.suiteTempPath );
+  _.path.pathDirTempClose( context.suiteTempPath );
 }
-
-//
 
 // --
 // tests
 // --
-
 
 function trivial( test )
 {
@@ -65,15 +51,18 @@ function trivial( test )
 function fixate( test )
 {
   let self = this;
+  var a = test.assetFor( 'fixateNotEmptyVersions' ); /* qqq : should be single call of assetFor per test routine */
+  a.reflect(); /* qqq : reflect should be inside of test case, not outside */
 
-  var a = test.assetFor( 'fixateNotEmptyVersions' );
-  a.reflect();
+  /* qqq : simplify package.json files. remove redundant fields */
 
   test.case = 'dependency versions are specified';
 
   var localPath = a.abs( '' );
   var tag = '=';
-  var got = _.npm.fixate( { localPath, tag } ).config;
+  var got = _.npm.fixate({ localPath, tag }).config;
+  /* qqq : sperate case should test whole "got" map */
+  /* qqq : another case read written file and check it content */
   var exp =
   {
     'name' : 'test package.json',
@@ -102,8 +91,9 @@ function fixate( test )
     },
     'keywords' : [],
     'author' : '',
-    'license' : 'ISC'
+    'license' : 'MIT'
   }
+  /* qqq : what fixateNotEmptyVersions is called only without callback onDependency */
 
   test.identical( got, exp );
 
@@ -132,12 +122,13 @@ function fixate( test )
       'package3' : '=3.3.3',
       'package4' : '=4.4.4'
     },
-    'optionalDependencies' : {
+    'optionalDependencies' : { /* qqq : fix styles, please */
       'package5' : '=5.5.5',
       'package6' : '=6.6.6'
     },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' : {
+    'peerDependencies' :
+    {
       'package9' : '=9.9.9',
       'package10' : '=10.10.10'
     },
@@ -146,14 +137,15 @@ function fixate( test )
     },
     'keywords' : [],
     'author' : '',
-    'license' : 'ISC'
+    'license' : 'MIT'
   }
 
   test.identical( got, exp );
 
   function onDependency( dep )
   {
-    const depVersionsToFixate = {
+    const depVersionsToFixate =
+    {
       'package1' : '1.1.1',
       'package2' : '2.2.2',
       'package3' : '3.3.3',
@@ -188,6 +180,8 @@ function bump( test )
   let a = test.assetFor( 'bump' );
   a.reflect();
 
+  /* qqq : similar problems here */
+
   test.case = '`local path` option points to the config file';
   var localPath = a.abs( '' );
   var got = _.npm.bump( { localPath } ).config;
@@ -205,7 +199,7 @@ function bump( test )
     },
     'keywords' : [],
     'author' : '',
-    'license' : 'ISC'
+    'license' : 'MIT'
   }
 
   test.identical( got, exp );
@@ -358,8 +352,12 @@ function pathFixate( test )
 function versionLocalRetrive( test )
 {
   let self = this;
-  let testPath = _.path.join( self.suitePath, test.name );
-  let filePath = _.path.join( testPath, 'package.json' );
+  let a = test.assetFor( false );
+  // let testPath = _.path.join( self.suiteTempPath, test.name );
+  // let filePath = _.path.join( testPath, 'package.json' );
+  let testPath = a.abs( '.' );
+  let filePath = a.abs( 'package.json' );
+  /* qqq : avoid using _.path.* in tests, use a.abs() instead please */
 
   test.case = 'path doesn`t exist'
   var got = _.npm.versionLocalRetrive({ localPath : testPath })
@@ -388,25 +386,28 @@ function versionLocalRetrive( test )
 
 function versionRemoteLatestRetrive( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+
+  /* qqq : use modules for testing instead of production modules here and everywhere */
+  var remotePath = 'npm:///wpathbasic';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic@latest'
+  var remotePath = 'npm:///wpathbasic@latest';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic@beta'
+  var remotePath = 'npm:///wpathbasic@beta';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic#0.7.1'
+  var remotePath = 'npm:///wpathbasic#0.7.1';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
   test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc' ))
   test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc@beta' ))
   test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc#0.7.1' ))
+
 }
 
 versionRemoteLatestRetrive.timeOut = 30000;
@@ -442,7 +443,8 @@ versionRemoteCurrentRetrive.timeOut = 30000;
 function isUpToDate( test )
 {
   let self = this;
-  let testPath = _.path.join( self.suitePath, test.name );
+  let a = test.assetFor( false );
+  let testPath = _.path.join( self.suiteTempPath, test.name );
   let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
   let ready = new _.Consequence().take( null );
 
@@ -546,7 +548,8 @@ isUpToDate.timeOut = 60000;
 function isRepository( test )
 {
   let self = this;
-  let testPath = _.path.join( self.suitePath, test.name );
+  let a = test.assetFor( false );
+  let testPath = _.path.join( self.suiteTempPath, test.name );
   let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
   let ready = new _.Consequence().take( null );
 
@@ -606,7 +609,8 @@ isRepository.timeOut = 20000;
 function hasRemote( test )
 {
   let self = this;
-  let testPath = _.path.join( self.suitePath, test.name );
+  let a = test.assetFor( false );
+  let testPath = _.path.join( self.suiteTempPath, test.name );
   let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
   let ready = new _.Consequence().take( null );
 
@@ -1013,7 +1017,6 @@ async function dependantsRetrieveStress( test )
 
 }
 
-// dependantsRetrieveStress.experimental = 1;
 dependantsRetrieveStress.rapidity = -2;
 dependantsRetrieveStress.timeOut = 300000;
 dependantsRetrieveStress.description =
@@ -1037,18 +1040,14 @@ var Proto =
 
   context :
   {
-    provider : null,
-    suitePath : null,
-
     suiteTempPath : null,
-    assetsOriginalSuitePath : null,
     assetsOriginalPath : null,
     appJsPath : null,
-    toolsPath : null,
   },
 
   tests :
   {
+
     fixate,
     bump,
 
