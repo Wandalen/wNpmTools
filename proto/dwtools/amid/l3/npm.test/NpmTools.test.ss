@@ -450,11 +450,9 @@ function versionLocalRetrive( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  // let testPath = _.path.join( self.suiteTempPath, test.name );
-  // let filePath = _.path.join( testPath, 'package.json' );
   let testPath = a.abs( '.' );
   let filePath = a.abs( 'package.json' );
-  /* qqq : avoid using _.path.* in tests, use a.abs() instead please */
+  /* aaa Artem : done. avoid using _.path.* in tests, use a.abs() instead please */
 
   test.case = 'path doesn`t exist'
   var got = _.npm.versionLocalRetrive({ localPath : testPath })
@@ -541,8 +539,8 @@ function isUpToDate( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wmodulefortesting1' );
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -646,8 +644,8 @@ function isRepository( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wmodulefortesting1');
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -707,8 +705,8 @@ function hasRemote( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wmodulefortesting1');
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
