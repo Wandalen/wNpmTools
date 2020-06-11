@@ -52,11 +52,12 @@ function fixate( test )
 {
   let self = this;
   var a = test.assetFor( 'fixateNotEmptyVersions' ); /* qqq : should be single call of assetFor per test routine */
-  a.reflect(); /* qqq : reflect should be inside of test case, not outside */
 
-  /* qqq : simplify package.json files. remove redundant fields */
+  /* aaa Artem : done. simplify package.json files. remove redundant fields */
 
   test.case = 'dependency versions are specified';
+
+  a.reflect(); /* aaa Artem : done. reflect should be inside of test case, not outside */
 
   var localPath = a.abs( '.' );
   var tag = '=';
@@ -68,31 +69,27 @@ function fixate( test )
   {
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'description' : 'for testing fixate routine',
-    'main' : 'index.js',
-    'dependencies' : {
+    'dependencies' :
+    {
       'package1' : '1.0.0',
       'package2' : '1.0.0'
     },
-    'devDependencies' : {
+    'devDependencies' :
+    {
       'package3' : '1.0.0',
       'package4' : '1.0.0'
     },
-    'optionalDependencies' : {
+    'optionalDependencies' :
+    {
       'package5' : '1.0.0',
       'package6' : '1.0.0'
     },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' : {
+    'peerDependencies' :
+    {
       'package9' : '1.0.0',
       'package10' : '1.0.0'
-    },
-    'scripts' : {
-      'test' : 'echo "Error: no test specified" && exit 1'
-    },
-    'keywords' : [],
-    'author' : '',
-    'license' : 'MIT'
+    }
   }
   /* qqq : why fixateNotEmptyVersions is called only without callback onDependency? */
 
@@ -101,9 +98,10 @@ function fixate( test )
   /* */
 
   var a = test.assetFor( 'fixateEmptyVersions' );
-  a.reflect();
 
   test.case = 'dependency versions are not specified';
+
+  a.reflect();
 
   var localPath = a.abs( '' );
   var tag = '=';
@@ -113,9 +111,8 @@ function fixate( test )
   {
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'description' : 'for testing fixate routine',
-    'main' : 'index.js',
-    'dependencies' : {
+    'dependencies' :
+    {
       'package1' : '=1.1.1',
       'package2' : '=2.2.2'
     },
@@ -125,7 +122,7 @@ function fixate( test )
       'package4' : '=4.4.4'
     },
     'optionalDependencies' :
-    { /* qqq : fix styles, please */
+    { /* aaa Artem : done. fix styles, please */
       'package5' : '=5.5.5',
       'package6' : '=6.6.6'
     },
@@ -134,13 +131,7 @@ function fixate( test )
     {
       'package9' : '=9.9.9',
       'package10' : '=10.10.10'
-    },
-    'scripts' : {
-      'test' : 'echo "Error: no test specified" && exit 1'
-    },
-    'keywords' : [],
-    'author' : '',
-    'license' : 'MIT'
+    }
   }
 
   test.identical( got, exp );
