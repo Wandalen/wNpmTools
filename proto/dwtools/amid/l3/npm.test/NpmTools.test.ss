@@ -51,15 +51,17 @@ function trivial( test )
 function fixate( test )
 {
   let self = this;
-  var a = test.assetFor( 'fixateNotEmptyVersions' ); /* qqq : should be single call of assetFor per test routine */
+  var a = test.assetFor( 'fixate' ); /* aaa Artem : done. should be single call of assetFor per test routine */
 
   /* aaa Artem : done. simplify package.json files. remove redundant fields */
 
-  test.case = 'dependency versions are specified';
+  test.open( 'dependency versions are specified' );
+
+  test.case = 'without callback';
 
   a.reflect(); /* aaa Artem : done. reflect should be inside of test case, not outside */
 
-  var localPath = a.abs( '.' );
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
   var got = _.npm.fixate({ localPath, tag }).config;
 
@@ -91,19 +93,72 @@ function fixate( test )
       'package10' : '1.0.0'
     }
   }
-  /* qqq : why fixateNotEmptyVersions is called only without callback onDependency? */
+  /* aaa Artem : done. why fixateNotEmptyVersions is called only without callback onDependency? */
 
   test.identical( got, exp );
 
-  /* */
+  //
 
-  var a = test.assetFor( 'fixateEmptyVersions' );
-
-  test.case = 'dependency versions are not specified';
+  test.case = 'with callback';
 
   a.reflect();
 
-  var localPath = a.abs( '' );
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
+  var tag = '=';
+  var o = { localPath, tag, onDependency }
+  var got = _.npm.fixate( o ).config;
+
+  test.identical( got, exp );
+
+  test.close( 'dependency versions are specified' );
+
+  /* */
+
+  test.open( 'dependency versions are not specified' );
+
+  test.case = 'without callback';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateEmptyVersions' );
+  var tag = '=';
+  var got = _.npm.fixate( { localPath, tag } ).config;
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' :
+    {
+      'package1' : '=',
+      'package2' : '='
+    },
+    'devDependencies' :
+    {
+      'package3' : '=',
+      'package4' : '='
+    },
+    'optionalDependencies' :
+    { /* aaa Artem : done. fix styles, please */
+      'package5' : '=',
+      'package6' : '='
+    },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' :
+    {
+      'package9' : '=',
+      'package10' : '='
+    }
+  }
+
+  test.identical( got, exp );
+
+  //
+
+  test.case = 'with callback';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateEmptyVersions' );
   var tag = '=';
   var o = { localPath, tag, onDependency }
   var got = _.npm.fixate( o ).config;
@@ -135,6 +190,10 @@ function fixate( test )
   }
 
   test.identical( got, exp );
+
+  test.close( 'dependency versions are not specified' );
+
+  /* callback */
 
   function onDependency( dep )
   {
