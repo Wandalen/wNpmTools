@@ -71,27 +71,11 @@ function fixate( test )
   {
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'dependencies' :
-    {
-      'package1' : '1.0.0',
-      'package2' : '1.0.0'
-    },
-    'devDependencies' :
-    {
-      'package3' : '1.0.0',
-      'package4' : '1.0.0'
-    },
-    'optionalDependencies' :
-    {
-      'package5' : '1.0.0',
-      'package6' : '1.0.0'
-    },
+    'dependencies' : { 'package1' : '1.0.0', 'package2' : '1.0.0' },
+    'devDependencies' : { 'package3' : '1.0.0', 'package4' : '1.0.0' },
+    'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' :
-    {
-      'package9' : '1.0.0',
-      'package10' : '1.0.0'
-    }
+    'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
   }
   /* aaa Artem : done. why fixateNotEmptyVersions is called only without callback onDependency? */
 
@@ -107,6 +91,16 @@ function fixate( test )
   var tag = '=';
   var o = { localPath, tag, onDependency }
   var got = _.npm.fixate( o ).config;
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '1.0.0', 'package2' : '1.0.0' },
+    'devDependencies' : { 'package3' : '1.0.0', 'package4' : '1.0.0' },
+    'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
+  }
 
   test.identical( got, exp );
 
@@ -138,6 +132,16 @@ function fixate( test )
   var tag = '=';
   _.npm.fixate({ localPath, tag });
   var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateNotEmptyVersions/package.json' ) });
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '1.0.0', 'package2' : '1.0.0' },
+    'devDependencies' : { 'package3' : '1.0.0', 'package4' : '1.0.0' },
+    'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
+  }
 
   test.identical( got, exp );
 
@@ -275,28 +279,41 @@ function bump( test )
   let self = this;
 
   let a = test.assetFor( 'bump' );
-  a.reflect();
 
   /* qqq : similar problems here */
 
   test.case = '`local path` option points to the config file';
+
+  a.reflect();
+
   var localPath = a.abs( '.' );
   var got = _.npm.bump( { localPath } ).config;
   var exp =
   {
     'name' : 'test package.json',
     'version' : '1.0.1',
-    'description' : 'for testing bump routine',
-    'main' : 'index.js',
-    'dependencies' : {},
-    'devDependencies' : {},
-    'scripts' :
-    {
-      'test' : 'echo "Error: no test specified" && exit 1'
-    },
-    'keywords' : [],
-    'author' : '',
-    'license' : 'MIT'
+    'dependencies' : { 'package1' : '1.1.1' },
+    'devDependencies' : { 'package2' : '2.2.2' }
+  }
+
+  test.identical( got, exp );
+
+  //
+
+  test.case = 'read written config';
+
+  a.reflect();
+
+  var localPath = a.abs( '.' );
+  var tag = '=';
+  _.npm.bump({ localPath });
+  var got = _.fileProvider.configRead({ filePath : a.abs( 'package.json' ) });
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.1',
+    'dependencies' : { 'package1' : '1.1.1' },
+    'devDependencies' : { 'package2' : '2.2.2' }
   }
 
   test.identical( got, exp );

@@ -1,15 +1,6 @@
 {
   "name" : "test package.json",
   "version" : "1.0.0",
-  "description" : "for testing bump routine",
-  "main" : "index.js",
-  "dependencies" : {},
-  "devDependencies" : {},
-  "scripts" :
-  {
-    "test" : "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords" : [],
-  "author" : "",
-  "license" : "MIT"
+  "dependencies" : { "package1" : "1.1.1" },
+  "devDependencies" : { "package2" : "2.2.2" }
 }
