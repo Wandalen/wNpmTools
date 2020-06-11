@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
   require( '../npm/Include.ss' );
 }
 
-var _ = _global_.wTools;
+var _ = _testerGlobal_.wTools;
 
 // --
 // context
@@ -58,9 +58,10 @@ function fixate( test )
 
   test.case = 'dependency versions are specified';
 
-  var localPath = a.abs( '' );
+  var localPath = a.abs( '.' );
   var tag = '=';
   var got = _.npm.fixate({ localPath, tag }).config;
+
   /* qqq : sperate case should test whole "got" map */
   /* qqq : another case read written file and check it content */
   var exp =
@@ -93,7 +94,7 @@ function fixate( test )
     'author' : '',
     'license' : 'MIT'
   }
-  /* qqq : what fixateNotEmptyVersions is called only without callback onDependency */
+  /* qqq : why fixateNotEmptyVersions is called only without callback onDependency? */
 
   test.identical( got, exp );
 
@@ -118,11 +119,13 @@ function fixate( test )
       'package1' : '=1.1.1',
       'package2' : '=2.2.2'
     },
-    'devDependencies' : {
+    'devDependencies' :
+    {
       'package3' : '=3.3.3',
       'package4' : '=4.4.4'
     },
-    'optionalDependencies' : { /* qqq : fix styles, please */
+    'optionalDependencies' :
+    { /* qqq : fix styles, please */
       'package5' : '=5.5.5',
       'package6' : '=6.6.6'
     },
