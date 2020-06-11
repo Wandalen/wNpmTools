@@ -269,64 +269,64 @@ function pathParse( test )
 {
 
   test.case = 'basic';
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var exp =
   {
     'protocol' : 'npm',
-    'longPath' : '/wpathbasic',
-    'parametrizedPath' : '/wpathbasic',
+    'longPath' : '/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1',
     'tag' : 'latest',
     'localVcsPath' : '',
-    'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@latest',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@latest',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
   test.identical( got, exp );
 
   test.case = 'hash';
-  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var exp =
   {
     'protocol' : 'npm',
     'hash' : '1.0.0',
-    'longPath' : '/wpathbasic',
-    'parametrizedPath' : '/wpathbasic#1.0.0',
+    'longPath' : '/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1#1.0.0',
     'localVcsPath' : '',
-    'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@1.0.0',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@1.0.0',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
   test.identical( got, exp );
 
   test.case = 'tag';
-  var remotePath = 'npm:///wpathbasic@beta';
+  var remotePath = 'npm:///wmodulefortesting1@beta';
   var exp =
   {
     'protocol' : 'npm',
     'tag' : 'beta',
-    'longPath' : '/wpathbasic',
-    'parametrizedPath' : '/wpathbasic@beta',
+    'longPath' : '/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1@beta',
     'localVcsPath' : '',
-    'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@beta',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@beta',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
   test.identical( got, exp );
 
   test.case = 'with local';
-  var remotePath = 'npm:///wColor/out/wColor#0.3.100';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
   var exp =
   {
     'protocol' : 'npm',
     'hash' : '0.3.100',
-    'longPath' : '/wColor/out/wColor',
-    'parametrizedPath' : '/wColor/out/wColor#0.3.100',
-    'localVcsPath' : 'out/wColor',
-    'remoteVcsPath' : 'wColor',
-    'remoteVcsLongerPath' : 'wColor@0.3.100',
+    'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1/out/wmodulefortesting1#0.3.100',
+    'localVcsPath' : 'out/wmodulefortesting1',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@0.3.100',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
@@ -353,7 +353,7 @@ function pathParse( test )
   return;
 
   test.case = 'throwing';
-  var remotePath = 'npm:///wpathbasic#1.0.0@beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
 
 }
@@ -362,19 +362,19 @@ function pathParse( test )
 
 function pathIsFixated( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.pathIsFixated( remotePath );
   test.identical( got, false );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var got = _.npm.pathIsFixated( remotePath );
   test.identical( got, true );
 
-  var remotePath = 'npm:///wpathbasic@beta'
+  var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.pathIsFixated( remotePath );
   test.identical( got, false );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0@beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
 }
 
@@ -382,21 +382,21 @@ function pathIsFixated( test )
 
 function pathFixate( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic@beta'
+  var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0@beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
@@ -440,26 +440,26 @@ function versionLocalRetrive( test )
 function versionRemoteLatestRetrive( test )
 {
 
-  /* qqq : use modules for testing instead of production modules here and everywhere */
-  var remotePath = 'npm:///wpathbasic';
+  /* aaa Artem : done. use modules for testing instead of production modules here and everywhere */
+  var remotePath = 'npm:///wmodulefortesting1';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic@latest';
+  var remotePath = 'npm:///wmodulefortesting1@latest';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic@beta';
+  var remotePath = 'npm:///wmodulefortesting1@beta';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic#0.7.1';
+  var remotePath = 'npm:///wmodulefortesting1#0.0.3';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc' ))
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc@beta' ))
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc#0.7.1' ))
+  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1' ))
+  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1@beta' ))
+  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1#0.0.3' ))
 
 }
 
@@ -469,24 +469,24 @@ versionRemoteLatestRetrive.timeOut = 30000;
 
 function versionRemoteCurrentRetrive( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic@latest'
+  var remotePath = 'npm:///wmodulefortesting1@latest'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic@beta'
+  var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic#0.7.1'
+  var remotePath = 'npm:///wmodulefortesting1#0.0.3'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
-  test.identical( got, '0.7.1' );
+  test.identical( got, '0.0.3' );
 }
 
 versionRemoteCurrentRetrive.timeOut = 30000;
@@ -498,7 +498,7 @@ function isUpToDate( test )
   let self = this;
   let a = test.assetFor( false );
   let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let localPath = _.path.join( testPath, 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -515,77 +515,77 @@ function isUpToDate( test )
   .then( () =>
   {
     test.case = 'no package'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic@beta'
+    let remotePath = 'npm:///wmodulefortesting1@beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
   })
 
-  install( 'wpathbasic@latest' )
+  install( 'wmodulefortesting1@latest' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.5' )
   .then( () =>
   {
     test.case = 'installed version, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wpathbasic@beta'
+    let remotePath = 'npm:///wmodulefortesting1@beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wpathbasic#0.7.1'
+    let remotePath = 'npm:///wmodulefortesting1#0.0.3'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
@@ -603,7 +603,7 @@ function isRepository( test )
   let self = this;
   let a = test.assetFor( false );
   let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let localPath = _.path.join( testPath, 'node_modules/wmodulefortesting1');
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -625,7 +625,7 @@ function isRepository( test )
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest'
@@ -634,7 +634,7 @@ function isRepository( test )
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta'
@@ -643,7 +643,7 @@ function isRepository( test )
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version'
@@ -664,7 +664,7 @@ function hasRemote( test )
   let self = this;
   let a = test.assetFor( false );
   let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let localPath = _.path.join( testPath, 'node_modules/wmodulefortesting1');
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -681,73 +681,73 @@ function hasRemote( test )
   .then( () =>
   {
     test.case = 'no package'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, false );
     test.identical( got.remoteIsValid, false );
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest, remote points to latest'
-    let remotePath = 'npm:///wpathbasicc'
+    let remotePath = 'npm:///wmodulefortestinggg1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, false );
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic@latest' )
+  install( 'wmodulefortesting1@latest' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wpathbasic@beta'
+    let remotePath = 'npm:///wmodulefortesting1@beta'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
