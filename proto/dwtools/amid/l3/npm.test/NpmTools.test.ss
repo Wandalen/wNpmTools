@@ -65,8 +65,8 @@ function fixate( test )
   var tag = '=';
   var got = _.npm.fixate({ localPath, tag }).config;
 
-  /* qqq : sperate case should test whole "got" map */
-  /* qqq : another case read written file and check it content */
+  /* aaa Artem : done. sperate case should test whole "got" map */
+  /* aaa Artem : done. another case read written file and check it content */
   var exp =
   {
     'name' : 'test package.json',
@@ -110,6 +110,37 @@ function fixate( test )
 
   test.identical( got, exp );
 
+  //
+
+  test.case = 'check whole "got" map';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
+  var tag = '=';
+  var got = _.npm.fixate({ localPath, tag });
+
+  test.is( _.strDefined( got.localPath ) );
+  test.is( _.strDefined( got.configPath ) );
+  test.identical( got.tag, '=' );
+  test.identical( got.onDependency, null );
+  test.identical( got.dry, 0 );
+  test.identical( got.verbosity, 0 );
+  test.identical( got.changed, false );
+
+  //
+
+  test.case = 'read written config';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
+  var tag = '=';
+  _.npm.fixate({ localPath, tag });
+  var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateNotEmptyVersions/package.json' ) });
+
+  test.identical( got, exp );
+
   test.close( 'dependency versions are specified' );
 
   /* */
@@ -149,6 +180,19 @@ function fixate( test )
       'package10' : '='
     }
   }
+
+  test.identical( got, exp );
+
+  //
+
+  test.case = 'read written config';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateEmptyVersions' );
+  var tag = '=';
+  _.npm.fixate({ localPath, tag });
+  var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateEmptyVersions/package.json' ) });
 
   test.identical( got, exp );
 
@@ -236,7 +280,7 @@ function bump( test )
   /* qqq : similar problems here */
 
   test.case = '`local path` option points to the config file';
-  var localPath = a.abs( '' );
+  var localPath = a.abs( '.' );
   var got = _.npm.bump( { localPath } ).config;
   var exp =
   {
