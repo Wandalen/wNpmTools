@@ -159,30 +159,14 @@ function fixate( test )
   var tag = '=';
   var got = _.npm.fixate( { localPath, tag } ).config;
   var exp =
-  {
+  { /* aaa Artem : done. fix styles, please */
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'dependencies' :
-    {
-      'package1' : '=',
-      'package2' : '='
-    },
-    'devDependencies' :
-    {
-      'package3' : '=',
-      'package4' : '='
-    },
-    'optionalDependencies' :
-    { /* aaa Artem : done. fix styles, please */
-      'package5' : '=',
-      'package6' : '='
-    },
+    'dependencies' : { 'package1' : '=', 'package2' : '=' },
+    'devDependencies' : { 'package3' : '=', 'package4' : '=' },
+    'optionalDependencies' : { 'package5' : '=', 'package6' : '=' },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' :
-    {
-      'package9' : '=',
-      'package10' : '='
-    }
+    'peerDependencies' : { 'package9' : '=', 'package10' : '=' }
   }
 
   test.identical( got, exp );
@@ -197,6 +181,16 @@ function fixate( test )
   var tag = '=';
   _.npm.fixate({ localPath, tag });
   var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateEmptyVersions/package.json' ) });
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '=', 'package2' : '=' },
+    'devDependencies' : { 'package3' : '=', 'package4' : '=' },
+    'optionalDependencies' : { 'package5' : '=', 'package6' : '=' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '=', 'package10' : '=' }
+  }
 
   test.identical( got, exp );
 
@@ -214,27 +208,11 @@ function fixate( test )
   {
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'dependencies' :
-    {
-      'package1' : '=1.1.1',
-      'package2' : '=2.2.2'
-    },
-    'devDependencies' :
-    {
-      'package3' : '=3.3.3',
-      'package4' : '=4.4.4'
-    },
-    'optionalDependencies' :
-    { /* aaa Artem : done. fix styles, please */
-      'package5' : '=5.5.5',
-      'package6' : '=6.6.6'
-    },
+    'dependencies' : { 'package1' : '=1.1.1', 'package2' : '=2.2.2' },
+    'devDependencies' : { 'package3' : '=3.3.3', 'package4' : '=4.4.4' },
+    'optionalDependencies' : { 'package5' : '=5.5.5', 'package6' : '=6.6.6' },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' :
-    {
-      'package9' : '=9.9.9',
-      'package10' : '=10.10.10'
-    }
+    'peerDependencies' : { 'package9' : '=9.9.9', 'package10' : '=10.10.10' }
   }
 
   test.identical( got, exp );
@@ -280,7 +258,7 @@ function bump( test )
 
   let a = test.assetFor( 'bump' );
 
-  /* qqq : similar problems here */
+  /* aaa Artem : done. similar problems here */
 
   test.case = '`local path` option points to the config file';
 
@@ -305,7 +283,6 @@ function bump( test )
   a.reflect();
 
   var localPath = a.abs( '.' );
-  var tag = '=';
   _.npm.bump({ localPath });
   var got = _.fileProvider.configRead({ filePath : a.abs( 'package.json' ) });
   var exp =
@@ -317,6 +294,21 @@ function bump( test )
   }
 
   test.identical( got, exp );
+
+  //
+
+  test.case = 'check whole "got" map';
+
+  a.reflect();
+
+  var localPath = a.abs( '.' );
+  var got = _.npm.bump({ localPath });
+
+  test.is( _.strDefined( got.localPath ) );
+  test.is( _.strDefined( got.configPath ) );
+  test.identical( got.dry, 0 );
+  test.identical( got.verbosity, 0 );
+  test.identical( got.changed, true );
 }
 
 bump.description =
