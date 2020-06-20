@@ -375,7 +375,7 @@ function _readChangeWrite( o )
   return o;
 
   let str = null;
-  let encoder = _.Gdf.Select
+  let encoder = _.gdf.select
   ({
     in : 'structure',
     out : 'string',
@@ -536,7 +536,7 @@ dependantsRetrieve.defaults =
  */
 
 /**
- * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm.RemotePathComponents}.
+ * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.Npm.RemotePathComponents}.
  * @param {String} remotePath Remote path.
  * @function pathParse
  * @namespace wTools.npm

@@ -3,11 +3,11 @@ root:
   - wNpmTools.out
 consistency:
   wNpmTools.out.will.yml: &ref_0
-    hash: a6c3c5770c3af171fc757e7a936e12e3
-    size: 39397
+    hash: 2e9e8ac2a516933651ee09ccb117fa5a
+    size: 38874
   ../.ex.will.yml: &ref_1
-    hash: 7a8f7d5e4489bf9cdc32adf70a6c2eb3
-    size: 1710
+    hash: d8f6143724d04e77f33e06c736b8b190
+    size: 1711
   ../.im.will.yml: &ref_2
     hash: 7a2575128252457e39677ebcce90e6d1
     size: 5018
@@ -20,7 +20,7 @@ module:
       enabled: 1
       version: 0.9.0
       interpreters:
-        - njs >= 8.0.0
+        - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
       keywords:
@@ -168,27 +168,17 @@ module:
           - ../proto/dwtools/amid/l3/npm/include/Mid.ss
           - ../proto/dwtools/amid/l3/npm/l1
           - ../proto/dwtools/amid/l3/npm/l1/Basic.ss
-          - ../proto/dwtools/amid/l3.test
-          - ../proto/dwtools/amid/l3.test/NpmTools.test.ss
-          - ../proto/dwtools/amid/l3.test/_assets
-          - ../proto/dwtools/amid/l3.test/_assets/bump
-          - ../proto/dwtools/amid/l3.test/_assets/bump/Hello.js
-          - ../proto/dwtools/amid/l3.test/_assets/bump/Hello.test.js
-          - ../proto/dwtools/amid/l3.test/_assets/bump/package.json
-          - ../proto/dwtools/amid/l3.test/_assets/fixateEmptyVersions
+          - ../proto/dwtools/amid/l3/npm.test
+          - ../proto/dwtools/amid/l3/npm.test/NpmTools.test.ss
+          - ../proto/dwtools/amid/l3/npm.test/_asset
+          - ../proto/dwtools/amid/l3/npm.test/_asset/bump
+          - ../proto/dwtools/amid/l3/npm.test/_asset/bump/package.json
+          - ../proto/dwtools/amid/l3/npm.test/_asset/fixateEmptyVersions
           - >-
-            ../proto/dwtools/amid/l3.test/_assets/fixateEmptyVersions/forComparison.json
+            ../proto/dwtools/amid/l3/npm.test/_asset/fixateEmptyVersions/package.json
+          - ../proto/dwtools/amid/l3/npm.test/_asset/fixateNotEmptyVersions
           - >-
-            ../proto/dwtools/amid/l3.test/_assets/fixateEmptyVersions/forRewriting.json
-          - >-
-            ../proto/dwtools/amid/l3.test/_assets/fixateEmptyVersions/package.json
-          - ../proto/dwtools/amid/l3.test/_assets/fixateNotEmptyVersions
-          - >-
-            ../proto/dwtools/amid/l3.test/_assets/fixateNotEmptyVersions/forComparison.json
-          - >-
-            ../proto/dwtools/amid/l3.test/_assets/fixateNotEmptyVersions/forRewriting.json
-          - >-
-            ../proto/dwtools/amid/l3.test/_assets/fixateNotEmptyVersions/package.json
+            ../proto/dwtools/amid/l3/npm.test/_asset/fixateNotEmptyVersions/package.json
           - ../proto/dwtools/atop
     submodule:
       wTools:
@@ -724,7 +714,7 @@ module:
           - files.transpile
       exported.proto.export:
         opts:
-          filePath: 'reflector::exported.proto.export*'
+          filePath: 'reflector::exported.proto.export'
         criterion:
           generated: 1
           content: proto
@@ -733,7 +723,7 @@ module:
           - files.reflect
       exported.files.proto.export:
         opts:
-          filePath: 'reflector::exported.files.proto.export*'
+          filePath: 'reflector::exported.files.proto.export'
         criterion:
           generated: 1
           content: proto
@@ -839,7 +829,7 @@ module:
       enabled: 1
       version: 0.9.0
       interpreters:
-        - njs >= 8.0.0
+        - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
       keywords:
@@ -1348,7 +1338,7 @@ module:
           debug: release
       reflect.proto.debug.raw:
         opts:
-          filePath: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto.debug.raw'
         criterion:
           tests: no.tests
           debug: debug
@@ -1358,7 +1348,7 @@ module:
           - files.reflect
       reflect.proto.release.raw:
         opts:
-          filePath: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto.release.raw'
         criterion:
           tests: no.tests
           debug: release
@@ -1368,7 +1358,7 @@ module:
           - files.reflect
       reflect.proto.debug.compiled:
         opts:
-          filePath: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto.debug.compiled'
         criterion:
           tests: no.tests
           debug: debug
@@ -1378,7 +1368,7 @@ module:
           - files.reflect
       reflect.proto.release.compiled:
         opts:
-          filePath: 'reflector::reflect.proto*'
+          filePath: 'reflector::reflect.proto.release.compiled'
         criterion:
           tests: no.tests
           debug: release
@@ -1389,7 +1379,7 @@ module:
       transpile.proto.raw:
         opts:
           entry: 'path::entry.proto.no.tests'
-          filePath: 'reflector::transpile.proto.raw*'
+          filePath: 'reflector::transpile.proto.raw'
         criterion:
           raw: raw
           debug: release
@@ -1399,7 +1389,7 @@ module:
       transpile.proto.no.tests.compiled.debug:
         opts:
           entry: 'path::entry.proto.*=1'
-          filePath: 'reflector::transpile.proto.no.tests.compiled*'
+          filePath: 'reflector::transpile.proto.no.tests.compiled.debug'
         criterion:
           tests: no.tests
           raw: compiled
@@ -1410,7 +1400,7 @@ module:
       transpile.proto.no.tests.compiled.release:
         opts:
           entry: 'path::entry.proto.*=1'
-          filePath: 'reflector::transpile.proto.no.tests.compiled*'
+          filePath: 'reflector::transpile.proto.no.tests.compiled.release'
         criterion:
           tests: no.tests
           raw: compiled
@@ -1422,7 +1412,7 @@ module:
         opts:
           entry: 'path::entry.proto.*=1'
           external.before: '{path::out.*=1}/Main.s'
-          filePath: 'reflector::transpile.proto.only.tests.compiled*'
+          filePath: 'reflector::transpile.proto.only.tests.compiled.debug'
         criterion:
           tests: only.tests
           raw: compiled
@@ -1434,7 +1424,7 @@ module:
         opts:
           entry: 'path::entry.proto.*=1'
           external.before: '{path::out.*=1}/Main.s'
-          filePath: 'reflector::transpile.proto.only.tests.compiled*'
+          filePath: 'reflector::transpile.proto.only.tests.compiled.release'
         criterion:
           tests: only.tests
           raw: compiled
@@ -1518,11 +1508,11 @@ module:
           - 'build::npm'
     consistency:
       ../.ex.will.yml:
-        hash: 7a8f7d5e4489bf9cdc32adf70a6c2eb3
-        size: 1710
+        hash: d8f6143724d04e77f33e06c736b8b190
+        size: 1711
       ../.im.will.yml:
         hash: 7a2575128252457e39677ebcce90e6d1
         size: 5018
       wNpmTools.out.will.yml:
-        hash: a6c3c5770c3af171fc757e7a936e12e3
-        size: 39397
+        hash: 2e9e8ac2a516933651ee09ccb117fa5a
+        size: 38874
