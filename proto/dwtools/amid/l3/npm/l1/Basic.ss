@@ -474,7 +474,7 @@ function dependantsRetrieve( o )
   function uriNormalize( filePath )
   {
     let result;
-    if( _.uriOld.isGlobal( filePath ) )
+    if( _.uri.isGlobal( filePath ) )
     {
       let parsed = self.pathParse( filePath );
       result = prefixUri + ( parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath );
@@ -546,7 +546,7 @@ dependantsRetrieve.defaults =
 function pathParse( remotePath )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
   let result = Object.create( null );
 
   if( _.mapIs( remotePath ) )
@@ -641,7 +641,7 @@ function pathParse( remotePath )
 function pathIsFixated( filePath )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
   let parsed = self.pathParse( filePath );
 
   if( !parsed.hash )
@@ -665,7 +665,7 @@ function pathIsFixated( filePath )
 function pathFixate( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
@@ -708,7 +708,7 @@ defaults.verbosity = 0;
 function versionLocalRetrive( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   if( !_.mapIs( o ) )
   o = { localPath : o }
@@ -771,7 +771,7 @@ defaults.verbosity = 0;
 function versionRemoteLatestRetrive( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
@@ -837,7 +837,7 @@ defaults.verbosity = 0;
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
@@ -874,7 +874,7 @@ defaults.verbosity = 0;
 function versionRemoteRetrive( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
@@ -932,7 +932,7 @@ defaults.verbosity = 0;
 function isUpToDate( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -1015,7 +1015,7 @@ defaults.verbosity = 0;
 function isRepository( o )
 {
   let self = this;
-  let path = _.uriOld;
+  let path = _.uri;
 
   _.routineOptions( isRepository, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
