@@ -2,10 +2,13 @@ format: outwillfile-2.0
 root:
   - wNpmTools.out
 consistency:
-  ../.ex.will.yml: &ref_0
+  wNpmTools.out.will.yml: &ref_0
+    hash: a9d1a506a12f3e96841e5eb4af18fa0e
+    size: 39169
+  ../.ex.will.yml: &ref_1
     hash: dac77e36e0ef977efd99914ba1f8b362
     size: 1753
-  ../.im.will.yml: &ref_1
+  ../.im.will.yml: &ref_2
     hash: 7a2575128252457e39677ebcce90e6d1
     size: 5018
 module:
@@ -16,20 +19,20 @@ module:
       description: Collection of tools to use npm programmatically.
       enabled: 1
       version: 0.9.0
-      interpreters: &ref_2
+      interpreters:
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords: &ref_3
+      keywords:
         - tools
         - wTools
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: &ref_4
+      contributors:
         - Kostiantyn Wandalen <wanalen@01.school>
         - Artem Bohush <art.bohush@gmail.com>
       npm.name: wnpmtools
-      npm.scripts: &ref_5
+      npm.scripts:
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -712,6 +715,24 @@ module:
           content: prime
         inherit:
           - files.transpile
+      exported.proto.export:
+        opts:
+          filePath: 'reflector::exported.proto.export'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
+      exported.files.proto.export:
+        opts:
+          filePath: 'reflector::exported.files.proto.export'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
     build:
       proto.export:
         steps:
@@ -800,8 +821,9 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      wNpmTools.out.will.yml: *ref_0
+      ../.ex.will.yml: *ref_1
+      ../.im.will.yml: *ref_2
   ../:
     about:
       name: wNpmTools
@@ -809,13 +831,22 @@ module:
       description: Collection of tools to use npm programmatically.
       enabled: 1
       version: 0.9.0
-      interpreters: *ref_2
-      keywords: *ref_3
+      interpreters:
+        - njs >= 10.0.0
+        - chrome >= 60.0.0
+        - firefox >= 60.0.0
+      keywords:
+        - tools
+        - wTools
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: *ref_4
+      contributors:
+        - Kostiantyn Wandalen <wanalen@01.school>
+        - Artem Bohush <art.bohush@gmail.com>
       npm.name: wnpmtools
-      npm.scripts: *ref_5
+      npm.scripts:
+        test: wtest .run proto/**
+        docgen: wdocgen .build proto
     path:
       module.willfiles:
         criterion:
@@ -1486,3 +1517,6 @@ module:
       ../.im.will.yml:
         hash: 7a2575128252457e39677ebcce90e6d1
         size: 5018
+      wNpmTools.out.will.yml:
+        hash: a9d1a506a12f3e96841e5eb4af18fa0e
+        size: 39169
