@@ -440,12 +440,12 @@ function pathFixate( test )
   test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wmodulefortesting1@beta'
+  var remotePath = 'npm:///wmodulefortesting1!beta'
   var got = _.npm.pathFixate( remotePath );
   test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
   test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
@@ -592,7 +592,7 @@ function isUpToDate( test )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wmodulefortesting1@beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
@@ -622,7 +622,7 @@ function isUpToDate( test )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wmodulefortesting1@beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
@@ -794,7 +794,7 @@ function hasRemote( test )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wmodulefortesting1@beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
