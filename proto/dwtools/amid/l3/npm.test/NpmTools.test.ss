@@ -386,14 +386,14 @@ function pathParse( test )
   test.identical( got, exp );
 
   // test.case = 'tag only';
-  // var remotePath = '@some tag'
+  // var remotePath = '!some tag'
   // var exp =
   // {
-  //   'longPath' : '@some tag',
-  //   'parametrizedPath' : '@some tag',
+  //   'longPath' : '!some tag',
+  //   'postfixedPath' : '!some tag',
   //   'localVcsPath' : '',
   //   'remoteVcsPath' : '',
-  //   'remoteVcsLongerPath' : '@some tag',
+  //   'remoteVcsLongerPath' : '!some tag',
   //   'isFixated' : true,
   // }
   // debugger;
