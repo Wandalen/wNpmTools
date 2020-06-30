@@ -51,61 +51,43 @@ function trivial( test )
 function fixate( test )
 {
   let self = this;
-  var a = test.assetFor( 'fixateNotEmptyVersions' ); /* qqq : should be single call of assetFor per test routine */
-  a.reflect(); /* qqq : reflect should be inside of test case, not outside */
+  var a = test.assetFor( 'fixate' ); /* aaa Artem : done. should be single call of assetFor per test routine */
 
-  /* qqq : simplify package.json files. remove redundant fields */
+  /* aaa Artem : done. simplify package.json files. remove redundant fields */
 
-  test.case = 'dependency versions are specified';
+  test.open( 'dependency versions are specified' );
 
-  var localPath = a.abs( '.' );
+  test.case = 'without callback';
+
+  a.reflect(); /* aaa Artem : done. reflect should be inside of test case, not outside */
+
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
   var got = _.npm.fixate({ localPath, tag }).config;
 
-  /* qqq : sperate case should test whole "got" map */
-  /* qqq : another case read written file and check it content */
+  /* aaa Artem : done. sperate case should test whole "got" map */
+  /* aaa Artem : done. another case read written file and check it content */
   var exp =
   {
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'description' : 'for testing fixate routine',
-    'main' : 'index.js',
-    'dependencies' : {
-      'package1' : '1.0.0',
-      'package2' : '1.0.0'
-    },
-    'devDependencies' : {
-      'package3' : '1.0.0',
-      'package4' : '1.0.0'
-    },
-    'optionalDependencies' : {
-      'package5' : '1.0.0',
-      'package6' : '1.0.0'
-    },
+    'dependencies' : { 'package1' : '1.0.0', 'package2' : '1.0.0' },
+    'devDependencies' : { 'package3' : '1.0.0', 'package4' : '1.0.0' },
+    'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' : {
-      'package9' : '1.0.0',
-      'package10' : '1.0.0'
-    },
-    'scripts' : {
-      'test' : 'echo "Error: no test specified" && exit 1'
-    },
-    'keywords' : [],
-    'author' : '',
-    'license' : 'MIT'
+    'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
   }
-  /* qqq : why fixateNotEmptyVersions is called only without callback onDependency? */
+  /* aaa Artem : done. why fixateNotEmptyVersions is called only without callback onDependency? */
 
   test.identical( got, exp );
 
-  /* */
+  //
 
-  var a = test.assetFor( 'fixateEmptyVersions' );
+  test.case = 'with callback';
+
   a.reflect();
 
-  test.case = 'dependency versions are not specified';
-
-  var localPath = a.abs( '' );
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
   var o = { localPath, tag, onDependency }
   var got = _.npm.fixate( o ).config;
@@ -113,37 +95,131 @@ function fixate( test )
   {
     'name' : 'test package.json',
     'version' : '1.0.0',
-    'description' : 'for testing fixate routine',
-    'main' : 'index.js',
-    'dependencies' : {
-      'package1' : '=1.1.1',
-      'package2' : '=2.2.2'
-    },
-    'devDependencies' :
-    {
-      'package3' : '=3.3.3',
-      'package4' : '=4.4.4'
-    },
-    'optionalDependencies' :
-    { /* qqq : fix styles, please */
-      'package5' : '=5.5.5',
-      'package6' : '=6.6.6'
-    },
+    'dependencies' : { 'package1' : '1.0.0', 'package2' : '1.0.0' },
+    'devDependencies' : { 'package3' : '1.0.0', 'package4' : '1.0.0' },
+    'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
     'bundledDependencies' : [ 'package7', 'package8' ],
-    'peerDependencies' :
-    {
-      'package9' : '=9.9.9',
-      'package10' : '=10.10.10'
-    },
-    'scripts' : {
-      'test' : 'echo "Error: no test specified" && exit 1'
-    },
-    'keywords' : [],
-    'author' : '',
-    'license' : 'MIT'
+    'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
   }
 
   test.identical( got, exp );
+
+  //
+
+  test.case = 'check whole "got" map';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
+  var tag = '=';
+  var got = _.npm.fixate({ localPath, tag });
+
+  test.is( _.strDefined( got.localPath ) );
+  test.is( _.strDefined( got.configPath ) );
+  test.identical( got.tag, '=' );
+  test.identical( got.onDependency, null );
+  test.identical( got.dry, 0 );
+  test.identical( got.verbosity, 0 );
+  test.identical( got.changed, false );
+
+  //
+
+  test.case = 'read written config';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateNotEmptyVersions' );
+  var tag = '=';
+  _.npm.fixate({ localPath, tag });
+  var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateNotEmptyVersions/package.json' ) });
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '1.0.0', 'package2' : '1.0.0' },
+    'devDependencies' : { 'package3' : '1.0.0', 'package4' : '1.0.0' },
+    'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
+  }
+
+  test.identical( got, exp );
+
+  test.close( 'dependency versions are specified' );
+
+  /* */
+
+  test.open( 'dependency versions are not specified' );
+
+  test.case = 'without callback';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateEmptyVersions' );
+  var tag = '=';
+  var got = _.npm.fixate( { localPath, tag } ).config;
+  var exp =
+  { /* aaa Artem : done. fix styles, please */
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '=', 'package2' : '=' },
+    'devDependencies' : { 'package3' : '=', 'package4' : '=' },
+    'optionalDependencies' : { 'package5' : '=', 'package6' : '=' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '=', 'package10' : '=' }
+  }
+
+  test.identical( got, exp );
+
+  //
+
+  test.case = 'read written config';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateEmptyVersions' );
+  var tag = '=';
+  _.npm.fixate({ localPath, tag });
+  var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateEmptyVersions/package.json' ) });
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '=', 'package2' : '=' },
+    'devDependencies' : { 'package3' : '=', 'package4' : '=' },
+    'optionalDependencies' : { 'package5' : '=', 'package6' : '=' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '=', 'package10' : '=' }
+  }
+
+  test.identical( got, exp );
+
+  //
+
+  test.case = 'with callback';
+
+  a.reflect();
+
+  var localPath = a.abs( 'fixateEmptyVersions' );
+  var tag = '=';
+  var o = { localPath, tag, onDependency }
+  var got = _.npm.fixate( o ).config;
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.0',
+    'dependencies' : { 'package1' : '=1.1.1', 'package2' : '=2.2.2' },
+    'devDependencies' : { 'package3' : '=3.3.3', 'package4' : '=4.4.4' },
+    'optionalDependencies' : { 'package5' : '=5.5.5', 'package6' : '=6.6.6' },
+    'bundledDependencies' : [ 'package7', 'package8' ],
+    'peerDependencies' : { 'package9' : '=9.9.9', 'package10' : '=10.10.10' }
+  }
+
+  test.identical( got, exp );
+
+  test.close( 'dependency versions are not specified' );
+
+  /* callback */
 
   function onDependency( dep )
   {
@@ -181,31 +257,58 @@ function bump( test )
   let self = this;
 
   let a = test.assetFor( 'bump' );
-  a.reflect();
 
-  /* qqq : similar problems here */
+  /* aaa Artem : done. similar problems here */
 
   test.case = '`local path` option points to the config file';
-  var localPath = a.abs( '' );
+
+  a.reflect();
+
+  var localPath = a.abs( '.' );
   var got = _.npm.bump( { localPath } ).config;
   var exp =
   {
     'name' : 'test package.json',
     'version' : '1.0.1',
-    'description' : 'for testing bump routine',
-    'main' : 'index.js',
-    'dependencies' : {},
-    'devDependencies' : {},
-    'scripts' :
-    {
-      'test' : 'echo "Error: no test specified" && exit 1'
-    },
-    'keywords' : [],
-    'author' : '',
-    'license' : 'MIT'
+    'dependencies' : { 'package1' : '1.1.1' },
+    'devDependencies' : { 'package2' : '2.2.2' }
   }
 
   test.identical( got, exp );
+
+  //
+
+  test.case = 'read written config';
+
+  a.reflect();
+
+  var localPath = a.abs( '.' );
+  _.npm.bump({ localPath });
+  var got = _.fileProvider.configRead({ filePath : a.abs( 'package.json' ) });
+  var exp =
+  {
+    'name' : 'test package.json',
+    'version' : '1.0.1',
+    'dependencies' : { 'package1' : '1.1.1' },
+    'devDependencies' : { 'package2' : '2.2.2' }
+  }
+
+  test.identical( got, exp );
+
+  //
+
+  test.case = 'check whole "got" map';
+
+  a.reflect();
+
+  var localPath = a.abs( '.' );
+  var got = _.npm.bump({ localPath });
+
+  test.is( _.strDefined( got.localPath ) );
+  test.is( _.strDefined( got.configPath ) );
+  test.identical( got.dry, 0 );
+  test.identical( got.verbosity, 0 );
+  test.identical( got.changed, true );
 }
 
 bump.description =
@@ -219,60 +322,64 @@ function pathParse( test )
 {
 
   test.case = 'basic';
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var exp =
   {
     'protocol' : 'npm',
-    'longPath' : '/wpathbasic',
+    'longPath' : '/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1',
     'tag' : 'latest',
     'localVcsPath' : '',
-    'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@latest',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@latest',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
   test.identical( got, exp );
 
   test.case = 'hash';
-  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var exp =
   {
     'protocol' : 'npm',
     'hash' : '1.0.0',
-    'longPath' : '/wpathbasic',
+    'longPath' : '/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1#1.0.0',
     'localVcsPath' : '',
-    'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@1.0.0',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@1.0.0',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
   test.identical( got, exp );
 
   test.case = 'tag';
-  var remotePath = 'npm:///wpathbasic!beta';
+  var remotePath = 'npm:///wmodulefortesting1@beta';
   var exp =
   {
     'protocol' : 'npm',
     'tag' : 'beta',
-    'longPath' : '/wpathbasic',
+    'longPath' : '/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1@beta',
     'localVcsPath' : '',
-    'remoteVcsPath' : 'wpathbasic',
-    'remoteVcsLongerPath' : 'wpathbasic@beta',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@beta',
     'isFixated' : false
   }
   var got = _.npm.pathParse( remotePath );
   test.identical( got, exp );
 
   test.case = 'with local';
-  var remotePath = 'npm:///wColor/out/wColor#0.3.100';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
   var exp =
   {
     'protocol' : 'npm',
     'hash' : '0.3.100',
-    'longPath' : '/wColor/out/wColor',
-    'localVcsPath' : 'out/wColor',
-    'remoteVcsPath' : 'wColor',
-    'remoteVcsLongerPath' : 'wColor@0.3.100',
+    'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
+    'parametrizedPath' : '/wmodulefortesting1/out/wmodulefortesting1#0.3.100',
+    'localVcsPath' : 'out/wmodulefortesting1',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@0.3.100',
     'isFixated' : true
   }
   var got = _.npm.pathParse( remotePath );
@@ -299,7 +406,7 @@ function pathParse( test )
   return;
 
   test.case = 'throwing';
-  var remotePath = 'npm:///wpathbasic#1.0.0!beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
 
 }
@@ -308,19 +415,19 @@ function pathParse( test )
 
 function pathIsFixated( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.pathIsFixated( remotePath );
   test.identical( got, false );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var got = _.npm.pathIsFixated( remotePath );
   test.identical( got, true );
 
-  var remotePath = 'npm:///wpathbasic!beta'
+  var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.pathIsFixated( remotePath );
   test.identical( got, false );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0!beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
 }
 
@@ -328,21 +435,21 @@ function pathIsFixated( test )
 
 function pathFixate( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic!beta'
+  var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wpathbasic#.+/ ));
+  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic#1.0.0!beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
   test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
@@ -352,11 +459,9 @@ function versionLocalRetrive( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  // let testPath = _.path.join( self.suiteTempPath, test.name );
-  // let filePath = _.path.join( testPath, 'package.json' );
   let testPath = a.abs( '.' );
   let filePath = a.abs( 'package.json' );
-  /* qqq : avoid using _.path.* in tests, use a.abs() instead please */
+  /* aaa Artem : done. avoid using _.path.* in tests, use a.abs() instead please */
 
   test.case = 'path doesn`t exist'
   var got = _.npm.versionLocalRetrive({ localPath : testPath })
@@ -386,26 +491,26 @@ function versionLocalRetrive( test )
 function versionRemoteLatestRetrive( test )
 {
 
-  /* qqq : use modules for testing instead of production modules here and everywhere */
-  var remotePath = 'npm:///wpathbasic';
+  /* aaa Artem : done. use modules for testing instead of production modules here and everywhere */
+  var remotePath = 'npm:///wmodulefortesting1';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic!latest';
+  var remotePath = 'npm:///wmodulefortesting1@latest';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic!beta';
+  var remotePath = 'npm:///wmodulefortesting1@beta';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic#0.7.1';
+  var remotePath = 'npm:///wmodulefortesting1#0.0.3';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc' ))
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc!beta' ))
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wpathbasicc#0.7.1' ))
+  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1' ))
+  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1@beta' ))
+  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1#0.0.3' ))
 
 }
 
@@ -415,24 +520,24 @@ versionRemoteLatestRetrive.timeOut = 30000;
 
 function versionRemoteCurrentRetrive( test )
 {
-  var remotePath = 'npm:///wpathbasic'
+  var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
 
-  var remotePath = 'npm:///wpathbasic!latest'
+  var remotePath = 'npm:///wmodulefortesting1@latest'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic!beta'
+  var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wpathbasic#0.7.1'
+  var remotePath = 'npm:///wmodulefortesting1#0.0.3'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
   test.is( _.strDefined( got ) );
-  test.identical( got, '0.7.1' );
+  test.identical( got, '0.0.3' );
 }
 
 versionRemoteCurrentRetrive.timeOut = 30000;
@@ -443,8 +548,8 @@ function isUpToDate( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -461,77 +566,77 @@ function isUpToDate( test )
   .then( () =>
   {
     test.case = 'no package'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic!beta'
+    let remotePath = 'npm:///wmodulefortesting1@beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
   })
 
-  install( 'wpathbasic@latest' )
+  install( 'wmodulefortesting1@latest' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.5' )
   .then( () =>
   {
     test.case = 'installed version, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wpathbasic!beta'
+    let remotePath = 'npm:///wmodulefortesting1@beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wpathbasic#0.7.1'
+    let remotePath = 'npm:///wmodulefortesting1#0.0.3'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
@@ -548,8 +653,8 @@ function isRepository( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -571,7 +676,7 @@ function isRepository( test )
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest'
@@ -580,7 +685,7 @@ function isRepository( test )
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta'
@@ -589,7 +694,7 @@ function isRepository( test )
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version'
@@ -609,8 +714,8 @@ function hasRemote( test )
 {
   let self = this;
   let a = test.assetFor( false );
-  let testPath = _.path.join( self.suiteTempPath, test.name );
-  let localPath = _.path.join( testPath, 'node_modules/wpathbasic');
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
   _.fileProvider.dirMake( testPath )
@@ -627,73 +732,73 @@ function hasRemote( test )
   .then( () =>
   {
     test.case = 'no package'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, false );
     test.identical( got.remoteIsValid, false );
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic' )
+  install( 'wmodulefortesting1' )
   .then( () =>
   {
     test.case = 'installed latest, remote points to latest'
-    let remotePath = 'npm:///wpathbasicc'
+    let remotePath = 'npm:///wmodulefortestinggg1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, false );
     return null;
   })
 
-  install( 'wpathbasic@beta' )
+  install( 'wmodulefortesting1@beta' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic@latest' )
+  install( 'wmodulefortesting1@latest' )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to latest'
-    let remotePath = 'npm:///wpathbasic'
+    let remotePath = 'npm:///wmodulefortesting1'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
     return null;
   })
 
-  install( 'wpathbasic@0.7.1' )
+  install( 'wmodulefortesting1@0.0.3' )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wpathbasic!beta'
+    let remotePath = 'npm:///wmodulefortesting1@beta'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
