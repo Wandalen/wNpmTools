@@ -17,6 +17,7 @@ about :
   author : 'Kostiantyn Wandalen <wanalen@01.school>'
   contributors :
   - 'Kostiantyn Wandalen <wanalen@01.school>'
+  - 'Artem Bohush <art.bohush@gmail.com>'
   npm.name : 'wnpmtools'
   npm.scripts :
     test : 'wtest .run proto/**'
