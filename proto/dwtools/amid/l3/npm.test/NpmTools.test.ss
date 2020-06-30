@@ -327,7 +327,6 @@ function pathParse( test )
   {
     'protocol' : 'npm',
     'longPath' : '/wmodulefortesting1',
-    'parametrizedPath' : '/wmodulefortesting1',
     'tag' : 'latest',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wmodulefortesting1',
@@ -344,7 +343,6 @@ function pathParse( test )
     'protocol' : 'npm',
     'hash' : '1.0.0',
     'longPath' : '/wmodulefortesting1',
-    'parametrizedPath' : '/wmodulefortesting1#1.0.0',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wmodulefortesting1',
     'remoteVcsLongerPath' : 'wmodulefortesting1@1.0.0',
@@ -354,13 +352,12 @@ function pathParse( test )
   test.identical( got, exp );
 
   test.case = 'tag';
-  var remotePath = 'npm:///wmodulefortesting1@beta';
+  var remotePath = 'npm:///wmodulefortesting1!beta';
   var exp =
   {
     'protocol' : 'npm',
     'tag' : 'beta',
     'longPath' : '/wmodulefortesting1',
-    'parametrizedPath' : '/wmodulefortesting1@beta',
     'localVcsPath' : '',
     'remoteVcsPath' : 'wmodulefortesting1',
     'remoteVcsLongerPath' : 'wmodulefortesting1@beta',
@@ -376,7 +373,6 @@ function pathParse( test )
     'protocol' : 'npm',
     'hash' : '0.3.100',
     'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
-    'parametrizedPath' : '/wmodulefortesting1/out/wmodulefortesting1#0.3.100',
     'localVcsPath' : 'out/wmodulefortesting1',
     'remoteVcsPath' : 'wmodulefortesting1',
     'remoteVcsLongerPath' : 'wmodulefortesting1@0.3.100',
@@ -406,7 +402,7 @@ function pathParse( test )
   return;
 
   test.case = 'throwing';
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
   test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
 
 }
@@ -444,12 +440,12 @@ function pathFixate( test )
   test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wmodulefortesting1@beta'
+  var remotePath = 'npm:///wmodulefortesting1!beta'
   var got = _.npm.pathFixate( remotePath );
   test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
   test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
@@ -596,7 +592,7 @@ function isUpToDate( test )
   .then( () =>
   {
     test.case = 'installed beta, remote points to latest'
-    let remotePath = 'npm:///wmodulefortesting1@beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, true );
     return null;
@@ -626,7 +622,7 @@ function isUpToDate( test )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wmodulefortesting1@beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
     var got = _.npm.isUpToDate({ localPath, remotePath });
     test.identical( got, false );
     return null;
@@ -798,7 +794,7 @@ function hasRemote( test )
   .then( () =>
   {
     test.case = 'installed version, remote points to beta'
-    let remotePath = 'npm:///wmodulefortesting1@beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
     var got = _.npm.hasRemote({ localPath, remotePath });
     test.identical( got.downloaded, true );
     test.identical( got.remoteIsValid, true );
