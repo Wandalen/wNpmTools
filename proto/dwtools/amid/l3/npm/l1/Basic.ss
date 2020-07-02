@@ -544,6 +544,7 @@ function versionLog( o )
 
   // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+  // let parsed = _.uri.parse( o.remotePath );
 
   return _.process.start
   ({
@@ -562,8 +563,8 @@ function versionLog( o )
     latest = 'unknown'
 
     let log = '';
-    log += `Current version : ${current}\n`;
-    log += `Latest version : ${latest}\n`;
+    log += `Current version of ${o.remotePath} : ${current}\n`;
+    log += `Latest version of ${o.remotePath} : ${latest}\n`;
 
     logger.log( log );
 
@@ -603,7 +604,7 @@ versionLog.defaults =
  * @module Tools/mid/NpmTools
  */
 
-function pathParse( remotePath )
+function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
 {
   let self = this;
   let path = _.uri;
@@ -641,6 +642,7 @@ function pathParse( remotePath )
   // parsed2.hash = parsed1.hash;
   // parsed2.tag = parsed1.tag;
   result.remoteVcsLongerPath = result.remoteVcsPath + '@' + ( result.hash || result.tag );
+  // result.remoteVcsLongerPath = self.pathNativize(  );
 
   // /* */
   //
@@ -686,6 +688,21 @@ function pathParse( remotePath )
     // return [ globalPath, splits[ 2 ] ];
   }
 
+}
+
+//
+
+function pathNativize( remotePath )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strDefined( remotePath ) );
+
+  let parsedPath = _.uri.parseFull( remotePath );
+
+  let result = parsedPath.longPath + '@' + ( parsedPath.hash || parsedPath.tag );
+
+  return result;
 }
 
 //
@@ -1222,6 +1239,7 @@ let Extend =
   // vcs
 
   pathParse,
+  pathNativize,
   pathIsFixated,
   pathFixate,
   versionLocalRetrive,
