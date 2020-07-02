@@ -524,17 +524,8 @@ dependantsRetrieve.defaults =
 
 function versionLog( o )
 {
-  // let cui = this;
-  //
-  // _.npm.versionLog
-  // ({
-  //   packageJsonPath : fop.packageJsonPath,
-  //   packageName : fop.packageName,
-  // });
 
-  // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
-
-  let logger = o.logger || _global_.logger;
+  _.routineOptions( versionLog, o );
 
   if( !o.configPath )
   o.configPath = _.path.join( o.localPath, 'package.json' );
@@ -542,13 +533,13 @@ function versionLog( o )
   _.assert( _.strDefined( o.configPath ) );
   _.assert( _.strDefined( o.remotePath ) );
 
-  // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
+  let logger = o.logger || _global_.logger;
   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
-  // let parsed = _.uri.parse( o.remotePath );
+  let remotePath = self.pathNativize( o.remotePath );
 
   return _.process.start
   ({
-    execPath : `npm view ${o.remotePath} version`,
+    execPath : `npm view ${remotePath} version`,
     outputCollecting : 1,
     outputPiping : 0,
     inputMirroring : 0,
@@ -566,6 +557,7 @@ function versionLog( o )
     log += `Current version of ${o.remotePath} : ${current}\n`;
     log += `Latest version of ${o.remotePath} : ${latest}\n`;
 
+    if( o.logging )
     logger.log( log );
 
     return log;
@@ -576,6 +568,7 @@ function versionLog( o )
 versionLog.defaults =
 {
   logger : null,
+  logging : 1,
   remotePath : null,
   localPath : null,
   configPath : null,
