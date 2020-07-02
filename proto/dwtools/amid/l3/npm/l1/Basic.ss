@@ -698,9 +698,14 @@ function pathNativize( remotePath )
   _.assert( arguments.length === 1 );
   _.assert( _.strDefined( remotePath ) );
 
+  debugger;
+
   let parsedPath = _.uri.parseFull( remotePath );
 
-  let result = parsedPath.longPath + '@' + ( parsedPath.hash || parsedPath.tag );
+  let result = parsedPath.longPath;
+
+  if( parsedPath.hash || parsedPath.tag )
+  result += '@' + ( parsedPath.hash || parsedPath.tag );
 
   return result;
 }
