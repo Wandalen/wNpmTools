@@ -555,7 +555,7 @@ function versionLog( o )
     latest = 'unknown'
 
     let log = '';
-    log += `Current version of ${o.remotePath} : ${current}\n`;
+    log += `Current version : ${current}\n`;
     log += `Latest version of ${o.remotePath} : ${latest}\n`;
 
     if( o.logging )
