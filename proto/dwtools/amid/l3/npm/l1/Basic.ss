@@ -524,6 +524,7 @@ dependantsRetrieve.defaults =
 
 function versionLog( o )
 {
+  let self = this;
 
   _.routineOptions( versionLog, o );
 
