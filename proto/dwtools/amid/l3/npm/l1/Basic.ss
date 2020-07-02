@@ -520,6 +520,66 @@ dependantsRetrieve.defaults =
   attemptDelay : 250,
 }
 
+//
+
+function versionLog( o )
+{
+  // let cui = this;
+  //
+  // _.npm.versionLog
+  // ({
+  //   packageJsonPath : fop.packageJsonPath,
+  //   packageName : fop.packageName,
+  // });
+
+  // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
+
+  let logger = o.logger || _global_.logger;
+
+  if( !o.configPath )
+  o.configPath = _.path.join( o.localPath, 'package.json' );
+
+  _.assert( _.strDefined( o.configPath ) );
+  _.assert( _.strDefined( o.remotePath ) );
+
+  // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
+  let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+
+  return _.process.start
+  ({
+    execPath : `npm view ${o.remotePath} version`,
+    outputCollecting : 1,
+    outputPiping : 0,
+    inputMirroring : 0,
+    throwingExitCode : 0,
+  })
+  .then( ( got ) =>
+  {
+    let current = packageJson ? packageJson.version : 'unknown';
+    let latest = _.strStrip( got.output );
+
+    if( got.exitCode || !latest )
+    latest = 'unknown'
+
+    let log = '';
+    log += `Current version : ${current}\n`;
+    log += `Latest version : ${latest}\n`;
+
+    logger.log( log );
+
+    return log;
+  })
+
+}
+
+versionLog.defaults =
+{
+  logger : null,
+  remotePath : null,
+  localPath : null,
+  configPath : null,
+}
+
 // --
 // path
 // --
@@ -1157,6 +1217,7 @@ let Extend =
   _readChangeWrite,
 
   dependantsRetrieve,
+  versionLog,
 
   // vcs
 
