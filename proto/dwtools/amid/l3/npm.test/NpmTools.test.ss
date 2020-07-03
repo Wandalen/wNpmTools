@@ -482,6 +482,8 @@ function versionLocalRetrive( test )
   test.identical( got, null );
 }
 
+versionLocalRetrive.timeOut = 300000;
+
 //
 
 function versionRemoteLatestRetrive( test )
