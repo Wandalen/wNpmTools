@@ -19,7 +19,7 @@ var _ = _testerGlobal_.wTools;
 function onSuiteBegin( test )
 {
   let context = this;
-  context.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'NpmTools' );
+  context.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..' ), 'NpmTools' );
   context.assetsOriginalPath = _.path.join( __dirname, '_asset' );
 }
 
@@ -29,7 +29,7 @@ function onSuiteEnd( test )
 {
   let context = this;
   _.assert( _.strHas( context.suiteTempPath, 'NpmTools' ), context.suiteTempPath );
-  _.path.pathDirTempClose( context.suiteTempPath );
+  _.path.tempClose( context.suiteTempPath );
 }
 
 // --
