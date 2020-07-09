@@ -114,7 +114,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: ../proto/dwtools/amid/l3/npm/Include.ss
+        path: ../proto/wtools/amid/l3/npm/Include.ss
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -124,13 +124,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
+        path: '{path::out.*=1}/source/wtools/amid/l3/npm/Include.ss'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
+        path: '{path::out.*=1}/source/wtools/amid/l3/npm/Include.ss'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug
@@ -157,32 +157,32 @@ module:
         path:
           - ../proto
           - ../proto/Integration.test.s
-          - ../proto/dwtools
-          - ../proto/dwtools/Tools.s
-          - ../proto/dwtools/abase
-          - ../proto/dwtools/amid
-          - ../proto/dwtools/amid/l3
-          - ../proto/dwtools/amid/l3/npm
-          - ../proto/dwtools/amid/l3/npm/Include.ss
-          - ../proto/dwtools/amid/l3/npm/include
-          - ../proto/dwtools/amid/l3/npm/include/Basic.ss
-          - ../proto/dwtools/amid/l3/npm/include/Mid.ss
-          - ../proto/dwtools/amid/l3/npm/l1
-          - ../proto/dwtools/amid/l3/npm/l1/Basic.ss
-          - ../proto/dwtools/amid/l3/npm.test
-          - ../proto/dwtools/amid/l3/npm.test/NpmTools.test.ss
-          - ../proto/dwtools/amid/l3/npm.test/_asset
-          - ../proto/dwtools/amid/l3/npm.test/_asset/bump
-          - ../proto/dwtools/amid/l3/npm.test/_asset/bump/package.json
-          - ../proto/dwtools/amid/l3/npm.test/_asset/fixate
-          - ../proto/dwtools/amid/l3/npm.test/_asset/fixate/fixateEmptyVersions
+          - ../proto/wtools
+          - ../proto/wtools/Tools.s
+          - ../proto/wtools/abase
+          - ../proto/wtools/amid
+          - ../proto/wtools/amid/l3
+          - ../proto/wtools/amid/l3/npm
+          - ../proto/wtools/amid/l3/npm/Include.ss
+          - ../proto/wtools/amid/l3/npm/include
+          - ../proto/wtools/amid/l3/npm/include/Basic.ss
+          - ../proto/wtools/amid/l3/npm/include/Mid.ss
+          - ../proto/wtools/amid/l3/npm/l1
+          - ../proto/wtools/amid/l3/npm/l1/Basic.ss
+          - ../proto/wtools/amid/l3/npm.test
+          - ../proto/wtools/amid/l3/npm.test/NpmTools.test.ss
+          - ../proto/wtools/amid/l3/npm.test/_asset
+          - ../proto/wtools/amid/l3/npm.test/_asset/bump
+          - ../proto/wtools/amid/l3/npm.test/_asset/bump/package.json
+          - ../proto/wtools/amid/l3/npm.test/_asset/fixate
+          - ../proto/wtools/amid/l3/npm.test/_asset/fixate/fixateEmptyVersions
           - >-
-            ../proto/dwtools/amid/l3/npm.test/_asset/fixate/fixateEmptyVersions/package.json
+            ../proto/wtools/amid/l3/npm.test/_asset/fixate/fixateEmptyVersions/package.json
           - >-
-            ../proto/dwtools/amid/l3/npm.test/_asset/fixate/fixateNotEmptyVersions
+            ../proto/wtools/amid/l3/npm.test/_asset/fixate/fixateNotEmptyVersions
           - >-
-            ../proto/dwtools/amid/l3/npm.test/_asset/fixate/fixateNotEmptyVersions/package.json
-          - ../proto/dwtools/atop
+            ../proto/wtools/amid/l3/npm.test/_asset/fixate/fixateNotEmptyVersions/package.json
+          - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
@@ -926,7 +926,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: proto/dwtools/amid/l3/npm/Include.ss
+        path: proto/wtools/amid/l3/npm/Include.ss
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -936,13 +936,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
+        path: '{path::out.*=1}/source/wtools/amid/l3/npm/Include.ss'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l3/npm/Include.ss'
+        path: '{path::out.*=1}/source/wtools/amid/l3/npm/Include.ss'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug

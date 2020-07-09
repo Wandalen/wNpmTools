@@ -7,7 +7,7 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( '../../../../../dwtools/Tools.s' );
+  let _ = require( '../../../../../wtools/Tools.s' );
   _.include( 'wHttp' );
   _.include( 'wProcess' );
   _.include( 'wFiles' );
