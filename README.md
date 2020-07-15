@@ -6,5 +6,5 @@ Collection of tools to use npm programmatically.
 ## Try out
 ```
 npm install
-node sample/Sample.js
+node sample/Sample.s
 ```
