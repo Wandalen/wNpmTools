@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
   require( '../npm/Include.ss' );
 }
 
-var _ = _testerGlobal_.wTools;
+let _ = _testerGlobal_.wTools;
 
 // --
 // context
@@ -1176,7 +1176,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuite( Proto );
+let Self = new wTestSuite( Proto );
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 
