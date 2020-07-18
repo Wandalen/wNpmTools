@@ -1216,7 +1216,7 @@ function hasLocalChanges( o )
 // declare
 // --
 
-let Extend =
+let Extension =
 {
 
   protocols : [ 'npm' ],
@@ -1254,7 +1254,7 @@ let Extend =
 
 }
 
-_.mapExtend( Self, Extend );
+_.mapExtend( Self, Extension );
 
 //
 
