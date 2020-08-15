@@ -374,15 +374,15 @@ function _readChangeWrite( o )
   if( !o.changed )
   return o;
 
-  let str = null;
-  let encoder = _.gdf.select
+  let encoder = _.gdf.selectSingleContext
   ({
-    in : 'structure',
-    out : 'string',
+    inFormat : 'structure',
+    outFormat : 'string',
     ext : 'json',
-  })[ 1 ]; /* xxx : workaround */
-  _.assert( !!encoder, `No encoder` );
-  str = encoder.encode({ data : o.config }).data;
+  })
+  debugger;
+  let str = encoder.encode({ data : o.config }).out.data;
+  debugger;
 
   str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
