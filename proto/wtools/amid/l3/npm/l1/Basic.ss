@@ -374,11 +374,13 @@ function _readChangeWrite( o )
   if( !o.changed )
   return o;
 
+  debugger;
   let encoder = _.gdf.selectSingleContext
   ({
     inFormat : 'structure',
     outFormat : 'string',
     ext : 'json',
+    feature : { fine : 1 },
   })
   debugger;
   let str = encoder.encode({ data : o.config }).out.data;
