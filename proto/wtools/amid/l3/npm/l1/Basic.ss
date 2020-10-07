@@ -540,6 +540,8 @@ function versionLog( o )
   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
   let remotePath = self.pathNativize( o.remotePath );
 
+  _.assert( !o.logging || !!logger, 'No defined logger' );
+
   return _.process.start
   ({
     execPath : `npm view ${remotePath} version`,
