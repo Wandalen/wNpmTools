@@ -40,7 +40,7 @@ function trivial( test )
 {
 
   var about = _.npm.aboutFromRemote( 'wTools' );
-  test.is( !!about );
+  test.true( !!about );
   var exp = 'wTools';
   test.identical( about.name, exp );
 
@@ -114,8 +114,8 @@ function fixate( test )
   var tag = '=';
   var got = _.npm.fixate({ localPath, tag });
 
-  test.is( _.strDefined( got.localPath ) );
-  test.is( _.strDefined( got.configPath ) );
+  test.true( _.strDefined( got.localPath ) );
+  test.true( _.strDefined( got.configPath ) );
   test.identical( got.tag, '=' );
   test.identical( got.onDependency, null );
   test.identical( got.dry, 0 );
@@ -304,8 +304,8 @@ function bump( test )
   var localPath = a.abs( '.' );
   var got = _.npm.bump({ localPath });
 
-  test.is( _.strDefined( got.localPath ) );
-  test.is( _.strDefined( got.configPath ) );
+  test.true( _.strDefined( got.localPath ) );
+  test.true( _.strDefined( got.configPath ) );
   test.identical( got.dry, 0 );
   test.identical( got.verbosity, 0 );
   test.identical( got.changed, true );
@@ -433,16 +433,16 @@ function pathFixate( test )
 {
   var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
 
   var remotePath = 'npm:///wmodulefortesting1#1.0.0'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
   var remotePath = 'npm:///wmodulefortesting1!beta'
   var got = _.npm.pathFixate( remotePath );
-  test.is( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
   test.notIdentical( got, remotePath );
 
   var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
@@ -492,19 +492,19 @@ function versionRemoteLatestRetrive( test )
   /* aaa Artem : done. use modules for testing instead of production modules here and everywhere */
   var remotePath = 'npm:///wmodulefortesting1';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1@latest';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1@beta';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1#0.0.3';
   var got = _.npm.versionRemoteLatestRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
 
   test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1' ))
   test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1@beta' ))
@@ -520,21 +520,21 @@ function versionRemoteCurrentRetrive( test )
 {
   var remotePath = 'npm:///wmodulefortesting1'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1@latest'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
   var remotePath = 'npm:///wmodulefortesting1@beta'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
   var remotePath = 'npm:///wmodulefortesting1#0.0.3'
   var got = _.npm.versionRemoteCurrentRetrive( remotePath );
-  test.is( _.strDefined( got ) );
+  test.true( _.strDefined( got ) );
   test.identical( got, '0.0.3' );
 }
 
@@ -865,17 +865,17 @@ async function dependantsRetrieve( test )
     test.open( 'dependants > 999' );
     test.case = 'local relative';
     got = await _.npm.dependantsRetrieve( 'express' );
-    test.is( _.numberIs( got ) );
+    test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global relative';
     got = await _.npm.dependantsRetrieve( 'npm://express' );
-    test.is( _.numberIs( got ) );
+    test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global absolute';
     got = await _.npm.dependantsRetrieve( 'npm:///express' );
-    test.is( _.numberIs( got ) );
+    test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
     test.close( 'dependants > 999' );
 
@@ -951,17 +951,17 @@ async function dependantsRetrieve( test )
     test.open( 'dependants > 999' );
     test.case = 'local relative';
     got = await _.npm.dependantsRetrieve( { remotePath : 'express' } );
-    test.is( _.numberIs( got ) );
+    test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global relative';
     got = await _.npm.dependantsRetrieve( { remotePath : 'npm://express' } );
-    test.is( _.numberIs( got ) );
+    test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global absolute';
     got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///express' } );
-    test.is( _.numberIs( got ) );
+    test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
     test.close( 'dependants > 999' );
 
