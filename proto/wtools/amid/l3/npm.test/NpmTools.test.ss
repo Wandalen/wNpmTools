@@ -992,99 +992,130 @@ Retrieves the number of dependent packages
 
 //
 
-async function dependantsRetrieveMultipleRequests( test )
+function dependantsRetrieveMultipleRequests( test )
 {
-  let names =
-  [
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-  ];
+  let ready = _.take( null );
 
-  let namesResult =
-  [
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-    4, 1, 1,
-    1, 0, NaN,
-  ];
+  /* */
 
-  let wrongNames =
-  [
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-    'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-  ]
+  ready.then( () =>
+  {
+    test.case = 'array as a parameter';
+    var names =
+    [
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    ];
+    return _.npm.dependantsRetrieve( names )
+    .then( ( got ) =>
+    {
+      var exp =
+      [
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+      ];
+      test.identical( got, exp );
+      return null;
+    });
+  });
 
-  let wrongNamesResult =
-  [
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-    NaN, NaN, NaN, NaN, NaN, NaN,
-  ];
+  /* */
 
-  test.case = 'array as a parameter';
-  let got = await _.npm.dependantsRetrieve( names );
-  let exp = namesResult;
-  test.identical( got, exp );
+  ready.then( () =>
+  {
+    test.case = 'map as a parameter';
+    var names =
+    [
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    ];
+    return _.npm.dependantsRetrieve({ remotePath : names })
+    .then( ( got ) =>
+    {
+      var exp =
+      [
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+        4, 1, 1,
+        1, 0, NaN,
+      ];
+      test.identical( got, exp );
+      return null;
+    });
+  });
 
-  test.case = 'map as a parameter';
-  got = await _.npm.dependantsRetrieve( { remotePath : names } );
-  exp = namesResult;
-  test.identical( got, exp );
+  /* */
 
-  test.case = 'wrong names array';
-  got = await _.npm.dependantsRetrieve( wrongNames );
-  exp = wrongNamesResult;
-  test.identical( got, exp );
+  ready.then( () =>
+  {
+    test.case = 'map as a parameter';
+    var wrongNames =
+    [
+      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+    ];
+    return _.npm.dependantsRetrieve({ remotePath : wrongNames })
+    .then( ( got ) =>
+    {
+      var exp =
+      [
+        NaN, NaN, NaN, NaN, NaN, NaN,
+        NaN, NaN, NaN, NaN, NaN, NaN,
+        NaN, NaN, NaN, NaN, NaN, NaN,
+        NaN, NaN, NaN, NaN, NaN, NaN,
+        NaN, NaN, NaN, NaN, NaN, NaN,
+        NaN, NaN, NaN, NaN, NaN, NaN,
+      ];
+      test.identical( got, exp );
+      return null;
+    });
+  });
 
+  /* */
+
+  return ready;
 }
 
 dependantsRetrieveMultipleRequests.timeOut = 120000;
@@ -1100,7 +1131,7 @@ async function dependantsRetrieveStress( test )
   const temp =
   [
     'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-    'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
+    'wmodulefortesting12', 'nonexistentPackageName', 'nonexistentPackageName',
   ];
   const remotePath = [];
   const result = [];
@@ -1109,15 +1140,16 @@ async function dependantsRetrieveStress( test )
   for( let i = 0; i < l; i++ )
   {
     remotePath.push( ... temp );
-    result.push( 4, 1, 1, 1, 0, NaN );
+    result.push( 4, 1, 1, 1, NaN, NaN );
   }
 
   test.case = `${remotePath.length} packages`;
-  let got = await _.npm.dependantsRetrieve( { remotePath, verbosity : 3 } );
+  let got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3, attemptLimit : 20 });
   let exp = result;
   test.identical( got, exp );
 
 }
+
 
 dependantsRetrieveStress.rapidity = -2;
 dependantsRetrieveStress.timeOut = 300000;
