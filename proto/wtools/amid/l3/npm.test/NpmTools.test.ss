@@ -1059,7 +1059,7 @@ function dependantsRetrieveMultipleRequests( test )
       'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
-    return _.npm.dependantsRetrieve({ remotePath : names })
+    return _.npm.dependantsRetrieve({ remotePath : names, attemptLimit : 20 })
     .then( ( got ) =>
     {
       var exp =
@@ -1086,17 +1086,17 @@ function dependantsRetrieveMultipleRequests( test )
 
   ready.then( () =>
   {
-    test.case = 'map as a parameter';
+    test.case = 'map as a parameter, not existed packages';
     var wrongNames =
     [
-      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
-      'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName', 'nonexistentName',
+      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
+      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
+      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
+      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
+      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
+      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
     ];
-    return _.npm.dependantsRetrieve({ remotePath : wrongNames })
+    return _.npm.dependantsRetrieve({ remotePath : wrongNames, attemptLimit : 20 })
     .then( ( got ) =>
     {
       var exp =
@@ -1134,22 +1134,20 @@ async function dependantsRetrieveStress( test )
     'wmodulefortesting12', 'nonexistentPackageName', 'nonexistentPackageName',
   ];
   const remotePath = [];
-  const result = [];
+  const exp = [];
   const l = 100;
 
   for( let i = 0; i < l; i++ )
   {
     remotePath.push( ... temp );
-    result.push( 4, 1, 1, 1, NaN, NaN );
+    exp.push( 4, 1, 1, 1, NaN, NaN );
   }
 
   test.case = `${remotePath.length} packages`;
   let got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3, attemptLimit : 20 });
-  let exp = result;
   test.identical( got, exp );
 
 }
-
 
 dependantsRetrieveStress.rapidity = -2;
 dependantsRetrieveStress.timeOut = 300000;
