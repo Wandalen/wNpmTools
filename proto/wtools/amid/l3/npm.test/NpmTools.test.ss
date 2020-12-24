@@ -318,6 +318,150 @@ Bumps package version
 
 //
 
+function aboutFromRemote( test )
+{
+  let ready = _.take( null );
+
+  ready.then( () =>
+  {
+    test.case = 'only name';
+    var got = _.npm.aboutFromRemote( 'wmodulefortesting1' );
+    test.identical( got.name, 'wmodulefortesting1' );
+    test.identical( got.license, 'MIT' );
+    return null;
+  });
+
+  ready.then( () =>
+  {
+    test.case = 'only name in map';
+    var o = { name : 'wmodulefortesting1' };
+    var got = _.npm.aboutFromRemote( o );
+    test.identical( got.name, 'wmodulefortesting1' );
+    test.identical( got.license, 'MIT' );
+    return null;
+  });
+
+  ready.then( () =>
+  {
+    test.case = 'package not exists, throwing - 0';
+    var o = { name : 'notexists', throwing : 0 };
+    var got = _.npm.aboutFromRemote( o );
+    test.identical( got, null );
+    return null;
+  });
+
+  /* */
+
+  ready.then( () =>
+  {
+    test.case = 'only name with tag ( dist version )';
+    var got = _.npm.aboutFromRemote( 'wmodulefortesting1!alpha' );
+    test.identical( got.name, 'wmodulefortesting1' );
+    test.identical( got.license, 'MIT' );
+    var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
+    test.identical( got.description, exp );
+    return null;
+  });
+
+  ready.then( () =>
+  {
+    test.case = 'only name with tag ( dist version ) in map';
+    var o = { name : 'wmodulefortesting1!alpha' };
+    var got = _.npm.aboutFromRemote( o );
+    test.identical( got.name, 'wmodulefortesting1' );
+    test.identical( got.license, 'MIT' );
+    var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
+    test.identical( got.description, exp );
+    return null;
+  });
+
+  ready.then( () =>
+  {
+    test.case = 'package not exists, name with tag ( dist version ), throwing - 0';
+    var o = { name : 'notexists!alpha', throwing : 0 };
+    var got = _.npm.aboutFromRemote( o );
+    test.identical( got, null );
+    return null;
+  });
+
+  /* */
+
+  ready.then( () =>
+  {
+    test.case = 'only name with tag ( version )';
+    var got = _.npm.aboutFromRemote( 'wmodulefortesting1!0.0.109' );
+    test.identical( got.name, 'wmodulefortesting1' );
+    test.identical( got.license, 'MIT' );
+    var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
+    test.identical( got.description, exp );
+    return null;
+  });
+
+  ready.then( () =>
+  {
+    test.case = 'only name with tag ( version ) in map';
+    var o = { name : 'wmodulefortesting1!0.0.109' };
+    var got = _.npm.aboutFromRemote( o );
+    test.identical( got.name, 'wmodulefortesting1' );
+    test.identical( got.license, 'MIT' );
+    var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
+    test.identical( got.description, exp );
+    return null;
+  });
+
+  ready.then( () =>
+  {
+    test.case = 'package not exists, name with tag ( version ), throwing - 0';
+    var o = { name : 'notexists!0.0.109', throwing : 0 };
+    var got = _.npm.aboutFromRemote( o );
+    test.identical( got, null );
+    return null;
+  });
+
+  /* - */
+
+  if( Config.debug )
+  {
+    ready.then( () =>
+    {
+      test.case = 'unknown option in options map';
+      var o = { name : 'notexists', unknown : 1 };
+      test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ) );
+      return null;
+    });
+
+    ready.then( () =>
+    {
+      test.case = 'package not exists, throwing - 1';
+      var o = { name : 'notexists', throwing : 1 };
+      var errCallback = ( err, arg ) =>
+      {
+        test.identical( arg, undefined );
+        test.identical( _.strCount( err.message, 'Failed to get information about remote module "notexists"' ), 1 );
+      };
+      test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ), errCallback );
+      return null;
+    });
+
+    ready.then( () =>
+    {
+      test.case = 'package exists, wrong version, throwing - 1';
+      var o = { name : 'wmodulefortesting1!notexists', throwing : 1 };
+      var errCallback = ( err, arg ) =>
+      {
+        test.identical( arg, undefined );
+        test.identical( _.strCount( err.message, 'Wrong version tag "notexists"' ), 1 );
+      };
+      test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ), errCallback );
+      return null;
+    });
+  }
+
+  return ready;
+}
+
+//
+
 function pathParse( test )
 {
 
@@ -1182,6 +1326,8 @@ var Proto =
 
     fixate,
     bump,
+
+    aboutFromRemote,
 
     trivial,
     pathParse,
