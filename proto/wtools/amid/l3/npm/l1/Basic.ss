@@ -326,7 +326,7 @@ function aboutFromRemote( o )
   ({
     uri : _.path.join( packageServer, o.name ),
     sync : 0,
-    attemptLimit : o.attemptsLimit,
+    attemptLimit : o.attemptLimit,
     attemptDelay : o.attemptDelay,
     successStatus : [ 200, 404 ],
   });
@@ -384,7 +384,7 @@ aboutFromRemote.defaults =
   name : null,
   sync : 1,
   throwing : 1,
-  attemptsLimit : 3,
+  attemptLimit : 3,
   attemptDelay : 500,
 }
 
