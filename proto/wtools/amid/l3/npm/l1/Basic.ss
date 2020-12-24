@@ -309,34 +309,40 @@ structureBump.defaults =
 
 function aboutFromRemote( o )
 {
-  let self = this;
-  let PackageJson = require( 'package-json' );
+  const self = this;
+  const packageServer = 'https://registry.npmjs.org/';
+  // let PackageJson = require( 'package-json' );
 
   if( _.strIs( arguments[ 0 ] ) )
-  o = { name : arguments[ 0 ] }
+  o = { name : arguments[ 0 ] };
   o = _.routineOptions( aboutFromRemote, o );
 
-  let ready = _.Consequence.From( PackageJson( o.name, { fullMetadata : true } ) );
+  const splits = _.strIsolateLeftOrAll({ src : o.name, delimeter : '!' });
+  o.name = splits[ 0 ];
+  o.version = splits[ 2 ] ? splits[ 2 ] : 'latest';
 
-  ready.then( ( record ) =>
-  {
-    // debugger;
-    // console.log( record.author )
-    // return null;
-    // debugger;
-    return record;
+  // let ready = _.Consequence.From( PackageJson( o.name, { fullMetadata : true, version : o.version } ) );
+  const ready = _.http.retrieve
+  ({
+    uri : _.path.join( packageServer, o.name ),
+    sync : 0,
+    verbosity : o.verbosity,
+    attemptLimit : o.attemptLimit,
+    attemptDelay : o.attemptDelay,
+    successStatus : [ 200, 404 ],
   });
 
-  ready.catch( ( err ) =>
-  {
-    debugger;
-    if( !o.throwing )
-    {
-      _.errAttend( err );
-      return null;
-    }
-    throw _.err( err, `\nFailed to get information about remote module ${name}` );
-  });
+  ready.then( handleResponse );
+
+  // ready.catch( ( err ) =>
+  // {
+  //   if( !o.throwing )
+  //   {
+  //     _.errAttend( err );
+  //     return null;
+  //   }
+  //   throw _.err( err, `\nFailed to get information about remote module ${name}` );
+  // });
 
   if( o.sync )
   {
@@ -345,13 +351,42 @@ function aboutFromRemote( o )
   }
 
   return ready;
+
+  /* */
+
+  function handleResponse( op )
+  {
+    const response = op.response;
+    let err;
+
+    if( response.statusCode === 200 )
+    {
+      const data = response.body;
+      const distTagVersion = data[ 'dist-tags' ][ o.version ];
+
+      if( distTagVersion )
+      return data.versions[ distTagVersion ];
+
+      const versionData = data.versions[ o.version ];
+      if( versionData )
+      return versionData;
+
+      err = _.err( `Wrong version tag ${ _.strQuote( o.version ) }` );
+    }
+
+    if( o.throwing )
+    throw _.err( err ? err : response.body.error, `\nFailed to get information about remote module ${ _.strQuote( o.name ) }` );
+    return null;
+  }
 }
 
 aboutFromRemote.defaults =
 {
   name : null,
   sync : 1,
-  throwing : 0,
+  throwing : 1,
+  attemptsLimit : 3,
+  attemptDelay : 500,
 }
 
 //
