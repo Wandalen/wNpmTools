@@ -450,7 +450,6 @@ function aboutFromRemote( test )
       var errCallback = ( err, arg ) =>
       {
         test.identical( arg, undefined );
-        debugger;
         test.identical( _.strCount( err.message, 'Wrong version tag "notexists"' ), 1 );
       };
       test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ), errCallback );
