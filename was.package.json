@@ -26,8 +26,7 @@
     "wTools" : "",
     "whttp" : "",
     "wFiles" : "",
-    "wprocess" : "",
-    "package-json" : "6.5.0"
+    "wprocess" : ""
   },
   "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0", "wnpmtools" : "file:." },
   "keywords" : [ "wTools" ]

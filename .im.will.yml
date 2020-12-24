@@ -13,9 +13,6 @@ submodule :
   wHttp :
     path : npm:///whttp
     enabled : 0 # submodule
-  'package-json' :
-    path : npm:///package-json#6.5.0
-    enabled : 0 # submodule
   # Self :
   #  path : hd://.
   #  enabled : 0
