@@ -1165,17 +1165,17 @@ function dependantsRetrieveMultipleRequests( test )
     {
       var exp =
       [
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
       ];
       test.identical( got, exp );
@@ -1208,17 +1208,17 @@ function dependantsRetrieveMultipleRequests( test )
     {
       var exp =
       [
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
       ];
       test.identical( got, exp );
@@ -1284,7 +1284,7 @@ async function dependantsRetrieveStress( test )
   for( let i = 0; i < l; i++ )
   {
     remotePath.push( ... temp );
-    exp.push( 4, 1, 1, 1, NaN, NaN );
+    exp.push( 5, 1, 1, 1, NaN, NaN );
   }
 
   test.case = `${remotePath.length} packages`;
