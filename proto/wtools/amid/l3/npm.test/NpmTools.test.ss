@@ -1190,20 +1190,12 @@ function dependantsRetrieveMultipleRequests( test )
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
       'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
-      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
-      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
     return _.npm.dependantsRetrieve({ remotePath : names, attemptLimit : 20, attemptDelay : 500 })
     .then( ( got ) =>
     {
       var exp =
       [
-        5, 1, 1,
-        1, 0, NaN,
-        5, 1, 1,
-        1, 0, NaN,
         5, 1, 1,
         1, 0, NaN,
         5, 1, 1,
@@ -1229,16 +1221,12 @@ function dependantsRetrieveMultipleRequests( test )
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
-      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
-      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
     ];
     return _.npm.dependantsRetrieve({ remotePath : wrongNames, attemptLimit : 20, attemptDelay : 500 })
     .then( ( got ) =>
     {
       var exp =
       [
-        NaN, NaN, NaN, NaN, NaN, NaN,
-        NaN, NaN, NaN, NaN, NaN, NaN,
         NaN, NaN, NaN, NaN, NaN, NaN,
         NaN, NaN, NaN, NaN, NaN, NaN,
         NaN, NaN, NaN, NaN, NaN, NaN,
@@ -1285,11 +1273,12 @@ async function dependantsRetrieveStress( test )
 
 }
 
-dependantsRetrieveStress.rapidity = -2;
+dependantsRetrieveStress.rapidity = -4;
 dependantsRetrieveStress.timeOut = 300000;
 dependantsRetrieveStress.description =
 `
-Stress testing
+Stress testing.
+Depends on remote server, should be tested manually.
 `
 
 // --
