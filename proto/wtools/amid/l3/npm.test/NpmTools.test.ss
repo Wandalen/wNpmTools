@@ -1155,27 +1155,19 @@ function dependantsRetrieveMultipleRequests( test )
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
       'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
     return _.npm.dependantsRetrieve( names )
     .then( ( got ) =>
     {
       var exp =
       [
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
-        1, 0, NaN,
-        4, 1, 1,
-        1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
       ];
       test.identical( got, exp );
@@ -1190,35 +1182,27 @@ function dependantsRetrieveMultipleRequests( test )
     test.case = 'map as a parameter';
     var names =
     [
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
-      'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
-    return _.npm.dependantsRetrieve({ remotePath : names, attemptLimit : 20 })
+    return _.npm.dependantsRetrieve({ remotePath : names, attemptLimit : 20, attemptDelay : 500 })
     .then( ( got ) =>
     {
       var exp =
       [
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
-        4, 1, 1,
-        1, 0, NaN,
-        4, 1, 1,
-        1, 0, NaN,
-        4, 1, 1,
+        5, 1, 1,
         1, 0, NaN,
       ];
       test.identical( got, exp );
@@ -1237,16 +1221,12 @@ function dependantsRetrieveMultipleRequests( test )
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
-      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
-      'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
     ];
-    return _.npm.dependantsRetrieve({ remotePath : wrongNames, attemptLimit : 20 })
+    return _.npm.dependantsRetrieve({ remotePath : wrongNames, attemptLimit : 20, attemptDelay : 500 })
     .then( ( got ) =>
     {
       var exp =
       [
-        NaN, NaN, NaN, NaN, NaN, NaN,
-        NaN, NaN, NaN, NaN, NaN, NaN,
         NaN, NaN, NaN, NaN, NaN, NaN,
         NaN, NaN, NaN, NaN, NaN, NaN,
         NaN, NaN, NaN, NaN, NaN, NaN,
@@ -1274,7 +1254,7 @@ async function dependantsRetrieveStress( test )
 {
   const temp =
   [
-    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
+    'wmodulefortesting1',  'wmodulefortesting1a',    'wmodulefortesting1b',
     'wmodulefortesting12', 'nonexistentPackageName', 'nonexistentPackageName',
   ];
   const remotePath = [];
@@ -1284,20 +1264,21 @@ async function dependantsRetrieveStress( test )
   for( let i = 0; i < l; i++ )
   {
     remotePath.push( ... temp );
-    exp.push( 4, 1, 1, 1, NaN, NaN );
+    exp.push( 5, 1, 1, 1, NaN, NaN );
   }
 
   test.case = `${remotePath.length} packages`;
-  let got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3, attemptLimit : 20 });
+  let got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3, attemptLimit : 20, attemptDelay : 500 });
   test.identical( got, exp );
 
 }
 
-dependantsRetrieveStress.rapidity = -2;
+dependantsRetrieveStress.rapidity = -4;
 dependantsRetrieveStress.timeOut = 300000;
 dependantsRetrieveStress.description =
 `
-Stress testing
+Stress testing.
+Depends on remote server, should be tested manually.
 `
 
 // --
