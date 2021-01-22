@@ -1242,11 +1242,13 @@ function dependantsRetrieveMultipleRequests( test )
   return ready;
 }
 
+dependantsRetrieveMultipleRequests.rapidity = -4; /* xxx : investigate and improve behavior */
 dependantsRetrieveMultipleRequests.timeOut = 120000;
 dependantsRetrieveMultipleRequests.description =
 `
 Retrieves dependants of each package in array
-`
+Depends on remote server, should be tested manually.
+`;
 
 //
 
@@ -1270,16 +1272,15 @@ async function dependantsRetrieveStress( test )
   test.case = `${remotePath.length} packages`;
   let got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3, attemptLimit : 20, attemptDelay : 500 });
   test.identical( got, exp );
-
 }
 
-dependantsRetrieveStress.rapidity = -4;
+dependantsRetrieveStress.rapidity = -4; /* xxx : investigate and improve behavior */
 dependantsRetrieveStress.timeOut = 300000;
 dependantsRetrieveStress.description =
 `
 Stress testing.
 Depends on remote server, should be tested manually.
-`
+`;
 
 // --
 // declare
