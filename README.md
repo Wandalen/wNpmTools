@@ -8,7 +8,7 @@ Collection of tools to use npm programmatically.
 git clone https://github.com/Wandalen/wNpmTools
 cd wNpmTools
 npm install
-node sample/Sample.s
+node sample/trivial/Sample.s
 ```
 
 ## To add to your project
