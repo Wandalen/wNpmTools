@@ -1,6 +1,6 @@
 {
   "name": "wnpmtools",
-  "version": "0.3.162",
+  "version": "0.3.163",
   "description": "Collection of tools to use npm programmatically.",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors": [
@@ -16,7 +16,7 @@
   "license": "MIT",
   "main": "proto/wtools/amid/l3/npm/Include.ss",
   "files": [
-    "proto/wtools/amid/l3",
+    "proto/wtools/amid/l3/npm",
     "proto/wtools/Tools.s"
   ],
   "scripts": {
