@@ -1182,13 +1182,13 @@ function dependantsRetrieveMultipleRequests( test )
     test.case = 'map as a parameter';
     var names =
     [
-      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
-      'wmodulefortesting1',  'wmodulefortesting1a',   'wmodulefortesting1b',
+      'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
     return _.npm.dependantsRetrieve({ remotePath : names, attemptLimit : 20, attemptDelay : 500 })
@@ -1256,7 +1256,7 @@ async function dependantsRetrieveStress( test )
 {
   const temp =
   [
-    'wmodulefortesting1',  'wmodulefortesting1a',    'wmodulefortesting1b',
+    'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
     'wmodulefortesting12', 'nonexistentPackageName', 'nonexistentPackageName',
   ];
   const remotePath = [];
