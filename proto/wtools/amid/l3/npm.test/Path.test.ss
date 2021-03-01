@@ -307,6 +307,153 @@ function parse( test )
 
 //
 
+function nativize( test )
+{
+  test.open( 'global' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'npm:///wmodulefortesting1'
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
+  var exp = 'wmodulefortesting1@1.0.0';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'npm:///wmodulefortesting1!beta';
+  var exp = 'wmodulefortesting1@beta';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var exp = 'wmodulefortesting1@0.3.100';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var exp = 'wmodulefortesting1@alpha';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var remotePath = 'npm:///'
+  var exp = '';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var remotePath = 'npm:///!some tag'
+  var exp = '@some tag';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var remotePath = 'npm:///#0.3.201'
+  var exp = '@0.3.201';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'global' );
+
+  /* - */
+
+  test.open( 'local' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'npm://wmodulefortesting1'
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'npm://wmodulefortesting1#1.0.0'
+  var exp = 'wmodulefortesting1@1.0.0';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'npm://wmodulefortesting1!beta';
+  var exp = 'wmodulefortesting1@beta';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1';
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var exp = 'wmodulefortesting1@0.3.100';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var exp = 'wmodulefortesting1@alpha';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var remotePath = 'npm://'
+  var exp = '';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var remotePath = 'npm://!some tag'
+  var exp = '@some tag';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var remotePath = 'npm://#0.3.201'
+  var exp = '@0.3.201';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'local' );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize( 'npm:///wmodulefortesting1', 'npm://wmodulefortesting1' ) );
+
+  test.case = 'wrong format of remotePath';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize( '/wmodulefortesting1' ) );
+
+  test.case = 'wrong type of remotePath';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize([ 'npm:///wmodulefortesting1' ]) );
+
+  test.case = 'unknown option in options map';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize({ remotePath : 'npm:///wmodulefortesting1', unknown : 1 }) );
+
+  test.case = 'remotePath with hash and tag';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize( remotePath ) );
+}
+
+//
+
 function isFixated( test )
 {
   test.case = 'simple path';
@@ -367,7 +514,7 @@ function isFixated( test )
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   name : 'Tools.mid.NpmTools.path',
@@ -377,6 +524,8 @@ var Proto =
   {
 
     parse,
+
+    nativize,
 
     isFixated,
 
