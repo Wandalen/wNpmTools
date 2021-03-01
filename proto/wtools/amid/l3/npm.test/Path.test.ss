@@ -376,6 +376,72 @@ function parseFull( test )
 
   /* - */
 
+  test.open( 'not npm paths' );
+
+  test.case = 'git path';
+  var remotePath = 'git://git@github.com:user/repo';
+  var exp =
+  {
+    'protocol' : 'git',
+    'protocols' : [ 'git' ],
+    'tag' : 'latest',
+    'longPath' : 'git@github.com:user/repo',
+    'host' : 'git@github.com:user',
+    'localVcsPath' : 'repo',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'ssh git path';
+  var remotePath = 'ssh://git@github.com/user/repo';
+  var exp =
+  {
+    'protocol' : 'ssh',
+    'protocols' : [ 'ssh' ],
+    'tag' : 'latest',
+    'longPath' : 'git@github.com/user/repo',
+    'host' : 'git@github.com',
+    'localVcsPath' : 'user/repo',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var remotePath = 'https://github.com/user/repo';
+  var exp =
+  {
+    'protocol' : 'https',
+    'protocols' : [ 'https' ],
+    'tag' : 'latest',
+    'longPath' : 'github.com/user/repo',
+    'host' : 'github.com',
+    'localVcsPath' : 'user/repo',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var remotePath = 'file://local/repo';
+  var exp =
+  {
+    'protocol' : 'file',
+    'protocols' : [ 'file' ],
+    'tag' : 'latest',
+    'longPath' : 'local/repo',
+    'host' : 'local',
+    'localVcsPath' : 'repo',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'not npm paths' );
+
+  /* - */
+
   if( !Config.debug )
   return;
 
@@ -401,7 +467,13 @@ function parseFull( test )
   test.case = 'no settled options';
   test.shouldThrowErrorSync( () =>
   {
-    return _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1', full : 0, atomic : 0, objects : 0 })
+    return _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1', full : 0, atomic : 0, objects : 0 });
+  });
+
+  test.case = 'parsing objects for not npm path';
+  test.shouldThrowErrorSync( () =>
+  {
+    return _.npm.path.parse({ remotePath : 'https://github.com/usser/repo.git', full : 0, atomic : 0, objects : 1 });
   });
 }
 
@@ -718,12 +790,126 @@ function parseAtomic( test )
   test.identical( got, exp );
 
   test.close( 'local' );
+
+  /* - */
+
+  test.open( 'not npm paths' );
+
+  test.case = 'git path';
+  var remotePath = 'git://git@github.com:user/repo';
+  var exp =
+  {
+    'protocol' : 'git',
+    'tag' : 'latest',
+    'host' : 'git@github.com:user',
+    'localVcsPath' : 'repo',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'ssh git path';
+  var remotePath = 'ssh://git@github.com/user/repo';
+  var exp =
+  {
+    'protocol' : 'ssh',
+    'tag' : 'latest',
+    'host' : 'git@github.com',
+    'localVcsPath' : 'user/repo',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var remotePath = 'https://github.com/user/repo';
+  var exp =
+  {
+    'protocol' : 'https',
+    'tag' : 'latest',
+    'host' : 'github.com',
+    'localVcsPath' : 'user/repo',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var remotePath = 'file://local/repo';
+  var exp =
+  {
+    'protocol' : 'file',
+    'tag' : 'latest',
+    'host' : 'local',
+    'localVcsPath' : 'repo',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.close( 'not npm paths' );
 }
 
 //
 
 function parseObjects( test )
 {
+  test.open( 'paths without protocol' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'wmodulefortesting1';
+  var exp =
+  {
+    'tag' : 'latest',
+    'host' : 'wmodulefortesting1',
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'wmodulefortesting1#1.0.0';
+  var exp =
+  {
+    'hash' : '1.0.0',
+    'host' : 'wmodulefortesting1',
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'wmodulefortesting1!beta';
+  var exp =
+  {
+    'tag' : 'beta',
+    'host' : 'wmodulefortesting1',
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
+  test.identical( got, exp );
+
+  test.case = 'only hash';
+  var remotePath = '#1.0.0';
+  var exp =
+  {
+    'hash' : '1.0.0',
+    'host' : '',
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
+  test.identical( got, exp );
+
+  test.case = 'only tag';
+  var remotePath = '!beta';
+  var exp =
+  {
+    'tag' : 'beta',
+    'host' : '',
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
+  test.identical( got, exp );
+
+  test.close( 'paths without protocol' );
+
+  /* - */
+
   test.open( 'global' );
 
   test.case = 'simple remotePath';

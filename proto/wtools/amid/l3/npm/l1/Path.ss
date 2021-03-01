@@ -142,11 +142,22 @@ function parse_body( o )
     butMap.isFixated = null;
 
     if( o.atomic )
-    src.isGlobal = _.strBegins( src.longPath, _.uri.rootToken );
+    {
+      src.isGlobal = _.strBegins( src.longPath, _.uri.rootToken );
+    }
     else if( o.objects )
-    butMap.localVcsPath = null;
+    {
+      _.assert
+      (
+        !src.protocol || _.longHas( _.npm.protocols, src.protocol ), 'Parsing of objects is available only for npm paths'
+      );
+      _.assert( !_.strHasAny( parsed.longPath, [ 'git@', '.git' ] ), 'Parsing of objects is available only for npm paths' );
+      butMap.localVcsPath = null;
+    }
     else
-    _.assert( 0, 'Unexpected set of options' );
+    {
+      _.assert( 0, 'Unexpected set of options' );
+    }
 
     return _.mapDelete( src, butMap );
   }
