@@ -178,6 +178,36 @@ let parse = _.routineUnite( parse_head, parse_body );
 
 //
 
+/**
+ * Routine str() construct paths from map with parsed parts.
+ * If path constructs from objects, then the part of information is lost.
+ *
+ * @example
+ * let src = _.npm.path.parse( 'npm:///wmodulefortesting1!gamma' );
+ * _.npm.path.str( src );
+ * // returns : 'npm:///wmodulefortesting1!gamma'
+ *
+ * @example
+ * let src = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1!gamma', full : 0, atomic : 1 });
+ * _.npm.path.str( src );
+ * // returns : 'npm:///wmodulefortesting1!gamma'
+ *
+ * @example
+ * let src = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1!gamma', full : 0, atomic : 0, objects : 1 });
+ * _.npm.path.str( src );
+ * // returns : 'wmodulefortesting1!gamma'
+ *
+ * @param { Aux } srcPath - A parsed path to construct string path.
+ * @returns { String } - Returns string path from parsed parts.
+ * @function str
+ * @throws { Error } If arguments.length is not equal to 1.
+ * @throws { Error } If {-srcPath-} has hash and tag simultaneously.
+ * @throws { Error } If {-srcPath-} has not valid type.
+ * @throws { Error } If {-srcPath-} contains no host and it is parsed atomic.
+ * @namespace wTools.npm.path
+ * @module Tools/mid/NpmTools
+ */
+
 function str( srcPath )
 {
   _.assert( arguments.length === 1, 'Expects single argument {-srcPath-}' );
@@ -186,6 +216,7 @@ function str( srcPath )
   return srcPath;
 
   _.assert( _.mapIs( srcPath ), 'Expects map with parsed path to construct string path' );
+  _.assert( !srcPath.tag || !srcPath.hash, `Source path {-srcPath-} should contain only hash or tag, but not both.` );
 
   let result = '';
   let isParsedAtomic = srcPath.isFixated === undefined && srcPath.protocols === undefined;
@@ -201,6 +232,8 @@ function str( srcPath )
     butMap.tag = null;
     return _.uri.str( _.mapDelete( srcPath, butMap ) );
   }
+
+  /* */
 
   if( srcPath.protocol )
   result += srcPath.protocol + _.uri.protocolToken;

@@ -1304,6 +1304,11 @@ function strFull( test )
   test.case = 'not valid srcPath';
   var src = { tag : 'alpha' };
   test.shouldThrowErrorSync( () => _.npm.path.str( src ) );
+
+  test.case = 'tag and hash in path';
+  var src = _.npm.path.parse( 'npm:///wmodulefortesting1!beta' );
+  src.hash = '0.3.100';
+  test.shouldThrowErrorSync( () => _.npm.path.str( src ) );
 }
 
 //
