@@ -77,12 +77,16 @@ function parse_body( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.remotePath ) );
   _.assert( _.uri.isGlobal( o.remotePath ) );
+  _.assert( !o.full || !o.atomic, 'Expects single parse algorithm' );
 
   /* */
 
   let result = Object.create( null );
-  let parsed1 = _.uri.parseConsecutive( o.remotePath );
-  _.mapExtend( result, parsed1 );
+  let parsed = _.uri.parseConsecutive( o.remotePath );
+  _.mapExtend( result, parsed );
+
+  if( o.full )
+  result.protocols = parsed.protocols = parsed.protocol ? parsed.protocol.split( '+' ) : [];
 
   _.assert
   (
@@ -93,13 +97,13 @@ function parse_body( o )
   if( !result.tag && !result.hash )
   result.tag = 'latest';
 
-  let [ name, localPath ] = pathIsolateGlobalAndLocal( parsed1.longPath );
+  let [ name, localPath ] = pathIsolateGlobalAndLocal( parsed.longPath );
   result.localVcsPath = localPath;
   result.host = name || '';
 
   /* */
 
-  // let parsed2 = _.mapExtend( null, parsed1 );
+  // let parsed2 = _.mapExtend( null, parsed );
   // parsed2.protocol = null;
   // parsed2.hash = null;
   // parsed2.tag = null;
@@ -112,6 +116,8 @@ function parse_body( o )
 
   result.isFixated = _.npm.path.isFixated( result );
 
+  result = resultFilter( result );
+
   return result;
 
   /* */
@@ -123,11 +129,41 @@ function parse_body( o )
     splits.splice( 0, 1 );
     return [ splits[ 0 ], splits.slice( 1 ).join( '/' ) ];
   }
+
+  /* */
+
+  function resultFilter( src )
+  {
+    if( o.full )
+    return src;
+
+    /* */
+
+    let butMap = Object.create( null );
+    if( o.atomic )
+    {
+      _.assert( !o.objects, 'Expects no defined option {-o.objects-}' );
+      src.isGlobal = _.strBegins( src.longPath, _.uri.rootToken );
+      butMap.longPath = null;
+    }
+
+    if( o.objects )
+    {
+      butMap.longPath = null;
+      butMap.localVcsPath = null;
+      butMap.isFixated = null;
+    }
+
+    return _.mapBut_( src, src, butMap );
+  }
 }
 
 parse_body.defaults =
 {
   remotePath : null,
+  full : 1,
+  atomic : 0,
+  objects : 0,
 };
 
 //

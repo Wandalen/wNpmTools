@@ -25,6 +25,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'latest',
     'longPath' : '/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -39,6 +40,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'hash' : '1.0.0',
     'longPath' : '/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -53,6 +55,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'beta',
     'longPath' : '/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -67,6 +70,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'latest',
     'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -81,6 +85,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'hash' : '0.3.100',
     'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -95,6 +100,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'alpha',
     'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -109,6 +115,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'latest',
     'longPath' : '/',
     'host' : '',
@@ -123,6 +130,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'some tag',
     'longPath' : '/',
     'host' : '',
@@ -137,6 +145,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'hash' : '0.3.201',
     'longPath' : '/',
     'host' : '',
@@ -157,6 +166,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'latest',
     'longPath' : 'wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -171,6 +181,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'hash' : '1.0.0',
     'longPath' : 'wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -185,6 +196,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'beta',
     'longPath' : 'wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -199,6 +211,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'latest',
     'longPath' : 'wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -213,6 +226,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'hash' : '0.3.100',
     'longPath' : 'wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -227,6 +241,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'alpha',
     'longPath' : 'wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
@@ -241,6 +256,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'latest',
     'longPath' : '',
     'host' : '',
@@ -255,6 +271,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'tag' : 'some tag',
     'longPath' : '',
     'host' : '',
@@ -269,6 +286,7 @@ function parse( test )
   var exp =
   {
     'protocol' : 'npm',
+    'protocols' : [ 'npm' ],
     'hash' : '0.3.201',
     'longPath' : '',
     'host' : '',
