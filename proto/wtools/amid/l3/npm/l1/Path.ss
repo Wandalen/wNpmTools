@@ -44,7 +44,6 @@ let Self = _.npm.path = _.npm.path || Object.create( Parent );
  * @returns { Map } - Returns map with parsed {-remotePath-}
  * @function parse
  * @throws { Error } If arguments.length is not equal to 1.
- * @throws { Error } If {-remotePath-} is not a global path.
  * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
  * @throws { Error } If {-remotePath-} has not valid type.
  * @throws { Error } If options map {-o-} has unknown option.
@@ -203,7 +202,12 @@ function normalize( remotePath )
   );
 
   let result;
-  if( !parsed.protocol )
+  if( parsed.protocol )
+  {
+    result = _.uri.normalize( remotePath );
+    result = _.strReplace( result, /:\/+/, ':///' );
+  }
+  else
   {
     _.assert( !_.strHasAny( parsed.longPath, [ 'git@', '.git' ] ), 'Expects full git paths' );
     result = _.npm.protocols[ 0 ] + _.uri.protocolToken;
@@ -213,11 +217,6 @@ function normalize( remotePath )
     result += _.uri.tagToken + parsed.tag;
     if( parsed.hash )
     result += _.uri.hashToken + parsed.hash;
-  }
-  else
-  {
-    result = _.uri.normalize( remotePath );
-    result = _.strReplace( result, /:\/+/, ':///' );
   }
 
   return result;
