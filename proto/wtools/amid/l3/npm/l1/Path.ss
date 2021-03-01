@@ -136,6 +136,41 @@ let parse = _.routineUnite( parse_head, parse_body );
 
 //
 
+function normalize( remotePath )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strDefined( remotePath ) );
+
+  let parsed = _.uri.parse( remotePath );
+
+  _.assert
+  (
+    !parsed.tag || !parsed.hash,
+    `Remote path: ${ _.strQuote( remotePath ) } should contain only hash or tag, but not both.`
+  );
+
+  let result;
+  if( !parsed.protocol )
+  {
+    _.assert( !_.strHasAny( parsed.longPath, [ 'git@', '.git' ] ), 'Expects full git paths' );
+    result = _.npm.protocols[ 0 ] + _.uri.protocolToken;
+    parsed.longPath = _.uri.join( _.uri.rootToken, parsed.longPath );
+    result += parsed.longPath;
+    if( parsed.tag )
+    result += _.uri.tagToken + parsed.tag;
+    if( parsed.hash )
+    result += _.uri.hashToken + parsed.hash;
+  }
+  else
+  {
+    result = _.strReplace( remotePath, /:\/+/, ':///' );
+  }
+
+  return result;
+}
+
+//
+
 /**
  * Routine nativize() returns nativized path for utility NPM.
  *
@@ -232,6 +267,7 @@ let Extension =
 
   parse,
 
+  normalize,
   nativize,
 
   isFixated,
