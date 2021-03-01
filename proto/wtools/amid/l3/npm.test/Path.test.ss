@@ -307,6 +307,223 @@ function parse( test )
 
 //
 
+function normalize( test )
+{
+  test.open( 'normalized npm paths' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'wmodulefortesting1';
+  var exp = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'wmodulefortesting1#1.0.0';
+  var exp = 'npm:///wmodulefortesting1#1.0.0';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'wmodulefortesting1!beta';
+  var exp = 'npm:///wmodulefortesting1!beta';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only hash';
+  var remotePath = '#1.0.0';
+  var exp = 'npm:///#1.0.0';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only tag';
+  var remotePath = '!beta';
+  var exp = 'npm:///!beta';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'normalized npm paths' );
+
+  /* - */
+
+  test.open( 'global npm paths' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'npm:///wmodulefortesting1';
+  var exp = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0';
+  var exp = 'npm:///wmodulefortesting1#1.0.0';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'npm:///wmodulefortesting1!beta';
+  var exp = 'npm:///wmodulefortesting1!beta';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var remotePath = 'npm:///';
+  var exp = 'npm:///';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var remotePath = 'npm:///!some tag';
+  var exp = 'npm:///!some tag';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var remotePath = 'npm:///#0.3.201';
+  var exp = 'npm:///#0.3.201';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'global npm paths' );
+
+  /* - */
+
+  test.open( 'local npm paths' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'npm://wmodulefortesting1';
+  var exp = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'npm://wmodulefortesting1#1.0.0';
+  var exp = 'npm:///wmodulefortesting1#1.0.0';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'npm://wmodulefortesting1!beta';
+  var exp = 'npm:///wmodulefortesting1!beta';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var remotePath = 'npm://';
+  var exp = 'npm:///';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var remotePath = 'npm://!some tag';
+  var exp = 'npm:///!some tag';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var remotePath = 'npm://#0.3.201';
+  var exp = 'npm:///#0.3.201';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'local npm paths' );
+
+  /* - */
+
+  test.open( 'not npm paths' );
+
+  test.case = 'git path';
+  var remotePath = 'git://git@github.com:user/repo';
+  var exp = 'git:///git@github.com:user/repo';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'ssh git path';
+  var remotePath = 'ssh://git@github.com/user/repo';
+  var exp = 'ssh:///git@github.com/user/repo';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var remotePath = 'https://github.com/user/repo';
+  var exp = 'https:///github.com/user/repo';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var remotePath = 'file://local/repo';
+  var exp = 'file:///local/repo';
+  var got = _.npm.path.normalize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'not npm paths' );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize( 'npm:///wmodulefortesting1', 'npm://wmodulefortesting1' ) );
+
+  test.case = 'remotePath is not defined string';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize( '' ) );
+
+  test.case = 'remotePath with git repo';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize( 'user/repo.git' ) );
+  test.shouldThrowErrorSync( () => _.npm.path.normalize( 'git@github.com:user/repo.git' ) );
+
+  test.case = 'wrong type of remotePath';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize([ 'npm:///wmodulefortesting1' ]) );
+
+  test.case = 'unknown option in options map';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize({ remotePath : 'npm:///wmodulefortesting1', unknown : 1 }) );
+
+  test.case = 'remotePath with hash and tag';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta';
+  test.shouldThrowErrorSync( () => _.npm.path.normalize( remotePath ) );
+}
+
+//
+
 function nativize( test )
 {
   test.open( 'nativized npm paths' );
@@ -595,6 +812,7 @@ let Proto =
 
     parse,
 
+    normalize,
     nativize,
 
     isFixated,
