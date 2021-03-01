@@ -101,7 +101,6 @@ function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
 
   function pathIsolateGlobalAndLocal( longPath )
   {
-    // debugger;
     let splits = _.path.split( longPath );
     if( splits[ 0 ] === '' )
     splits.splice( 0, 1 );
@@ -122,8 +121,6 @@ function pathNativize( remotePath )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strDefined( remotePath ) );
-
-  debugger;
 
   let parsedPath = _.uri.parseFull( remotePath );
 
@@ -602,7 +599,6 @@ function _readChangeWrite( o )
   if( !o.changed )
   return o;
 
-  debugger;
   let encoder = _.gdf.selectSingleContext
   ({
     inFormat : 'structure',
@@ -610,9 +606,7 @@ function _readChangeWrite( o )
     ext : 'json',
     feature : { fine : 1 },
   })
-  debugger;
   let str = encoder.encode({ data : o.config }).out.data;
-  debugger;
 
   str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
@@ -694,8 +688,6 @@ function dependantsRetrieve( o )
     ready.deasync();
     return ready.sync();
   }
-
-  // debugger;
 
   return ready;
 
@@ -913,7 +905,6 @@ function versionRemoteLatestRetrive( o )
     let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
     if( !latestVersion )
     {
-      debugger;
       throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
     }
     latestVersion = latestVersion[ 1 ];

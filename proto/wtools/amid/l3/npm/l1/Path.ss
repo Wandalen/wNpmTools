@@ -71,8 +71,6 @@ function parse_head( routine, args )
 
 function parse_body( o )
 {
-  let self = this;
-
   if( _.mapIs( o.remotePath ) )
   return o.remotePath;
 
@@ -134,6 +132,22 @@ let parse = _.routineUnite( parse_head, parse_body );
 
 //
 
+function nativize( remotePath )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strDefined( remotePath ) );
+
+  let parsed = _.npm.path.parse( remotePath );
+
+  let result = parsed.host;
+  if( parsed.tag !== 'latest' )
+  result += '@' + ( parsed.hash || parsed.tag );
+
+  return result;
+}
+
+//
+
 /**
  * Routine isFixated() returns true if remote path {-remotePath-} has fixed version of npm package.
  *
@@ -176,6 +190,8 @@ let Extension =
 {
 
   parse,
+
+  nativize,
 
   isFixated,
 
