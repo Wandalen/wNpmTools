@@ -396,6 +396,40 @@ function isFixated( remotePath )
   return true;
 }
 
+//
+
+function fixate( o )
+{
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o };
+
+  _.routineOptions( fixate, o );
+
+  let parsed = _.npm.path.parse( o.remotePath );
+  let latestVersion = _.npm.versionRemoteLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  let result = _.npm.path.str
+  ({
+    protocol : parsed.protocol,
+    longPath : parsed.longPath,
+    hash : latestVersion,
+  });
+
+  return result;
+}
+
+fixate.defaults =
+{
+  remotePath : null,
+  verbosity : 0,
+};
+
 // --
 // declare
 // --
@@ -411,6 +445,7 @@ let Extension =
   nativize,
 
   isFixated,
+  fixate,
 
 }
 
