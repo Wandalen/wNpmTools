@@ -152,6 +152,7 @@ function parse_body( o )
         !src.protocol || _.longHas( _.npm.protocols, src.protocol ), 'Parsing of objects is available only for npm paths'
       );
       _.assert( !_.strHasAny( parsed.longPath, [ 'git@', '.git' ] ), 'Parsing of objects is available only for npm paths' );
+      butMap.protocol = null;
       butMap.localVcsPath = null;
     }
     else
@@ -174,6 +175,54 @@ parse_body.defaults =
 //
 
 let parse = _.routineUnite( parse_head, parse_body );
+
+//
+
+function str( srcPath )
+{
+  _.assert( arguments.length === 1, 'Expects single argument {-srcPath-}' );
+
+  if( _.strIs( srcPath ) )
+  return srcPath;
+
+  _.assert( _.mapIs( srcPath ), 'Expects map with parsed path to construct string path' );
+
+  let result = '';
+  let isParsedAtomic = srcPath.isFixated === undefined && srcPath.protocols === undefined;
+
+  if( isParsedAtomic && srcPath.protocol === undefined && srcPath.host === undefined )
+  throw _.err( 'Cannot create path. Not enough information about protocols' );
+
+  if( srcPath.protocols )
+  if( !_.longHasAll( _.npm.protocols, srcPath.protocols ) )
+  {
+    let butMap = { localVcsPath : null, isFixated : null, isGlobal : null };
+    if( srcPath.tag === 'latest' )
+    butMap.tag = null;
+    return _.uri.str( _.mapBut_( srcPath, srcPath, butMap ) );
+  }
+
+  if( srcPath.protocol )
+  result += srcPath.protocol + _.uri.protocolToken;
+  if( srcPath.longPath )
+  result += srcPath.longPath;
+
+  if( isParsedAtomic )
+  {
+    result += srcPath.isGlobal ? '/' : '';
+    if( srcPath.host )
+    result += srcPath.host;
+    if( srcPath.localVcsPath )
+    result += _.uri.rootToken + srcPath.localVcsPath;
+  }
+
+  if( srcPath.tag )
+  result += srcPath.tag === 'latest' ? '' : _.uri.tagToken + srcPath.tag;
+  if( srcPath.hash )
+  result += _.uri.hashToken + srcPath.hash;
+
+  return result;
+}
 
 //
 
@@ -330,6 +379,8 @@ let Extension =
 {
 
   parse,
+
+  str,
 
   normalize,
   nativize,
