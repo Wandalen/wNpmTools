@@ -199,7 +199,7 @@ function str( srcPath )
     let butMap = { localVcsPath : null, isFixated : null, isGlobal : null };
     if( srcPath.tag === 'latest' )
     butMap.tag = null;
-    return _.uri.str( _.mapBut_( srcPath, srcPath, butMap ) );
+    return _.uri.str( _.mapDelete( srcPath, butMap ) );
   }
 
   if( srcPath.protocol )
@@ -253,13 +253,9 @@ function normalize( remotePath )
   _.assert( arguments.length === 1 );
   _.assert( _.strDefined( remotePath ) );
 
-  let parsed = _.uri.parse( remotePath );
-
-  _.assert
-  (
-    !parsed.tag || !parsed.hash,
-    `Remote path: ${ _.strQuote( remotePath ) } should contain only hash or tag, but not both.`
-  );
+  let parsed = _.npm.path.parse( remotePath );
+  if( parsed.tag && parsed.tag === 'latest' )
+  _.mapDelete( parsed, { tag : null } ) ;
 
   let result;
   if( parsed.protocol )
@@ -310,13 +306,7 @@ function nativize( remotePath )
   _.assert( arguments.length === 1 );
   _.assert( _.strDefined( remotePath ) );
 
-  let parsed = _.uri.parse( remotePath );
-
-  _.assert
-  (
-    !parsed.tag || !parsed.hash,
-    `Remote path: ${ _.strQuote( remotePath ) } should contain only hash or tag, but not both.`
-  );
+  let parsed = _.npm.path.parse( remotePath );
 
   let result;
   if( !parsed.protocol || _.longHas( _.npm.protocols, parsed.protocol ) )
@@ -324,8 +314,10 @@ function nativize( remotePath )
     _.assert( !_.strHasAny( parsed.longPath, [ 'git@', '.git' ] ), 'Expects full git paths' );
     result = parsed.host || '';
     result = _.strRemoveBegin( result, '/' );
-    if( parsed.tag || parsed.hash )
-    result += '@' + ( parsed.tag || parsed.hash );
+    if( parsed.tag && parsed.tag !== 'latest' )
+    result += '@' + parsed.tag;
+    if( parsed.hash )
+    result += '@' + parsed.hash;
   }
   else
   {
