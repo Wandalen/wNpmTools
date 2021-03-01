@@ -83,7 +83,8 @@ function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
 
   /* */
 
-  result.isFixated = self.pathIsFixated( result );
+  // result.isFixated = self.pathIsFixated( result );
+  result.isFixated = _.npm.path.isFixated( result );
 
   return result
 
@@ -146,7 +147,8 @@ function pathIsFixated( filePath )
 {
   let self = this;
   let path = _.uri;
-  let parsed = self.pathParse( filePath );
+  // let parsed = self.pathParse( filePath );
+  let parsed = _.npm.path.parse( filePath );
 
   if( !parsed.hash )
   return false;
@@ -176,7 +178,8 @@ function pathFixate( o )
   _.routineOptions( pathFixate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let parsed = self.pathParse( o.remotePath );
+  // let parsed = self.pathParse( o.remotePath );
+  let parsed = _.npm.path.parse( o.remotePath );
   let latestVersion = self.versionRemoteLatestRetrive
   ({
     remotePath : o.remotePath,
@@ -698,7 +701,8 @@ function dependantsRetrieve( o )
     let result;
     if( _.uri.isGlobal( filePath ) )
     {
-      let parsed = self.pathParse( filePath );
+      // let parsed = self.pathParse( filePath );
+      let parsed = _.npm.path.parse( filePath );
       result = prefixUri + ( parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath );
     }
     else
@@ -758,7 +762,8 @@ function versionLog( o )
 
   let logger = o.logger || _global_.logger;
   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
-  let remotePath = self.pathNativize( o.remotePath );
+  // let remotePath = self.pathNativize( o.remotePath );
+  let remotePath = _.npm.path.nativize( o.remotePath );
 
   _.assert( !o.logging || !!logger, 'No defined logger' );
 
@@ -897,15 +902,18 @@ function versionRemoteLatestRetrive( o )
 
   ready.then( () =>
   {
-    parsed = self.pathParse( o.remotePath );
-    return shell( 'npm show ' + parsed.remoteVcsPath );
+    // parsed = _.npm.pathParse( o.remotePath );
+    // return shell( 'npm show ' + parsed.remoteVcsPath );
+    parsed = _.npm.path.parse({ remotePath : o.remotePath, full : 0, objects : 1 });
+    return shell( 'npm show ' + parsed.host );
   })
   ready.then( ( got ) =>
   {
     let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
     if( !latestVersion )
     {
-      throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+      // throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+      throw _.err( 'Failed to get information about NPM package', parsed.host );
     }
     latestVersion = latestVersion[ 1 ];
 
@@ -954,7 +962,8 @@ function versionRemoteCurrentRetrive( o )
 
   ready.then( () =>
   {
-    let parsed = self.pathParse( o.remotePath );
+    // let parsed = self.pathParse( o.remotePath );
+    let parsed = self.path.parse( o.remotePath );
     if( parsed.isFixated )
     return parsed.hash;
     return self.versionRemoteLatestRetrive( o );
@@ -998,8 +1007,10 @@ function versionRemoteRetrive( o )
 
   ready.then( () =>
   {
-    let parsed = self.pathParse( o.remotePath );
-    return shell( 'npm show ' + parsed.remoteVcsLongerPath + ' version' );
+    // let parsed = self.pathParse( o.remotePath );
+    // return shell( 'npm show ' + parsed.remoteVcsLongerPath + ' version' );
+    let packageVcsName = _.npm.path.nativize( o.remotePath );
+    return shell( 'npm show ' + packageVcsName + ' version' );
   })
   ready.then( ( got ) =>
   {
@@ -1042,7 +1053,8 @@ function isUpToDate( o )
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let parsed = self.pathParse( o.remotePath );
+  // let parsed = self.pathParse( o.remotePath );
+  let parsed = self.path.parse( o.remotePath );
 
   let ready = new _.Consequence().take( null );
 
@@ -1198,7 +1210,8 @@ function hasRemote( o )
     }
 
     let config = localProvider.configRead( configPath );
-    let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    // let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    let remoteVcsPath = _.npm.path.parse({ remotePath : o.remotePath, full : 0, objects : 1 }).host;
     let originVcsPath = config.name;
 
     _.sure( _.strDefined( remoteVcsPath ) );

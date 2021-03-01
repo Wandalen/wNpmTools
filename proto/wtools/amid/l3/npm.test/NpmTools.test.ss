@@ -110,9 +110,7 @@ function pathParse( test )
   //   'remoteVcsLongerPath' : '!some tag',
   //   'isFixated' : true,
   // }
-  // debugger;
   // var got = _.npm.pathParse( remotePath );
-  // debugger;
   // test.identical( got, exp );
   // xxx
 
