@@ -140,21 +140,17 @@ function parse_body( o )
     /* */
 
     let butMap = Object.create( null );
+    butMap.longPath = null;
+    butMap.isFixated = null;
+
     if( o.atomic )
-    {
-      _.assert( !o.objects, 'Expects no defined option {-o.objects-}' );
-      src.isGlobal = _.strBegins( src.longPath, _.uri.rootToken );
-      butMap.longPath = null;
-    }
+    src.isGlobal = _.strBegins( src.longPath, _.uri.rootToken );
+    else if( o.objects )
+    butMap.localVcsPath = null;
+    else
+    _.assert( 0, 'Unexpected set of options' );
 
-    if( o.objects )
-    {
-      butMap.longPath = null;
-      butMap.localVcsPath = null;
-      butMap.isFixated = null;
-    }
-
-    return _.mapBut_( src, src, butMap );
+    return _.mapDelete( src, butMap );
   }
 }
 
