@@ -704,7 +704,7 @@ function nativize( test )
 
   test.case = 'https git path';
   var remotePath = 'file://local/repo';
-  var exp = 'file://local/repo';
+  var exp = _.uri.nativize( 'file://local/repo' );
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 

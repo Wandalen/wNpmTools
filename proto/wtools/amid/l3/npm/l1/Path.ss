@@ -136,6 +136,28 @@ let parse = _.routineUnite( parse_head, parse_body );
 
 //
 
+/**
+ * Routine normalize() returns normalized path for module routines.
+ * Normalized path contains protocol. Normalized path is global path.
+ *
+ * @example
+ * _.npm.path.normalize( 'wmodulefortesting1' );
+ * // returns : 'npm:///wmodulefortesting1'
+ *
+ * @example
+ * _.npm.path.normalize( 'wmodulefortesting1#0.1.101' );
+ * // returns : 'npm:///wmodulefortesting1#0.1.101'
+ *
+ * @param { String } remotePath - A path to normalize.
+ * @returns { String } - Returns normalized remote path.
+ * @function normalize
+ * @throws { Error } If arguments.length is not equal to 1.
+ * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
+ * @throws { Error } If {-remotePath-} has not valid type.
+ * @namespace wTools.npm.path
+ * @module Tools/mid/NpmTools
+ */
+
 function normalize( remotePath )
 {
   _.assert( arguments.length === 1 );
@@ -163,7 +185,8 @@ function normalize( remotePath )
   }
   else
   {
-    result = _.strReplace( remotePath, /:\/+/, ':///' );
+    result = _.uri.normalize( remotePath );
+    result = _.strReplace( result, /:\/+/, ':///' );
   }
 
   return result;
@@ -176,11 +199,11 @@ function normalize( remotePath )
  *
  * @example
  * _.npm.path.nativize( 'npm:///wmodulefortesting1' );
- * // returns : wmodulefortesting1
+ * // returns : 'wmodulefortesting1'
  *
  * @example
  * _.npm.path.nativize( 'npm:///wmodulefortesting1#0.1.101' );
- * // returns : wmodulefortesting1@0.1.101
+ * // returns : 'wmodulefortesting1@0.1.101'
  *
  * @param { String } remotePath - A path to nativize.
  * @returns { String } - Returns nativized remote path.
@@ -216,7 +239,7 @@ function nativize( remotePath )
   }
   else
   {
-    result = remotePath;
+    result = _.uri.nativize( remotePath );
   }
 
   return result;
