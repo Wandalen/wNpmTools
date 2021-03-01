@@ -153,7 +153,7 @@ let parse = _.routineUnite( parse_head, parse_body );
  * @throws { Error } If arguments.length is not equal to 1.
  * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
  * @throws { Error } If {-remotePath-} has not valid type.
- * @namespace wTools.npm
+ * @namespace wTools.npm.path
  * @module Tools/mid/NpmTools
  */
 
@@ -198,7 +198,7 @@ function nativize( remotePath )
  * @throws { Error } If {-remotePath-} is not a global path.
  * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
  * @throws { Error } If {-remotePath-} has not valid type.
- * @namespace wTools.npm
+ * @namespace wTools.npm.path
  * @module Tools/mid/NpmTools
  */
 

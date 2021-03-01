@@ -309,6 +309,30 @@ function parse( test )
 
 function nativize( test )
 {
+  test.open( 'nativized paths' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'wmodulefortesting1'
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'wmodulefortesting1#1.0.0'
+  var exp = 'wmodulefortesting1@1.0.0';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'wmodulefortesting1!beta';
+  var exp = 'wmodulefortesting1@beta';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'nativized paths' );
+
+  /* - */
+
   test.open( 'global' );
 
   test.case = 'simple remotePath';
@@ -437,9 +461,6 @@ function nativize( test )
 
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( () => _.npm.path.nativize( 'npm:///wmodulefortesting1', 'npm://wmodulefortesting1' ) );
-
-  test.case = 'wrong format of remotePath';
-  test.shouldThrowErrorSync( () => _.npm.path.nativize( '/wmodulefortesting1' ) );
 
   test.case = 'wrong type of remotePath';
   test.shouldThrowErrorSync( () => _.npm.path.nativize([ 'npm:///wmodulefortesting1' ]) );
