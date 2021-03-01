@@ -170,10 +170,18 @@ function nativize( remotePath )
     `Remote path: ${ _.strQuote( remotePath ) } should contain only hash or tag, but not both.`
   );
 
-  let result = parsed.host || '';
-  result = _.strRemoveBegin( result, '/' );
-  if( parsed.tag || parsed.hash )
-  result += '@' + ( parsed.tag || parsed.hash );
+  let result;
+  if( !parsed.protocol || _.longHas( _.npm.protocols, parsed.protocol ) )
+  {
+    result = parsed.host || '';
+    result = _.strRemoveBegin( result, '/' );
+    if( parsed.tag || parsed.hash )
+    result += '@' + ( parsed.tag || parsed.hash );
+  }
+  else
+  {
+    result = remotePath;
+  }
 
   return result;
 }
