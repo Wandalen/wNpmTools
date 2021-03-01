@@ -84,7 +84,11 @@ function parse_body( o )
   let parsed1 = _.uri.parseConsecutive( o.remotePath );
   _.mapExtend( result, parsed1 );
 
-  _.assert( !result.tag || !result.hash, 'Remote path:', _.strQuote( o.remotePath ), 'should contain only hash or tag, but not both.' )
+  _.assert
+  (
+    !result.tag || !result.hash,
+    `Remote path: ${ _.strQuote( o.remotePath ) } should contain only hash or tag, but not both.`
+  );
 
   if( !result.tag && !result.hash )
   result.tag = 'latest';
@@ -132,16 +136,44 @@ let parse = _.routineUnite( parse_head, parse_body );
 
 //
 
+/**
+ * Routine nativize() returns nativized path for utility NPM.
+ *
+ * @example
+ * _.npm.path.nativize( 'npm:///wmodulefortesting1' );
+ * // returns : wmodulefortesting1
+ *
+ * @example
+ * _.npm.path.nativize( 'npm:///wmodulefortesting1#0.1.101' );
+ * // returns : wmodulefortesting1@0.1.101
+ *
+ * @param { String } remotePath - A path to nativize.
+ * @returns { String } - Returns nativized remote path.
+ * @function nativize
+ * @throws { Error } If arguments.length is not equal to 1.
+ * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
+ * @throws { Error } If {-remotePath-} has not valid type.
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
 function nativize( remotePath )
 {
   _.assert( arguments.length === 1 );
   _.assert( _.strDefined( remotePath ) );
 
-  let parsed = _.npm.path.parse( remotePath );
+  let parsed = _.uri.parse( remotePath );
 
-  let result = parsed.host;
-  if( parsed.tag !== 'latest' )
-  result += '@' + ( parsed.hash || parsed.tag );
+  _.assert
+  (
+    !parsed.tag || !parsed.hash,
+    `Remote path: ${ _.strQuote( remotePath ) } should contain only hash or tag, but not both.`
+  );
+
+  let result = parsed.host || '';
+  result = _.strRemoveBegin( result, '/' );
+  if( parsed.tag || parsed.hash )
+  result += '@' + ( parsed.tag || parsed.hash );
 
   return result;
 }
