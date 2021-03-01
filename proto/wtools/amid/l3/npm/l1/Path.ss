@@ -76,7 +76,6 @@ function parse_body( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.remotePath ) );
-  _.assert( _.uri.isGlobal( o.remotePath ) );
   _.assert( !o.full || !o.atomic, 'Expects single parse algorithm' );
 
   /* */

@@ -18,6 +18,82 @@ let _ = _globals_.testing.wTools;
 
 function parseFull( test )
 {
+  test.open( 'paths without protocol' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'wmodulefortesting1';
+  var exp =
+  {
+    'protocols' : [],
+    'tag' : 'latest',
+    'longPath' : 'wmodulefortesting1',
+    'host' : 'wmodulefortesting1',
+    'localVcsPath' : '',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'wmodulefortesting1#1.0.0';
+  var exp =
+  {
+    'protocols' : [],
+    'hash' : '1.0.0',
+    'longPath' : 'wmodulefortesting1',
+    'host' : 'wmodulefortesting1',
+    'localVcsPath' : '',
+    'isFixated' : true,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'wmodulefortesting1!beta';
+  var exp =
+  {
+    'protocols' : [],
+    'tag' : 'beta',
+    'longPath' : 'wmodulefortesting1',
+    'host' : 'wmodulefortesting1',
+    'localVcsPath' : '',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only hash';
+  var remotePath = '#1.0.0';
+  var exp =
+  {
+    'protocols' : [],
+    'hash' : '1.0.0',
+    'longPath' : '',
+    'host' : '',
+    'localVcsPath' : '',
+    'isFixated' : true,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'only tag';
+  var remotePath = '!beta';
+  var exp =
+  {
+    'protocols' : [],
+    'tag' : 'beta',
+    'longPath' : '',
+    'host' : '',
+    'localVcsPath' : '',
+    'isFixated' : false,
+  };
+  var got = _.npm.path.parse( remotePath );
+  test.identical( got, exp );
+
+  test.close( 'paths without protocol' );
+
+  /* - */
+
   test.open( 'global' );
 
   test.case = 'simple remotePath';
@@ -309,9 +385,6 @@ function parseFull( test )
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( () => _.npm.path.parse( 'npm:///wmodulefortesting1', 'npm://wmodulefortesting1' ) );
 
-  test.case = 'wrong format of remotePath';
-  test.shouldThrowErrorSync( () => _.npm.path.parse( '/wmodulefortesting1' ) );
-
   test.case = 'wrong type of remotePath';
   test.shouldThrowErrorSync( () => _.npm.path.parse([ 'npm:///wmodulefortesting1' ]) );
 
@@ -336,6 +409,72 @@ function parseFull( test )
 
 function parseAtomic( test )
 {
+  test.open( 'paths without protocol' );
+
+  test.case = 'simple remotePath';
+  var remotePath = 'wmodulefortesting1';
+  var exp =
+  {
+    'tag' : 'latest',
+    'host' : 'wmodulefortesting1',
+    'localVcsPath' : '',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var remotePath = 'wmodulefortesting1#1.0.0';
+  var exp =
+  {
+    'hash' : '1.0.0',
+    'host' : 'wmodulefortesting1',
+    'localVcsPath' : '',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var remotePath = 'wmodulefortesting1!beta';
+  var exp =
+  {
+    'tag' : 'beta',
+    'host' : 'wmodulefortesting1',
+    'localVcsPath' : '',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'only hash';
+  var remotePath = '#1.0.0';
+  var exp =
+  {
+    'hash' : '1.0.0',
+    'host' : '',
+    'localVcsPath' : '',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.case = 'only tag';
+  var remotePath = '!beta';
+  var exp =
+  {
+    'tag' : 'beta',
+    'host' : '',
+    'localVcsPath' : '',
+    'isGlobal' : false,
+  };
+  var got = _.npm.path.parse({ remotePath, full : 0, atomic : 1 });
+  test.identical( got, exp );
+
+  test.close( 'paths without protocol' );
+
+  /* - */
+
   test.open( 'global' );
 
   test.case = 'simple remotePath';
@@ -1274,9 +1413,6 @@ function isFixated( test )
 
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( () => _.npm.path.isFixated( 'npm:///wmodulefortesting1', 'npm://wmodulefortesting1' ) );
-
-  test.case = 'wrong format of remotePath';
-  test.shouldThrowErrorSync( () => _.npm.path.isFixated( '/wmodulefortesting1' ) );
 
   test.case = 'wrong type of remotePath';
   test.shouldThrowErrorSync( () => _.npm.path.isFixated([ 'npm:///wmodulefortesting1' ]) );
