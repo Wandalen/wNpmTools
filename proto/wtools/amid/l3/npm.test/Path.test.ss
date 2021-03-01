@@ -2148,6 +2148,101 @@ function isFixated( test )
   test.shouldThrowErrorSync( () => _.npm.path.isFixated( remotePath ) );
 }
 
+//
+
+function fixate( test )
+{
+  test.case = 'simple path';
+  var remotePath = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.fixate( remotePath );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  test.case = 'path hash';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0';
+  var got = _.npm.path.fixate( remotePath );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  test.notIdentical( got, remotePath );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  test.case = 'simple tag';
+  var remotePath = 'npm:///wmodulefortesting1!beta';
+  var got = _.npm.path.fixate( remotePath );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  test.notIdentical( got, remotePath );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  /* */
+
+  test.case = 'simple path';
+  var remotePath = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.fixate({ remotePath });
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  test.case = 'path hash';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0';
+  var got = _.npm.path.fixate({ remotePath });
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  test.notIdentical( got, remotePath );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  test.case = 'simple tag';
+  var remotePath = 'npm:///wmodulefortesting1!beta';
+  var got = _.npm.path.fixate({ remotePath });
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  test.notIdentical( got, remotePath );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  /* */
+
+  test.case = 'simple path, verbosity - 5';
+  var remotePath = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.fixate({ remotePath, verbosity : 5 });
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
+  var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
+  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  test.identical( got, gotVersion );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.npm.path.fixate() );
+
+  test.case = 'extra arguments';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta';
+  test.shouldThrowErrorSync( () => _.npm.path.fixate( remotePath, remotePath ) );
+
+  test.case = 'wrong type of remotePath';
+  var remotePath = 'npm:///wmodulefortesting1';
+  test.shouldThrowErrorSync( () => _.npm.path.fixate([ remotePath ]) );
+
+  test.case = 'remote path has hash and tag';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta';
+  test.shouldThrowErrorSync( () => _.npm.path.fixate( remotePath ) );
+
+  test.case = 'unknown option in options map';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta';
+  test.shouldThrowErrorSync( () => _.npm.path.fixate({ remotePath, unknown : 1 }) );
+}
+
+fixate.timeOut = 30000;
+
 // --
 // declare
 // --
@@ -2173,6 +2268,7 @@ let Proto =
     nativize,
 
     isFixated,
+    fixate,
 
   },
 
