@@ -349,6 +349,9 @@ function isFixated( test )
   test.case = 'without arguments';
   test.shouldThrowErrorSync( () => _.npm.path.isFixated() );
 
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.npm.path.isFixated( 'npm:///wmodulefortesting1', 'npm://wmodulefortesting1' ) );
+
   test.case = 'wrong format of remotePath';
   test.shouldThrowErrorSync( () => _.npm.path.isFixated( '/wmodulefortesting1' ) );
 

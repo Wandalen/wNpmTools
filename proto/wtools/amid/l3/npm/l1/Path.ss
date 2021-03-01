@@ -36,9 +36,18 @@ let Self = _.npm.path = _.npm.path || Object.create( Parent );
  * //   localVcsPath : 'out/wTools.out.will.yml',
  * // }
  *
- * @returns { Map } - Returns map with parsed {-remotePath-}
+ * First parameter set :
  * @param { String } remotePath - Remote path.
- * @function pathParse
+ * Second parameter set :
+ * @param { Aux } o - Options map.
+ * @param { String } o.remotePath - Remote path.
+ * @returns { Map } - Returns map with parsed {-remotePath-}
+ * @function parse
+ * @throws { Error } If arguments.length is not equal to 1.
+ * @throws { Error } If {-remotePath-} is not a global path.
+ * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
+ * @throws { Error } If {-remotePath-} has not valid type.
+ * @throws { Error } If options map {-o-} has unknown option.
  * @namespace wTools.npm.path
  * @module Tools/mid/NpmTools
  */
@@ -125,8 +134,32 @@ let parse = _.routineUnite( parse_head, parse_body );
 
 //
 
+/**
+ * Routine isFixated() returns true if remote path {-remotePath-} has fixed version of npm package.
+ *
+ * @example
+ * _.npm.path.isFixated( 'npm:///wmodulefortesting1' );
+ * // returns : false
+ *
+ * @example
+ * _.npm.path.isFixated( 'npm:///wmodulefortesting1#0.1.101' );
+ * // returns : true
+ *
+ * @param { String|Aux } remotePath - A path to check. Can be parsed path in an Aux container.
+ * @returns { Boolean } - Returns true if remote path has fixated version, otherwise, returns false.
+ * @function isFixated
+ * @throws { Error } If arguments.length is not equal to 1.
+ * @throws { Error } If {-remotePath-} is not a global path.
+ * @throws { Error } If {-remotePath-} has hash and tag simultaneously.
+ * @throws { Error } If {-remotePath-} has not valid type.
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
 function isFixated( remotePath )
 {
+  _.assert( arguments.length === 1, 'Expects single remote path {-remotePath-}' );
+
   let parsed = _.npm.path.parse({ remotePath });
 
   if( !parsed.hash )
