@@ -916,7 +916,6 @@ function parseObjects( test )
   var remotePath = 'npm:///wmodulefortesting1';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'latest',
     'host' : 'wmodulefortesting1',
   };
@@ -927,7 +926,6 @@ function parseObjects( test )
   var remotePath = 'npm:///wmodulefortesting1#1.0.0';
   var exp =
   {
-    'protocol' : 'npm',
     'hash' : '1.0.0',
     'host' : 'wmodulefortesting1',
   };
@@ -938,7 +936,6 @@ function parseObjects( test )
   var remotePath = 'npm:///wmodulefortesting1!beta';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'beta',
     'host' : 'wmodulefortesting1',
   };
@@ -949,7 +946,6 @@ function parseObjects( test )
   var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'latest',
     'host' : 'wmodulefortesting1',
   };
@@ -960,7 +956,6 @@ function parseObjects( test )
   var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
   var exp =
   {
-    'protocol' : 'npm',
     'hash' : '0.3.100',
     'host' : 'wmodulefortesting1',
   };
@@ -971,7 +966,6 @@ function parseObjects( test )
   var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'alpha',
     'host' : 'wmodulefortesting1',
   };
@@ -982,7 +976,6 @@ function parseObjects( test )
   var remotePath = 'npm:///';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'latest',
     'host' : '',
   };
@@ -993,7 +986,6 @@ function parseObjects( test )
   var remotePath = 'npm:///!some tag';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'some tag',
     'host' : '',
   };
@@ -1004,7 +996,6 @@ function parseObjects( test )
   var remotePath = 'npm:///#0.3.201';
   var exp =
   {
-    'protocol' : 'npm',
     'hash' : '0.3.201',
     'host' : '',
   };
@@ -1021,7 +1012,6 @@ function parseObjects( test )
   var remotePath = 'npm://wmodulefortesting1';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'latest',
     'host' : 'wmodulefortesting1',
   };
@@ -1032,7 +1022,6 @@ function parseObjects( test )
   var remotePath = 'npm://wmodulefortesting1#1.0.0';
   var exp =
   {
-    'protocol' : 'npm',
     'hash' : '1.0.0',
     'host' : 'wmodulefortesting1',
   };
@@ -1043,7 +1032,6 @@ function parseObjects( test )
   var remotePath = 'npm://wmodulefortesting1!beta';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'beta',
     'host' : 'wmodulefortesting1',
   };
@@ -1054,7 +1042,6 @@ function parseObjects( test )
   var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'latest',
     'host' : 'wmodulefortesting1',
   };
@@ -1065,7 +1052,6 @@ function parseObjects( test )
   var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100';
   var exp =
   {
-    'protocol' : 'npm',
     'hash' : '0.3.100',
     'host' : 'wmodulefortesting1',
   };
@@ -1076,7 +1062,6 @@ function parseObjects( test )
   var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'alpha',
     'host' : 'wmodulefortesting1',
   };
@@ -1087,7 +1072,6 @@ function parseObjects( test )
   var remotePath = 'npm://';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'latest',
     'host' : '',
   };
@@ -1098,7 +1082,6 @@ function parseObjects( test )
   var remotePath = 'npm://!some tag';
   var exp =
   {
-    'protocol' : 'npm',
     'tag' : 'some tag',
     'host' : '',
   };
@@ -1109,7 +1092,6 @@ function parseObjects( test )
   var remotePath = 'npm://#0.3.201';
   var exp =
   {
-    'protocol' : 'npm',
     'hash' : '0.3.201',
     'host' : '',
   };
@@ -1511,6 +1493,165 @@ function strAtomic( test )
   test.identical( got, exp );
 
   test.close( 'not npm paths' );
+}
+
+//
+
+function strObjects( test )
+{
+  test.open( 'paths without protocol' );
+
+  test.case = 'simple remotePath';
+  var parsed = _.npm.path.parse({ remotePath : 'wmodulefortesting1', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var parsed = _.npm.path.parse({ remotePath : 'wmodulefortesting1#1.0.0', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var parsed = _.npm.path.parse({ remotePath : 'wmodulefortesting1!beta', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only hash';
+  var parsed = _.npm.path.parse({ remotePath : '#1.0.0', full : 0, atomic : 0, objects : 1 });
+  var exp = '#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only tag';
+  var parsed = _.npm.path.parse({ remotePath : '!beta', full : 0, atomic : 0, objects : 1 });
+  var exp = '!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'paths without protocol' );
+
+  /* - */
+
+  test.open( 'global' );
+
+  test.case = 'simple remotePath';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1#1.0.0', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1!beta', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1#0.3.100';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!alpha';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///', full : 0, atomic : 0, objects : 1 });
+  var exp = '';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///!some tag', full : 0, atomic : 0, objects : 1 });
+  var exp = '!some tag';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///#0.3.201', full : 0, atomic : 0, objects : 1 });
+  var exp = '#0.3.201';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'global' );
+
+  /* - */
+
+  test.open( 'local' );
+
+  test.case = 'simple remotePath';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1#1.0.0', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1!beta', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1#0.3.100';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!alpha';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://', full : 0, atomic : 0, objects : 1 });
+  var exp = '';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://!some tag', full : 0, atomic : 0, objects : 1 });
+  var exp = '!some tag';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://#0.3.201', full : 0, atomic : 0, objects : 1 });
+  var exp = '#0.3.201';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'local' );
 }
 
 //
@@ -2021,6 +2162,7 @@ let Proto =
 
     strFull,
     strAtomic,
+    strObjects,
 
     normalize,
     nativize,
