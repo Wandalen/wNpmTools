@@ -1,11 +1,11 @@
-( function _Include_ss_( )
+( function _Include_ss_()
 {
 
 'use strict';
 
 /**
  * Collection of tools to use npm programmatically.
-  @module Tools/mid/NpmTools
+ * @module Tools/mid/NpmTools
 */
 
 if( typeof module !== 'undefined' )
@@ -14,4 +14,4 @@ if( typeof module !== 'undefined' )
   module[ 'exports' ] = _global_.wTools;
 }
 
-} )();
+})();
