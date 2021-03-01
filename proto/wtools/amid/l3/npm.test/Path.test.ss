@@ -467,6 +467,12 @@ function nativize( test )
 
   test.open( 'not npm paths' );
 
+  test.case = 'git path';
+  var remotePath = 'git://git@github.com:user/repo';
+  var exp = 'git://git@github.com:user/repo';
+  var got = _.npm.path.nativize( remotePath );
+  test.identical( got, exp );
+
   test.case = 'ssh git path';
   var remotePath = 'ssh://git@github.com/user/repo';
   var exp = 'ssh://git@github.com/user/repo';
@@ -500,6 +506,10 @@ function nativize( test )
 
   test.case = 'remotePath is not defined string';
   test.shouldThrowErrorSync( () => _.npm.path.nativize( '' ) );
+
+  test.case = 'remotePath with git repo';
+  test.shouldThrowErrorSync( () => _.npm.path.nativize( 'user/repo.git' ) );
+  test.shouldThrowErrorSync( () => _.npm.path.nativize( 'git@github.com:user/repo.git' ) );
 
   test.case = 'wrong type of remotePath';
   test.shouldThrowErrorSync( () => _.npm.path.nativize([ 'npm:///wmodulefortesting1' ]) );
