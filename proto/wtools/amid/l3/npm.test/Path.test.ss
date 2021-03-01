@@ -1326,6 +1326,195 @@ function strFull( test )
 
 //
 
+function strAtomic( test )
+{
+  test.open( 'paths without protocol' );
+
+  test.case = 'simple remotePath';
+  var parsed = _.npm.path.parse({ remotePath : 'wmodulefortesting1', full : 0, atomic : 1 });
+  var exp = 'wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var parsed = _.npm.path.parse({ remotePath : 'wmodulefortesting1#1.0.0', full : 0, atomic : 1 });
+  var exp = 'wmodulefortesting1#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var parsed = _.npm.path.parse({ remotePath : 'wmodulefortesting1!beta', full : 0, atomic : 1 });
+  var exp = 'wmodulefortesting1!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only hash';
+  var parsed = _.npm.path.parse({ remotePath : '#1.0.0', full : 0, atomic : 1 });
+  var exp = '#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only tag';
+  var parsed = _.npm.path.parse({ remotePath : '!beta', full : 0, atomic : 1 });
+  var exp = '!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'paths without protocol' );
+
+  /* - */
+
+  test.open( 'global' );
+
+  test.case = 'simple remotePath';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1#1.0.0', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1!beta', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///', full : 0, atomic : 1 });
+  var exp = 'npm:///';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///!some tag', full : 0, atomic : 1 });
+  var exp = 'npm:///!some tag';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///#0.3.201', full : 0, atomic : 1 });
+  var exp = 'npm:///#0.3.201';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'global' );
+
+  /* - */
+
+  test.open( 'local' );
+
+  test.case = 'simple remotePath';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1#1.0.0', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1#1.0.0';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'with tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1!beta', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1!beta';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'simple path with local and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'only protocol';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://', full : 0, atomic : 1 });
+  var exp = 'npm://';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and tag';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://!some tag', full : 0, atomic : 1 });
+  var exp = 'npm://!some tag';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'protocol and hash';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://#0.3.201', full : 0, atomic : 1 });
+  var exp = 'npm://#0.3.201';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'local' );
+
+  /* - */
+
+  test.open( 'not npm paths' );
+
+  test.case = 'git path';
+  var parsed = _.npm.path.parse({ remotePath : 'git://git@github.com:user/repo', full : 0, atomic : 1 });
+  var exp = 'git://git@github.com:user/repo';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'ssh git path';
+  var parsed = _.npm.path.parse({ remotePath : 'ssh://git@github.com/user/repo', full : 0, atomic : 1 });
+  var exp = 'ssh://git@github.com/user/repo';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var parsed = _.npm.path.parse({ remotePath : 'https://github.com/user/repo', full : 0, atomic : 1 });
+  var exp = 'https://github.com/user/repo';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.case = 'https git path';
+  var parsed = _.npm.path.parse({ remotePath : 'file://local/repo', full : 0, atomic : 1 });
+  var exp = 'file://local/repo';
+  var got = _.npm.path.str( parsed );
+  test.identical( got, exp );
+
+  test.close( 'not npm paths' );
+}
+
+//
+
 function normalize( test )
 {
   test.open( 'normalized npm paths' );
@@ -1831,6 +2020,7 @@ let Proto =
     parseObjects,
 
     strFull,
+    strAtomic,
 
     normalize,
     nativize,
