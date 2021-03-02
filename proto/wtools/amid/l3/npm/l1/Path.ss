@@ -293,7 +293,8 @@ function normalize( remotePath )
   let result;
   if( parsed.protocol )
   {
-    result = _.strReplace( remotePath, /:\/+/, ':///' );
+    result = _.uri.normalize( remotePath );
+    result = _.strReplace( result, /:\/+/, ':///' );
   }
   else
   {
@@ -353,7 +354,7 @@ function nativize( remotePath )
   }
   else
   {
-    result = _.uri.nativize( remotePath );
+    result = remotePath;
   }
 
   return result;
