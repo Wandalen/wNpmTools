@@ -354,6 +354,9 @@ function nativize( remotePath )
   }
   else
   {
+    if( _.longHas( _.fileProvider.protocols, parsed.protocol ) )
+    result = _.uri.nativize( remotePath );
+    else
     result = remotePath;
   }
 
