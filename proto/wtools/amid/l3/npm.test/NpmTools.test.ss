@@ -36,14 +36,133 @@ function onSuiteEnd( test )
 // tests
 // --
 
-function trivial( test )
+function pathParse( test )
 {
 
-  var about = _.npm.aboutFromRemote( 'wTools' );
-  test.true( !!about );
-  var exp = 'wTools';
-  test.identical( about.name, exp );
+  test.case = 'basic';
+  var remotePath = 'npm:///wmodulefortesting1'
+  var exp =
+  {
+    'protocol' : 'npm',
+    'longPath' : '/wmodulefortesting1',
+    'tag' : 'latest',
+    'localVcsPath' : '',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@latest',
+    'isFixated' : false
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, exp );
 
+  test.case = 'hash';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
+  var exp =
+  {
+    'protocol' : 'npm',
+    'hash' : '1.0.0',
+    'longPath' : '/wmodulefortesting1',
+    'localVcsPath' : '',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@1.0.0',
+    'isFixated' : true
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'tag';
+  var remotePath = 'npm:///wmodulefortesting1!beta';
+  var exp =
+  {
+    'protocol' : 'npm',
+    'tag' : 'beta',
+    'longPath' : '/wmodulefortesting1',
+    'localVcsPath' : '',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@beta',
+    'isFixated' : false
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, exp );
+
+  test.case = 'with local';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
+  var exp =
+  {
+    'protocol' : 'npm',
+    'hash' : '0.3.100',
+    'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
+    'localVcsPath' : 'out/wmodulefortesting1',
+    'remoteVcsPath' : 'wmodulefortesting1',
+    'remoteVcsLongerPath' : 'wmodulefortesting1@0.3.100',
+    'isFixated' : true
+  }
+  var got = _.npm.pathParse( remotePath );
+  test.identical( got, exp );
+
+  // test.case = 'tag only';
+  // var remotePath = '!some tag'
+  // var exp =
+  // {
+  //   'longPath' : '!some tag',
+  //   'postfixedPath' : '!some tag',
+  //   'localVcsPath' : '',
+  //   'remoteVcsPath' : '',
+  //   'remoteVcsLongerPath' : '!some tag',
+  //   'isFixated' : true,
+  // }
+  // var got = _.npm.pathParse( remotePath );
+  // test.identical( got, exp );
+  // xxx
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'throwing';
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
+  test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
+
+}
+
+//
+
+function pathIsFixated( test )
+{
+  var remotePath = 'npm:///wmodulefortesting1'
+  var got = _.npm.pathIsFixated( remotePath );
+  test.identical( got, false );
+
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
+  var got = _.npm.pathIsFixated( remotePath );
+  test.identical( got, true );
+
+  var remotePath = 'npm:///wmodulefortesting1@beta'
+  var got = _.npm.pathIsFixated( remotePath );
+  test.identical( got, false );
+
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
+  test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
+}
+
+//
+
+function pathFixate( test )
+{
+  var remotePath = 'npm:///wmodulefortesting1'
+  var got = _.npm.pathFixate( remotePath );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
+
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
+  var got = _.npm.pathFixate( remotePath );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
+  test.notIdentical( got, remotePath );
+
+  var remotePath = 'npm:///wmodulefortesting1!beta'
+  var got = _.npm.pathFixate( remotePath );
+  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
+  test.notIdentical( got, remotePath );
+
+  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
+  test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
 //
@@ -458,139 +577,6 @@ function aboutFromRemote( test )
   }
 
   return ready;
-}
-
-//
-
-function pathParse( test )
-{
-
-  test.case = 'basic';
-  var remotePath = 'npm:///wmodulefortesting1'
-  var exp =
-  {
-    'protocol' : 'npm',
-    'longPath' : '/wmodulefortesting1',
-    'tag' : 'latest',
-    'localVcsPath' : '',
-    'remoteVcsPath' : 'wmodulefortesting1',
-    'remoteVcsLongerPath' : 'wmodulefortesting1@latest',
-    'isFixated' : false
-  }
-  var got = _.npm.pathParse( remotePath );
-  test.identical( got, exp );
-
-  test.case = 'hash';
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
-  var exp =
-  {
-    'protocol' : 'npm',
-    'hash' : '1.0.0',
-    'longPath' : '/wmodulefortesting1',
-    'localVcsPath' : '',
-    'remoteVcsPath' : 'wmodulefortesting1',
-    'remoteVcsLongerPath' : 'wmodulefortesting1@1.0.0',
-    'isFixated' : true
-  }
-  var got = _.npm.pathParse( remotePath );
-  test.identical( got, exp );
-
-  test.case = 'tag';
-  var remotePath = 'npm:///wmodulefortesting1!beta';
-  var exp =
-  {
-    'protocol' : 'npm',
-    'tag' : 'beta',
-    'longPath' : '/wmodulefortesting1',
-    'localVcsPath' : '',
-    'remoteVcsPath' : 'wmodulefortesting1',
-    'remoteVcsLongerPath' : 'wmodulefortesting1@beta',
-    'isFixated' : false
-  }
-  var got = _.npm.pathParse( remotePath );
-  test.identical( got, exp );
-
-  test.case = 'with local';
-  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
-  var exp =
-  {
-    'protocol' : 'npm',
-    'hash' : '0.3.100',
-    'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
-    'localVcsPath' : 'out/wmodulefortesting1',
-    'remoteVcsPath' : 'wmodulefortesting1',
-    'remoteVcsLongerPath' : 'wmodulefortesting1@0.3.100',
-    'isFixated' : true
-  }
-  var got = _.npm.pathParse( remotePath );
-  test.identical( got, exp );
-
-  // test.case = 'tag only';
-  // var remotePath = '!some tag'
-  // var exp =
-  // {
-  //   'longPath' : '!some tag',
-  //   'postfixedPath' : '!some tag',
-  //   'localVcsPath' : '',
-  //   'remoteVcsPath' : '',
-  //   'remoteVcsLongerPath' : '!some tag',
-  //   'isFixated' : true,
-  // }
-  // debugger;
-  // var got = _.npm.pathParse( remotePath );
-  // debugger;
-  // test.identical( got, exp );
-  // xxx
-
-  if( !Config.debug )
-  return;
-
-  test.case = 'throwing';
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
-  test.shouldThrowErrorSync( () => npm.pathParse( remotePath ) );
-
-}
-
-//
-
-function pathIsFixated( test )
-{
-  var remotePath = 'npm:///wmodulefortesting1'
-  var got = _.npm.pathIsFixated( remotePath );
-  test.identical( got, false );
-
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
-  var got = _.npm.pathIsFixated( remotePath );
-  test.identical( got, true );
-
-  var remotePath = 'npm:///wmodulefortesting1@beta'
-  var got = _.npm.pathIsFixated( remotePath );
-  test.identical( got, false );
-
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0@beta'
-  test.shouldThrowErrorSync( () => npm.pathIsFixated( remotePath ) );
-}
-
-//
-
-function pathFixate( test )
-{
-  var remotePath = 'npm:///wmodulefortesting1'
-  var got = _.npm.pathFixate( remotePath );
-  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
-
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0'
-  var got = _.npm.pathFixate( remotePath );
-  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
-  test.notIdentical( got, remotePath );
-
-  var remotePath = 'npm:///wmodulefortesting1!beta'
-  var got = _.npm.pathFixate( remotePath );
-  test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#.+/ ) );
-  test.notIdentical( got, remotePath );
-
-  var remotePath = 'npm:///wmodulefortesting1#1.0.0!beta'
-  test.shouldThrowErrorSync( () => npm.pathFixate( remotePath ) );
 }
 
 //
@@ -1306,15 +1292,16 @@ var Proto =
   tests :
   {
 
+    pathParse,
+    pathIsFixated,
+    pathFixate,
+
+    //
+
     fixate,
     bump,
 
     aboutFromRemote,
-
-    trivial,
-    pathParse,
-    pathIsFixated,
-    pathFixate,
 
     versionLocalRetrive,
     versionRemoteLatestRetrive,

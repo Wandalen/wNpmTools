@@ -1,10 +1,204 @@
-( function _Basic_ss_( )
+( function _Basic_ss_()
 {
 
 'use strict';
 
 let _ = _global_.wTools;
 let Self = _.npm = _.npm || Object.create( null );
+
+// --
+// path
+// --
+
+/**
+ * @typedef {Object} RemotePathComponents
+ * @property {String} protocol
+ * @property {String} hash
+ * @property {String} longPath
+ * @property {String} localVcsPath
+ * @property {String} remoteVcsPath
+ * @property {String} remoteVcsLongerPath
+ * @module Tools/mid/NpmTools
+ */
+
+/**
+ * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.Npm.RemotePathComponents}.
+ * @param {String} remotePath Remote path.
+ * @function pathParse
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
+{
+  let self = this;
+  let path = _.uri;
+  let result = Object.create( null );
+
+  if( _.mapIs( remotePath ) )
+  return remotePath;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( remotePath ) );
+  _.assert( path.isGlobal( remotePath ) );
+
+  /* */
+
+  let parsed1 = path.parseConsecutive( remotePath );
+  _.mapExtend( result, parsed1 );
+
+  if( !result.tag && !result.hash )
+  result.tag = 'latest';
+
+  _.assert( !result.tag || !result.hash, 'Remote path:', _.strQuote( remotePath ), 'should contain only hash or tag, but not both.' )
+
+  let [ name, localPath ] = pathIsolateGlobalAndLocal( parsed1.longPath );
+  result.localVcsPath = localPath;
+
+  /* */
+
+  let parsed2 = _.mapExtend( null, parsed1 );
+  parsed2.protocol = null;
+  parsed2.hash = null;
+  parsed2.tag = null;
+  parsed2.longPath = name;
+  result.remoteVcsPath = path.str( parsed2 );
+
+  // parsed2.hash = parsed1.hash;
+  // parsed2.tag = parsed1.tag;
+  result.remoteVcsLongerPath = result.remoteVcsPath + '@' + ( result.hash || result.tag );
+  // result.remoteVcsLongerPath = self.pathNativize(  );
+
+  // /* */
+  //
+  // let parsed3 = _.mapExtend( null, parsed1 );
+  // parsed3.longPath = parsed2.longPath;
+  // parsed3.protocol = null;
+  // parsed3.hash = null;
+  // parsed3.tag = null;
+  // result.remoteVcsLongerPath = path.str( parsed3 );
+  // let version = parsed1.hash || parsed1.tag;
+  // if( version )
+  // result.remoteVcsLongerPath += '@' + version;
+
+  /* */
+
+  // result.isFixated = self.pathIsFixated( result );
+  result.isFixated = _.npm.path.isFixated( result );
+
+  return result
+
+  /*
+    remotePath : 'npm:///wColor/out/wColor#0.3.100'
+    protocol : 'npm',
+    hash : '0.3.100',
+    longPath : '/wColor/out/wColor',
+    localVcsPath : 'out/wColor',
+    remoteVcsPath : 'wColor',
+    remoteVcsLongerPath : 'wColor@0.3.100'
+  */
+
+  /* */
+
+  function pathIsolateGlobalAndLocal( longPath )
+  {
+    let splits = _.path.split( longPath );
+    if( splits[ 0 ] === '' )
+    splits.splice( 0, 1 );
+    return [ splits[ 0 ], splits.slice( 1 ).join( '/' ) ];
+    // let parsed = path.parseConsecutive( longPath );
+    // let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
+    // parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
+    // let globalPath = path.str( parsed );
+    // return [ globalPath, splits[ 2 ] ];
+  }
+
+}
+
+//
+
+function pathNativize( remotePath )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strDefined( remotePath ) );
+
+  let parsedPath = _.uri.parseFull( remotePath );
+
+  let result = parsedPath.longPath;
+
+  if( parsedPath.hash || parsedPath.tag )
+  result += '@' + ( parsedPath.hash || parsedPath.tag );
+
+  return result;
+}
+
+//
+
+/**
+ * @summary Returns true if remote path `filePath` has fixed version of npm package.
+ * @param {String} filePath Global path.
+ * @function pathIsFixated
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+function pathIsFixated( filePath )
+{
+  let self = this;
+  let path = _.uri;
+  // let parsed = self.pathParse( filePath );
+  let parsed = _.npm.path.parse( filePath );
+
+  if( !parsed.hash )
+  return false;
+
+  return true;
+}
+
+//
+
+/**
+ * @summary Changes version of package specified in path `o.remotePath` to latest available.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function pathIsFixated
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+function pathFixate( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+  _.routineOptions( pathFixate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  // let parsed = self.pathParse( o.remotePath );
+  let parsed = _.npm.path.parse( o.remotePath );
+  let latestVersion = self.versionRemoteLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  let result = path.str
+  ({
+    protocol : parsed.protocol,
+    longPath : parsed.longPath,
+    hash : latestVersion,
+  });
+
+  return result;
+}
+
+var defaults = pathFixate.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
 
 // --
 // inter
@@ -408,7 +602,6 @@ function _readChangeWrite( o )
   if( !o.changed )
   return o;
 
-  debugger;
   let encoder = _.gdf.selectSingleContext
   ({
     inFormat : 'structure',
@@ -416,9 +609,7 @@ function _readChangeWrite( o )
     ext : 'json',
     feature : { fine : 1 },
   })
-  debugger;
   let str = encoder.encode({ data : o.config }).out.data;
-  debugger;
 
   str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
@@ -501,8 +692,6 @@ function dependantsRetrieve( o )
     return ready.sync();
   }
 
-  // debugger;
-
   return ready;
 
   /* */
@@ -512,7 +701,8 @@ function dependantsRetrieve( o )
     let result;
     if( _.uri.isGlobal( filePath ) )
     {
-      let parsed = self.pathParse( filePath );
+      // let parsed = self.pathParse( filePath );
+      let parsed = _.npm.path.parse( filePath );
       result = prefixUri + ( parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath );
     }
     else
@@ -572,7 +762,8 @@ function versionLog( o )
 
   let logger = o.logger || _global_.logger;
   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
-  let remotePath = self.pathNativize( o.remotePath );
+  // let remotePath = self.pathNativize( o.remotePath );
+  let remotePath = _.npm.path.nativize( o.remotePath );
 
   _.assert( !o.logging || !!logger, 'No defined logger' );
 
@@ -612,200 +803,6 @@ versionLog.defaults =
   localPath : null,
   configPath : null,
 }
-
-// --
-// path
-// --
-
-/**
- * @typedef {Object} RemotePathComponents
- * @property {String} protocol
- * @property {String} hash
- * @property {String} longPath
- * @property {String} localVcsPath
- * @property {String} remoteVcsPath
- * @property {String} remoteVcsLongerPath
- * @module Tools/mid/NpmTools
- */
-
-/**
- * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.Npm.RemotePathComponents}.
- * @param {String} remotePath Remote path.
- * @function pathParse
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
-{
-  let self = this;
-  let path = _.uri;
-  let result = Object.create( null );
-
-  if( _.mapIs( remotePath ) )
-  return remotePath;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( remotePath ) );
-  _.assert( path.isGlobal( remotePath ) );
-
-  /* */
-
-  let parsed1 = path.parseConsecutive( remotePath );
-  _.mapExtend( result, parsed1 );
-
-  if( !result.tag && !result.hash )
-  result.tag = 'latest';
-
-  _.assert( !result.tag || !result.hash, 'Remote path:', _.strQuote( remotePath ), 'should contain only hash or tag, but not both.' )
-
-  let [ name, localPath ] = pathIsolateGlobalAndLocal( parsed1.longPath );
-  result.localVcsPath = localPath;
-
-  /* */
-
-  let parsed2 = _.mapExtend( null, parsed1 );
-  parsed2.protocol = null;
-  parsed2.hash = null;
-  parsed2.tag = null;
-  parsed2.longPath = name;
-  result.remoteVcsPath = path.str( parsed2 );
-
-  // parsed2.hash = parsed1.hash;
-  // parsed2.tag = parsed1.tag;
-  result.remoteVcsLongerPath = result.remoteVcsPath + '@' + ( result.hash || result.tag );
-  // result.remoteVcsLongerPath = self.pathNativize(  );
-
-  // /* */
-  //
-  // let parsed3 = _.mapExtend( null, parsed1 );
-  // parsed3.longPath = parsed2.longPath;
-  // parsed3.protocol = null;
-  // parsed3.hash = null;
-  // parsed3.tag = null;
-  // result.remoteVcsLongerPath = path.str( parsed3 );
-  // let version = parsed1.hash || parsed1.tag;
-  // if( version )
-  // result.remoteVcsLongerPath += '@' + version;
-
-  /* */
-
-  result.isFixated = self.pathIsFixated( result );
-
-  return result
-
-  /*
-    remotePath : 'npm:///wColor/out/wColor#0.3.100'
-    protocol : 'npm',
-    hash : '0.3.100',
-    longPath : '/wColor/out/wColor',
-    localVcsPath : 'out/wColor',
-    remoteVcsPath : 'wColor',
-    remoteVcsLongerPath : 'wColor@0.3.100'
-  */
-
-  /* */
-
-  function pathIsolateGlobalAndLocal( longPath )
-  {
-    // debugger;
-    let splits = _.path.split( longPath );
-    if( splits[ 0 ] === '' )
-    splits.splice( 0, 1 );
-    return [ splits[ 0 ], splits.slice( 1 ).join( '/' ) ];
-    // let parsed = path.parseConsecutive( longPath );
-    // let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
-    // parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
-    // let globalPath = path.str( parsed );
-    // return [ globalPath, splits[ 2 ] ];
-  }
-
-}
-
-//
-
-function pathNativize( remotePath )
-{
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strDefined( remotePath ) );
-
-  debugger;
-
-  let parsedPath = _.uri.parseFull( remotePath );
-
-  let result = parsedPath.longPath;
-
-  if( parsedPath.hash || parsedPath.tag )
-  result += '@' + ( parsedPath.hash || parsedPath.tag );
-
-  return result;
-}
-
-//
-
-/**
- * @summary Returns true if remote path `filePath` has fixed version of npm package.
- * @param {String} filePath Global path.
- * @function pathIsFixated
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function pathIsFixated( filePath )
-{
-  let self = this;
-  let path = _.uri;
-  let parsed = self.pathParse( filePath );
-
-  if( !parsed.hash )
-  return false;
-
-  return true;
-}
-
-//
-
-/**
- * @summary Changes version of package specified in path `o.remotePath` to latest available.
- * @param {Object} o Options map.
- * @param {String} o.remotePath Remote path.
- * @param {Number} o.verbosity=0 Level of verbosity.
- * @function pathIsFixated
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function pathFixate( o )
-{
-  let self = this;
-  let path = _.uri;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-  _.routineOptions( pathFixate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let parsed = self.pathParse( o.remotePath );
-  let latestVersion = self.versionRemoteLatestRetrive
-  ({
-    remotePath : o.remotePath,
-    verbosity : o.verbosity,
-  });
-
-  let result = path.str
-  ({
-    protocol : parsed.protocol,
-    longPath : parsed.longPath,
-    hash : latestVersion,
-  });
-
-  return result;
-}
-
-var defaults = pathFixate.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -905,16 +902,18 @@ function versionRemoteLatestRetrive( o )
 
   ready.then( () =>
   {
-    parsed = self.pathParse( o.remotePath );
-    return shell( 'npm show ' + parsed.remoteVcsPath );
+    // parsed = _.npm.pathParse( o.remotePath );
+    // return shell( 'npm show ' + parsed.remoteVcsPath );
+    parsed = _.npm.path.parse({ remotePath : o.remotePath, full : 0, objects : 1 });
+    return shell( 'npm show ' + parsed.host );
   })
   ready.then( ( got ) =>
   {
     let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
     if( !latestVersion )
     {
-      debugger;
-      throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+      // throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+      throw _.err( 'Failed to get information about NPM package', parsed.host );
     }
     latestVersion = latestVersion[ 1 ];
 
@@ -963,7 +962,8 @@ function versionRemoteCurrentRetrive( o )
 
   ready.then( () =>
   {
-    let parsed = self.pathParse( o.remotePath );
+    // let parsed = self.pathParse( o.remotePath );
+    let parsed = self.path.parse( o.remotePath );
     if( parsed.isFixated )
     return parsed.hash;
     return self.versionRemoteLatestRetrive( o );
@@ -1007,8 +1007,10 @@ function versionRemoteRetrive( o )
 
   ready.then( () =>
   {
-    let parsed = self.pathParse( o.remotePath );
-    return shell( 'npm show ' + parsed.remoteVcsLongerPath + ' version' );
+    // let parsed = self.pathParse( o.remotePath );
+    // return shell( 'npm show ' + parsed.remoteVcsLongerPath + ' version' );
+    let packageVcsName = _.npm.path.nativize( o.remotePath );
+    return shell( 'npm show ' + packageVcsName + ' version' );
   })
   ready.then( ( got ) =>
   {
@@ -1051,7 +1053,8 @@ function isUpToDate( o )
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let parsed = self.pathParse( o.remotePath );
+  // let parsed = self.pathParse( o.remotePath );
+  let parsed = self.path.parse( o.remotePath );
 
   let ready = new _.Consequence().take( null );
 
@@ -1207,7 +1210,8 @@ function hasRemote( o )
     }
 
     let config = localProvider.configRead( configPath );
-    let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    // let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    let remoteVcsPath = _.npm.path.parse({ remotePath : o.remotePath, full : 0, objects : 1 }).host;
     let originVcsPath = config.name;
 
     _.sure( _.strDefined( remoteVcsPath ) );
@@ -1259,6 +1263,15 @@ let Extension =
 
   protocols : [ 'npm' ],
 
+  // path
+
+  pathParse,
+  pathNativize,
+  pathIsFixated,
+  pathFixate,
+
+  //
+
   publish,
 
   fixate, /* qqq : cover please */
@@ -1275,10 +1288,6 @@ let Extension =
 
   // vcs
 
-  pathParse,
-  pathNativize,
-  pathIsFixated,
-  pathFixate,
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
