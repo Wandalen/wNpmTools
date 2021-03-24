@@ -1,0 +1,3 @@
+{
+  "bundledDependencies" : [ "wmodulefortesting2", "wmodulefortesting1b", "wmodulefortesting1a" ]
+}

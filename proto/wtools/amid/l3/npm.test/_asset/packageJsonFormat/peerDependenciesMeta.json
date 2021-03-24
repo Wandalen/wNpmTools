@@ -1,0 +1,7 @@
+{
+  "peerDependenciesMeta" : {
+    "wmodulefortesting12ab" : { "optional": true },
+    "wmodulefortesting12" : { "optional": true },
+    "eslint" : { "optional": true }
+  }
+}
