@@ -2276,7 +2276,7 @@ let Proto =
 
 //
 
-let Self = new wTestSuite( Proto );
+const Self = wTestSuite( Proto );
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

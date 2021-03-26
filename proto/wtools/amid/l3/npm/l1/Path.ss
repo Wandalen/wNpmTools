@@ -3,9 +3,9 @@
 
 'use strict';
 
-let _ = _global_.wTools;
-let Parent = _.uri.path;
-let Self = _.npm.path = _.npm.path || Object.create( Parent );
+const _ = _global_.wTools;
+const Parent = _.uri.path;
+const Self = _.npm.path = _.npm.path || Object.create( Parent );
 
 // --
 //

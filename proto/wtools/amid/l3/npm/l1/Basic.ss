@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _ = _global_.wTools;
-let Self = _.npm = _.npm || Object.create( null );
+const _ = _global_.wTools;
+const Self = _.npm = _.npm || Object.create( null );
 
 // --
 // path
@@ -283,7 +283,7 @@ function fixate( o )
 
   try
   {
-    let o2 = _.mapOnly( _.mapExtend( null, o ), self._readChangeWrite.defaults );
+    let o2 = _.mapOnly_( null, _.mapExtend( null, o ), self._readChangeWrite.defaults );
     o2.onChange = onChange;
     self._readChangeWrite( o2 );
     _.mapExtend( o, o2 );
@@ -297,8 +297,8 @@ function fixate( o )
   function onChange( op )
   {
     let o2 = Object.create( null );
-    _.mapExtend( o2, _.mapOnly( o, self.structureFixate.defaults ) );
-    _.mapExtend( o2, _.mapOnly( op, self.structureFixate.defaults ) );
+    _.mapExtend( o2, _.mapOnly_( null, o, self.structureFixate.defaults ) );
+    _.mapExtend( o2, _.mapOnly_( null, op, self.structureFixate.defaults ) );
     self.structureFixate( o2 );
     return o2.changed;
   }
@@ -408,7 +408,7 @@ function bump( o )
   o.verbosity = 0;
   try
   {
-    let o2 = _.mapOnly( _.mapExtend( null, o ), self._readChangeWrite.defaults );
+    let o2 = _.mapOnly_( null, _.mapExtend( null, o ), self._readChangeWrite.defaults );
     o2.onChange = onChange;
     self._readChangeWrite( o2 );
     _.mapExtend( o, o2 );
@@ -423,8 +423,8 @@ function bump( o )
   function onChange( op )
   {
     let o2 = Object.create( null );
-    _.mapExtend( o2, _.mapOnly( o, self.structureBump.defaults ) );
-    _.mapExtend( o2, _.mapOnly( op, self.structureBump.defaults ) );
+    _.mapExtend( o2, _.mapOnly_( null, o, self.structureBump.defaults ) );
+    _.mapExtend( o2, _.mapOnly_( null, op, self.structureBump.defaults ) );
     self.structureBump( o2 );
     return o2.changed;
   }
