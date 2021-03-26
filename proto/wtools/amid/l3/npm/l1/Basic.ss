@@ -201,6 +201,60 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 // --
+//
+// --
+
+function packageJsonFormat( o )
+{
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+  _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
+
+  const fileProvider = _.fileProvider;
+  let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
+  config = regularDependenciesSort( config );
+  fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
+  return true;
+
+  /* */
+
+  function regularDependenciesSort( config )
+  {
+    const dependencies =
+    [
+      'dependencies',
+      'devDependencies',
+      'optionalDependencies',
+      'peerDependencies',
+    ];
+    for( let i = 0; i < dependencies.length; i++ )
+    if( config[ dependencies[ i ] ] )
+    {
+      const src = config[ dependencies[ i ] ];
+      const result = Object.create( null );
+      const keys = _.mapKeys( src );
+      keys.sort( sortElements );
+
+      for( let i = 0; i < keys.length; i++ )
+      result[ keys[ i ] ] = src[ keys[ i ] ];
+
+      config[ dependencies[ i ] ] = result;
+    }
+
+    return config;
+  }
+
+  /* */
+
+  function sortElements( a, b )
+  {
+    return a.toLowerCase().localeCompare( b.toLowerCase() );
+  }
+}
+
+packageJsonFormat.defaults = Object.create( null );
+packageJsonFormat.defaults.filePath = null;
+
+// --
 // inter
 // --
 
@@ -261,10 +315,10 @@ publish.defaults =
 //
 
 /**
- * @summary Fixates versions of the dependecies in provided package.
+ * @summary Fixates versions of the dependencies in provided package.
  * @param {String} o.localPath Path to package directory.
  * @param {String} o.configPath Path to package.json file.
- * @param {String} o.tag Sets specified tag to all dependecies.
+ * @param {String} o.tag Sets specified tag to all dependencies.
  * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
  * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
  * @param {Number} [o.verbosity=2] Verbosity control.
@@ -318,9 +372,9 @@ fixate.defaults =
 //
 
 /**
- * @summary Fixates versions of the dependecies in provided config.
+ * @summary Fixates versions of the dependencies in provided config.
  * @param {Object} o.config Object representation of package.json file.
- * @param {String} o.tag Sets specified tag to all dependecies.
+ * @param {String} o.tag Sets specified tag to all dependencies.
  * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
  * @param {Number} [o.verbosity=2] Verbosity control.
  * @function structureFixate
@@ -1269,6 +1323,10 @@ let Extension =
   pathNativize,
   pathIsFixated,
   pathFixate,
+
+  //
+
+  packageJsonFormat,
 
   //
 

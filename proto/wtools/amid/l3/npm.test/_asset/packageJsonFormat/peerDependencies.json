@@ -1,0 +1,3 @@
+{
+  "peerDependencies" : { "wmodulefortesting12ab" : "alpha", "wmodulefortesting12" : "alpha", "eslint" : "7.1.0" }
+}

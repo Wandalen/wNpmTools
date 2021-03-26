@@ -1,0 +1,16 @@
+{
+  "name" : "packagejsonformat",
+  "version" : "0.0.0",
+  "enabled" : 1,
+  "description" : "To check the conversion",
+  "keywords" : [ "publish", "export", "npm", "package" ],
+  "license" : "MIT",
+  "author" : "Author <author@dot.com>",
+  "contributors" : [ "Contributor1 <contributor1@dot.com>", "Contributor2 <contributor2@dot.com>" ],
+  "repository" : "git+https://github.com/author/PackageJsonFormat.git",
+  "bugs" : "https://github.com/author/PackageJsonFormat/issues",
+  "dependencies" : { "wmodulefortesting12ab" : "alpha", "wmodulefortesting12" : "alpha", "eslint" : "7.1.0" },
+  "devDependencies" : { "wTesting" : "", "wmodulefortesting1" : "alpha" },
+  "optionalDependencies" : { "wmodulefortesting2b" : "", "wmodulefortesting2a" : "" },
+  "bundledDependencies" : [ "wmodulefortesting2", "wmodulefortesting1b", "wmodulefortesting1a" ]
+}

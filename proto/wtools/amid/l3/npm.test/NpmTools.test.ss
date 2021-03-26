@@ -167,6 +167,182 @@ function pathFixate( test )
 
 //
 
+function packageJsonFormat( test )
+{
+  let self = this;
+  var a = test.assetFor( 'packageJsonFormat' );
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'package.json with only field bundledDependencies';
+    a.reflect();
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'bundledDependencies.json' ) ] : a.abs( 'package.json' ) } });
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'bundledDependencies.json' ) });
+    test.identical( got, true );
+    return null;
+  });
+
+  a.shell( 'npm i' );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let npmConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    let npmToolsConfig = a.fileProvider.fileRead( a.abs( 'bundledDependencies.json' ) );
+    test.identical( npmToolsConfig, npmConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'package.json with only field dependencies';
+    a.reflect();
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'dependencies.json' ) ] : a.abs( 'package.json' ) } });
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'dependencies.json' ) });
+    test.identical( got, true );
+    return null;
+  });
+
+  a.shell( 'npm i' );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let npmConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    let npmToolsConfig = a.fileProvider.fileRead( a.abs( 'dependencies.json' ) );
+    test.identical( npmToolsConfig, npmConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'package.json with only field devDependencies';
+    a.reflect();
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'devDependencies.json' ) ] : a.abs( 'package.json' ) } });
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'devDependencies.json' ) });
+    test.identical( got, true );
+    return null;
+  });
+
+  a.shell( 'npm i' );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let npmConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    let npmToolsConfig = a.fileProvider.fileRead( a.abs( 'devDependencies.json' ) );
+    test.identical( npmToolsConfig, npmConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'package.json with only field peerDependencies';
+    a.reflect();
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'peerDependencies.json' ) ] : a.abs( 'package.json' ) } });
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'peerDependencies.json' ) });
+    test.identical( got, true );
+    return null;
+  });
+
+  a.shell( 'npm i' );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let npmConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    let npmToolsConfig = a.fileProvider.fileRead( a.abs( 'peerDependencies.json' ) );
+    test.identical( npmToolsConfig, npmConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'package.json with only field peerDependenciesMeta';
+    a.reflect();
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'peerDependenciesMeta.json' ) ] : a.abs( 'package.json' ) } });
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'peerDependenciesMeta.json' ) });
+    test.identical( got, true );
+    return null;
+  });
+
+  a.shell( 'npm i' );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let npmConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    let npmToolsConfig = a.fileProvider.fileRead( a.abs( 'peerDependenciesMeta.json' ) );
+    test.identical( npmToolsConfig, npmConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'compare full package.json file with many dependencies';
+    a.reflect();
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'package2.json' ) } });
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'package2.json' ) });
+    test.identical( got, true );
+    return null;
+  });
+
+  a.shell( 'npm i' );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let npmConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    let npmToolsConfig = a.fileProvider.fileRead( a.abs( 'package2.json' ) );
+    test.identical( npmToolsConfig, npmConfig );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+}
+
+packageJsonFormat.timeOut = 60000;
+
+//
+
 function fixate( test )
 {
   let self = this;
@@ -1295,6 +1471,10 @@ const Proto =
     pathParse,
     pathIsFixated,
     pathFixate,
+
+    //
+
+    packageJsonFormat,
 
     //
 
