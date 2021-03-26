@@ -184,6 +184,21 @@ module:
             ../proto/wtools/amid/l3/npm.test/_asset/fixate/fixateNotEmptyVersions
           - >-
             ../proto/wtools/amid/l3/npm.test/_asset/fixate/fixateNotEmptyVersions/package.json
+          - ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/bundledDependencies.json
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/dependencies.json
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/devDependencies.json
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/optionalDependencies.json
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/package.json
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/peerDependencies.json
+          - >-
+            ../proto/wtools/amid/l3/npm.test/_asset/packageJsonFormat/peerDependenciesMeta.json
           - ../proto/wtools/atop
     submodule:
       wTools:
