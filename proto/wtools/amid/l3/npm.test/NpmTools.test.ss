@@ -170,7 +170,7 @@ function pathFixate( test )
 function format( test )
 {
   let self = this;
-  var a = test.assetFor( 'format' );
+  let a = test.assetFor();
 
   /* - */
 
@@ -346,7 +346,7 @@ format.timeOut = 60000;
 function fixate( test )
 {
   let self = this;
-  var a = test.assetFor( 'fixate' ); /* aaa Artem : done. should be single call of assetFor per test routine */
+  let a = test.assetFor( 'fixate' ); /* aaa Artem : done. should be single call of assetFor per test routine */
 
   /* aaa Artem : done. simplify package.json files. remove redundant fields */
 

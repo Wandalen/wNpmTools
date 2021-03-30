@@ -381,10 +381,19 @@ function pathLocalFromDownload( configPath )
 /* qqq : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */
 function format( o )
 {
+  let self = this;
+  let fileProvider = _.fileProvider;
+  let depSectionsNames =
+  [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+    'peerDependencies',
+  ];
+
   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
 
-  const fileProvider = _.fileProvider;
   let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
   config = regularDependenciesSort( config );
   fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
@@ -394,17 +403,10 @@ function format( o )
 
   function regularDependenciesSort( config )
   {
-    const dependencies =
-    [
-      'dependencies',
-      'devDependencies',
-      'optionalDependencies',
-      'peerDependencies',
-    ];
-    for( let i = 0; i < dependencies.length; i++ )
-    if( config[ dependencies[ i ] ] )
+    for( let i = 0; i < depSectionsNames.length; i++ )
+    if( config[ depSectionsNames[ i ] ] )
     {
-      const src = config[ dependencies[ i ] ];
+      const src = config[ depSectionsNames[ i ] ];
       const result = Object.create( null );
       const keys = _.mapKeys( src );
       keys.sort( sortElements );
@@ -412,7 +414,7 @@ function format( o )
       for( let i = 0; i < keys.length; i++ )
       result[ keys[ i ] ] = src[ keys[ i ] ];
 
-      config[ dependencies[ i ] ] = result;
+      config[ depSectionsNames[ i ] ] = result;
     }
 
     return config;
