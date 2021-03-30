@@ -14,7 +14,7 @@ function _readChangeWrite( o )
 {
   let self = this;
 
-  o = _.routineOptions( _readChangeWrite, o );
+  o = _.routine.options( _readChangeWrite, o );
   if( !o.verbosity || o.verbosity < 0 )
   o.verbosity = 0;
 
@@ -73,7 +73,7 @@ function _readChangeWrite_functor( fo )
   if( !_.mapIs( fo ) )
   fo = { onChange : arguments[ 0 ], name : arguments[ 1 ] }
 
-  fo = _.routineOptions( _readChangeWrite_functor, fo );
+  fo = _.routine.options( _readChangeWrite_functor, fo );
   fo.head = fo.head || head;
   fo.body = fo.body || body;
 
@@ -101,7 +101,7 @@ function _readChangeWrite_functor( fo )
 
   function head( routine, args )
   {
-    let o = _.routineOptions( routine, args );
+    let o = _.routine.options( routine, args );
     if( routine.defaults.verbosity !== undefined )
     if( !o.verbosity || o.verbosity < 0 )
     o.verbosity = 0;
@@ -314,7 +314,7 @@ function pathFixate( o )
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
-  _.routineOptions( pathFixate, o );
+  _.routine.options( pathFixate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   // let parsed = self.pathParse( o.remotePath );
@@ -450,7 +450,7 @@ function structureFixate( o )
   //   'peerDependencies',
   // ];
 
-  o = _.routineOptions( structureFixate, o );
+  o = _.routine.options( structureFixate, o );
   o.changed = false;
 
   if( !o.onDep )
@@ -521,7 +521,7 @@ _.assert( defaults.onDep !== undefined );
 // {
 //   let self = this;
 //
-//   o = _.routineOptions( fixate, o );
+//   o = _.routine.options( fixate, o );
 //   if( !o.verbosity || o.verbosity < 0 )
 //   o.verbosity = 0;
 //
@@ -572,7 +572,7 @@ _.assert( defaults.onDep !== undefined );
 function structureBump( o )
 {
 
-  o = _.routineOptions( structureBump, o );
+  o = _.routine.options( structureBump, o );
   o.changed = false;
 
   let version = o.config.version || '0.0.0';
@@ -618,7 +618,7 @@ structureBump.defaults =
 // {
 //   let self = this;
 //
-//   o = _.routineOptions( bump, o );
+//   o = _.routine.options( bump, o );
 //   if( !o.verbosity || o.verbosity < 0 )
 //   o.verbosity = 0;
 //   try
@@ -670,9 +670,11 @@ function structureDepRemove( o )
 
   if( !_.mapIs( o ) )
   o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
-  o = _.routineOptions( structureDepRemove, o );
+  o = _.routine.options( structureDepRemove, o );
+  _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
+  _.assert( o.kind === null, 'not implemented' );
 
-
+  x
 
 }
 
@@ -693,7 +695,7 @@ const depRemove = _readChangeWrite_functor( structureDepRemove, 'depRemove' );
 //
 //   if( !_.mapIs( o ) )
 //   o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
-//   o = _.routineOptions( depRemove, o );
+//   o = _.routine.options( depRemove, o );
 //   if( !o.verbosity || o.verbosity < 0 )
 //   o.verbosity = 0;
 //
@@ -750,7 +752,7 @@ function publish( o )
 {
   let self = this;
 
-  _.routineOptions( publish, arguments );
+  _.routine.options( publish, arguments );
   if( !o.verbosity || o.verbosity < 0 )
   o.verbosity = 0;
 
@@ -796,7 +798,7 @@ function versionLog( o )
 {
   let self = this;
 
-  _.routineOptions( versionLog, o );
+  _.routine.options( versionLog, o );
 
   if( !o.configPath )
   o.configPath = self.pathConfigFromLocal( o.localPath );
@@ -871,7 +873,7 @@ function remoteAbout( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { name : arguments[ 0 ] };
-  o = _.routineOptions( remoteAbout, o );
+  o = _.routine.options( remoteAbout, o );
 
   const splits = _.strIsolateLeftOrAll({ src : o.name, delimeter : '!' });
   o.name = splits[ 0 ];
@@ -966,7 +968,7 @@ function remoteDependants( o )
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
-  _.routineOptions( remoteDependants, o );
+  _.routine.options( remoteDependants, o );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
@@ -1068,7 +1070,7 @@ function localName( o )
   if( !_.mapIs( o ) )
   o = { localPath : arguments[ 0 ] }
 
-  _.routineOptions( localName, o );
+  _.routine.options( localName, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( !o.config )
@@ -1112,7 +1114,7 @@ function localVersion( o )
   if( !_.mapIs( o ) )
   o = { localPath : arguments[ 0 ] }
 
-  _.routineOptions( localVersion, o );
+  _.routine.options( localVersion, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -1176,7 +1178,7 @@ function remoteVersionLatest( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( remoteVersionLatest, o );
+  _.routine.options( remoteVersionLatest, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -1244,7 +1246,7 @@ function remoteVersionCurrent( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( remoteVersionCurrent, o );
+  _.routine.options( remoteVersionCurrent, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -1282,7 +1284,7 @@ function remoteVersion( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( remoteVersionLatest, o );
+  _.routine.options( remoteVersionLatest, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -1339,7 +1341,7 @@ function isUpToDate( o )
   let self = this;
   let path = _.uri;
 
-  _.routineOptions( isUpToDate, o );
+  _.routine.options( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   // let parsed = self.pathParse( o.remotePath );
@@ -1391,7 +1393,7 @@ function hasFiles( o )
 {
   let localProvider = _.fileProvider;
 
-  _.routineOptions( hasFiles, o );
+  _.routine.options( hasFiles, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( !localProvider.isDir( o.localPath ) )
@@ -1423,7 +1425,7 @@ function isRepository( o )
   let self = this;
   let path = _.uri;
 
-  _.routineOptions( isRepository, o );
+  _.routine.options( isRepository, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = _.Consequence.Try( () =>
@@ -1471,7 +1473,7 @@ function hasRemote( o )
   let localProvider = _.fileProvider;
   let path = localProvider.path;
 
-  _.routineOptions( hasRemote, o );
+  _.routine.options( hasRemote, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strDefined( o.localPath ) );
   _.assert( _.strDefined( o.remotePath ) );
