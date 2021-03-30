@@ -1,33 +1,47 @@
 {
-  "name" : "wnpmtools",
-  "version" : "0.3.178",
-  "description" : "Collection of tools to use npm programmatically.",
-  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
-  "contributors" :
-  [
-    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@01.school" },
-    { "name" : "Artem Bohush", "email" : "art.bohush@gmail.com" }
+  "name": "wnpmtools",
+  "version": "0.3.179",
+  "description": "Collection of tools to use npm programmatically.",
+  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "contributors": [
+    {
+      "name": "Kostiantyn Wandalen",
+      "email": "wanalen@01.school"
+    },
+    {
+      "name": "Artem Bohush",
+      "email": "art.bohush@gmail.com"
+    }
   ],
-  "license" : "MIT",
-  "main" : "proto/wtools/amid/l3/npm/Include.ss",
-  "files" : [ "proto/wtools/amid/l3/npm", "proto/wtools/Tools.s" ],
-  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen .build proto" },
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/Wandalen/wNpmTools.git"
+  "license": "MIT",
+  "main": "proto/wtools/amid/l3/npm/Include.ss",
+  "files": [
+    "proto/wtools/amid/l3/npm",
+    "proto/wtools/Tools.s"
+  ],
+  "scripts": {
+    "test": "wtest .run 'proto/**' rapidity:-3",
+    "docgen": "wdocgen .build proto"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wNpmTools/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wNpmTools.git"
   },
-  "dependencies" :
-  {
-    "wTools" : "",
-    "whttp" : "",
-    "wFiles" : "",
-    "wprocess" : ""
+  "bugs": {
+    "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
-  "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0", "wnpmtools" : "file:." },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "wTools": "delta",
+    "whttp": "delta",
+    "wFiles": "delta",
+    "wprocess": "delta"
+  },
+  "devDependencies": {
+    "eslint": "7.1.0",
+    "wTesting": "delta",
+    "wnpmtools": "file:."
+  },
+  "keywords": [
+    "wTools"
+  ]
 }
