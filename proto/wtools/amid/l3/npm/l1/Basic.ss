@@ -12,70 +12,80 @@ _.assert( _.routineIs( _.strLinesIndentation ) );
 // meta
 // --
 
-function _readChangeWrite( o )
-{
-  let self = this;
-  let logger = o.logger || _global_.logger;
-
-  o = _.routine.options( _readChangeWrite, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-
-  if( !o.configPath )
-  o.configPath = self.pathConfigFromLocal( o.localPath );
-  o.config = _.fileProvider.configRead( o.configPath );
-
-  o.changed = o.onChange.call( self, o );
-
-  _.assert( _.boolIs( o.changed ) );
-  if( !o.changed )
-  return o;
-
-  /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
-
-  let encoder = _.gdf.selectSingleContext
-  ({
-    inFormat : 'structure',
-    outFormat : 'string',
-    ext : 'json',
-    feature : { fine : 1 },
-  })
-
-  let str = encoder.encode({ data : o.config }).out.data;
-
-  _.assert( _.strIs( str ) );
-
-  str = str.replace( /\s\n/mg, '\n' ) + '\n';
-
-  if( o.verbosity )
-  logger.log( `Rewriting ${o.configPath}` );
-  if( o.verbosity >= 2 )
-  logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
-
-  if( o.dry )
-  return o;
-
-  // if( str )
-  _.fileProvider.fileWrite( o.configPath, str );
-  // else
-  // _.fileProvider.fileWrite( o.configPath, o.config );
-
-  return o;
-}
-
-_readChangeWrite.defaults =
-{
-  localPath : null,
-  configPath : null,
-  dry : 0,
-  verbosity : 0,
-  onChange : null,
-}
+// function _readChangeWrite( o )
+// {
+//   let self = this;
+//   let logger = o.logger || _global_.logger;
+//
+//   o = _.routine.options( _readChangeWrite, o );
+//   if( !o.verbosity || o.verbosity < 0 )
+//   o.verbosity = 0;
+//
+//   if( !o.configPath )
+//   o.configPath = self.pathConfigFromLocal( o.localPath );
+//   o.config = _.fileProvider.configRead( o.configPath );
+//
+//   o.changed = o.onChange.call( self, o );
+//
+//   _.assert( _.boolIs( o.changed ) );
+//   if( !o.changed )
+//   return o;
+//
+//   /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
+//
+//   let encoder = _.gdf.selectSingleContext
+//   ({
+//     inFormat : 'structure',
+//     outFormat : 'string',
+//     ext : 'json',
+//     feature : { fine : 1 },
+//   })
+//
+//   let str = encoder.encode({ data : o.config }).out.data;
+//
+//   _.assert( _.strIs( str ) );
+//
+//   str = str.replace( /\s\n/mg, '\n' ) + '\n';
+//
+//   if( o.verbosity )
+//   logger.log( `Rewriting ${o.configPath}` );
+//   if( o.verbosity >= 2 )
+//   logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
+//
+//   if( o.dry )
+//   return o;
+//
+//   // if( str )
+//   _.fileProvider.fileWrite( o.configPath, str );
+//   // else
+//   // _.fileProvider.fileWrite( o.configPath, o.config );
+//
+//   return o;
+// }
+//
+// _readChangeWrite.defaults =
+// {
+//   localPath : null,
+//   configPath : null,
+//   dry : 0,
+//   verbosity : 0,
+//   onChange : null,
+// }
 
 //
 
 function _readChangeWrite_functor( fo )
 {
+  let defaults =
+  {
+    logger : null,
+    nativize : null,
+    localPath : null,
+    configPath : null,
+    dry : 0,
+    verbosity : 0,
+    onChange : null,
+  };
 
   if( !_.mapIs( fo ) )
   fo = { onChange : arguments[ 0 ], name : arguments[ 1 ] }
@@ -85,9 +95,9 @@ function _readChangeWrite_functor( fo )
   fo.body = fo.body || body;
 
   const name = fo.name;
-  const onChange = fo.onChange;
+  // const onChange = fo.onChange;
   _.assert( _.strDefined( name ) );
-  _.assert( _.routineIs( onChange ) );
+  _.assert( _.routineIs( fo.onChange ) );
   _.assert( _.aux.is( fo.onChange.defaults ) );
   _.assert( fo.onChange.defaults.config !== undefined );
 
@@ -124,9 +134,11 @@ function _readChangeWrite_functor( fo )
 
     try
     {
-      let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
-      o2.onChange = onChangeCall;
-      self._readChangeWrite( o2 );
+      let o2 = _.mapExtend( null, o );
+      _.mapSupplement( null, o2, defaults );
+      o2.onChange = fo.onChange;
+      // o2.onChange = onChangeCall;
+      _readChangeWrite.call( self, o2 );
       _.mapExtend( o, o2 );
       return o;
     }
@@ -135,17 +147,76 @@ function _readChangeWrite_functor( fo )
       throw _.err( err, `\nFailed to ${name} version of npm config ${o.configPath}` );
     }
 
-    function onChangeCall( op )
-    {
-      let o2 = Object.create( null );
-      _.mapOnly_( o2, o, onChange.defaults );
-      _.mapOnly_( o2, op, onChange.defaults );
-      onChange.call( self, o2 );
-      _.assert( _.boolIs( o2.changed ) );
-      return o2.changed;
-    }
+    // function onChangeCall( op )
+    // {
+    //   let o2 = Object.create( null );
+    //   _.mapOnly_( o2, o, onChange.defaults );
+    //   _.mapOnly_( o2, op, onChange.defaults );
+    //   onChange.call( self, o2 );
+    //   _.assert( _.boolIs( o2.changed ) );
+    //   return o2.changed;
+    // }
   }
 
+  /* */
+
+  function _readChangeWrite( o )
+  {
+    let logger = o.logger || _global_.logger;
+
+    if( !o.configPath )
+    o.configPath = _.npm.pathConfigFromLocal( o.localPath );
+    o.config = _.fileProvider.configRead( o.configPath );
+
+    let o2 = Object.create( null );
+    _.mapOnly_( o2, o, o.onChange.defaults );
+    _.routine.options( o.onChange, o2 );
+    o.onChange.call( this, o2 );
+    _.assert( _.boolIs( o2.changed ) );
+    o.changed = o2.changed;
+    o.config = o2.config;
+    // o.changed = o.onChange.call( self, o );
+
+    if( !o.changed )
+    return o;
+
+    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented */
+
+    let str;
+    if( o.nativize )
+    {
+      o.config = _.npm.structureFormat({ config : o.config });
+      str = JSON.stringify( o.config, null, '  ' ) + '\n';
+    }
+    else
+    {
+      let encoder = _.gdf.selectSingleContext
+      ({
+        inFormat : 'structure',
+        outFormat : 'string',
+        ext : 'json',
+        feature : { fine : 1 },
+      });
+
+      str = encoder.encode({ data : o.config }).out.data;
+      str = str.replace( /\s\n/mg, '\n' ) + '\n';
+    };
+
+    _.assert( _.strIs( str ) );
+
+
+    if( o.verbosity )
+    logger.log( `Rewriting ${o.configPath}` );
+    if( o.verbosity >= 2 )
+    logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
+
+    if( o.dry )
+    return o;
+
+    _.fileProvider.fileWrite( o.configPath, str );
+
+    return o;
+  }
 }
 
 _readChangeWrite_functor.defaults =
@@ -420,11 +491,11 @@ function pathLocalFromDownload( configPath )
 // write l2
 // --
 
-/* qqq : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */
-function format( o )
+function structureFormat( o )
 {
-  let self = this;
-  let fileProvider = _.fileProvider;
+  if( o.changed === true )
+  return o.config;
+
   let depSectionsNames =
   [
     'dependencies',
@@ -433,45 +504,88 @@ function format( o )
     'peerDependencies',
   ];
 
-  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
-  _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
+  const npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
+  const sortElements = npmJsVersionIsNewer ? sortElementsForward : sortElementsBackward;
 
-  let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
-  config = regularDependenciesSort( config );
-  fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
-  return true;
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+  _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
+
+  for( let i = 0; i < depSectionsNames.length; i++ )
+  if( o.config[ depSectionsNames[ i ] ] )
+  {
+    const src = o.config[ depSectionsNames[ i ] ];
+    const result = Object.create( null );
+    const keys = _.mapKeys( src );
+    keys.sort( sortElements );
+
+    for( let i = 0; i < keys.length; i++ )
+    result[ keys[ i ] ] = src[ keys[ i ] ];
+
+    o.config[ depSectionsNames[ i ] ] = result;
+  }
+
+  o.changed = true;
+
+  return o.config;
 
   /* */
 
-  function regularDependenciesSort( config )
+  function npmMajorVersionIsNewerOrSame( majorVersion )
   {
-    for( let i = 0; i < depSectionsNames.length; i++ )
-    if( config[ depSectionsNames[ i ] ] )
-    {
-      const src = config[ depSectionsNames[ i ] ];
-      const result = Object.create( null );
-      const keys = _.mapKeys( src );
-      keys.sort( sortElements );
-
-      for( let i = 0; i < keys.length; i++ )
-      result[ keys[ i ] ] = src[ keys[ i ] ];
-
-      config[ depSectionsNames[ i ] ] = result;
-    }
-
-    return config;
+    let op = _.process.start
+    ({
+      execPath : 'npm --version',
+      outputCollecting : 1,
+      mode : 'shell',
+      sync : 1,
+    });
+    return _.number.from( op.output[ 0 ] ) >= majorVersion;
   }
 
   /* */
 
-  function sortElements( a, b )
+  function sortElementsForward( a, b )
   {
     return a.toLowerCase().localeCompare( b.toLowerCase() );
   }
+
+  /* */
+
+  function sortElementsBackward( a, b )
+  {
+    return b.toLowerCase().localeCompare( a.toLowerCase() );
+  }
 }
 
-format.defaults = Object.create( null );
-format.defaults.filePath = null;
+structureFormat.defaults =
+{
+  config : null,
+};
+
+//
+
+/* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : implemented and used */
+const format = _readChangeWrite_functor( structureFormat, 'format' );
+format.defaults =
+{
+  configPath : null,
+  nativize : 1,
+};
+// function format( o )
+// {
+//   let fileProvider = _.fileProvider;
+//
+//   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+//   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
+//
+//   let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
+//   config = _.npm.structureFormat( config );
+//   fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
+//   return true;
+// }
+//
+// format.defaults = Object.create( null );
+// format.defaults.filePath = null;
 
 //
 
@@ -1722,7 +1836,6 @@ let Extension =
 
   // meta
 
-  _readChangeWrite,
   _readChangeWrite_functor,
   _read,
 
@@ -1739,6 +1852,7 @@ let Extension =
 
   // write l2
 
+  structureFormat,
   format,
 
   fixate, /* qqq : cover please */
