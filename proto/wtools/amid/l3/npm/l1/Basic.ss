@@ -91,7 +91,7 @@ function _readChangeWrite_functor( fo )
 
   function head( routine, args )
   {
-    o = _.routineOptions( routine, o );
+    let o = _.routineOptions( routine, o );
     if( routine.defaults.verbosity !== undefined )
     if( !o.verbosity || o.verbosity < 0 )
     o.verbosity = 0;
