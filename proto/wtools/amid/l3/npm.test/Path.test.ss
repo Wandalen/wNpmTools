@@ -2157,7 +2157,7 @@ function fixate( test )
   var got = _.npm.path.fixate( remotePath );
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   test.case = 'path hash';
@@ -2166,7 +2166,7 @@ function fixate( test )
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   test.notIdentical( got, remotePath );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   test.case = 'simple tag';
@@ -2175,7 +2175,7 @@ function fixate( test )
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   test.notIdentical( got, remotePath );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   /* */
@@ -2185,7 +2185,7 @@ function fixate( test )
   var got = _.npm.path.fixate({ remotePath });
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   test.case = 'path hash';
@@ -2194,7 +2194,7 @@ function fixate( test )
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   test.notIdentical( got, remotePath );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   test.case = 'simple tag';
@@ -2203,7 +2203,7 @@ function fixate( test )
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   test.notIdentical( got, remotePath );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   /* */
@@ -2213,7 +2213,7 @@ function fixate( test )
   var got = _.npm.path.fixate({ remotePath, verbosity : 5 });
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
-  var got = _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortesting1' );
+  var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
   test.identical( got, gotVersion );
 
   /* - */

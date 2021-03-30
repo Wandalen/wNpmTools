@@ -180,7 +180,7 @@ function pathFixate( o )
 
   // let parsed = self.pathParse( o.remotePath );
   let parsed = _.npm.path.parse( o.remotePath );
-  let latestVersion = self.versionRemoteLatestRetrive
+  let latestVersion = self.remoteVersionLatest
   ({
     remotePath : o.remotePath,
     verbosity : o.verbosity,
@@ -200,11 +200,43 @@ var defaults = pathFixate.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.verbosity = 0;
 
-// --
 //
+
+function pathConfigFromLocal( localPath )
+{
+  return _.path.join( localPath, 'package.json' );
+}
+
+//
+
+function pathLocalFromConfig( configPath )
+{
+  _.assert( _.path.fullName( configPath ) === 'package.json' );
+  return _.path.dir( configPath );
+}
+
+//
+
+/* xxx : qqq : implement and use similar routine for git */
+function pathDownloadFromLocal( localPath )
+{
+  return _.path.join( localPath, 'node_modules' );
+}
+
+//
+
+function pathLocalFromDownload( configPath )
+{
+  _.assert( _.path.fullName( configPath ) === 'node_modules' );
+  return _.path.dir( configPath );
+}
+
+// --
+// write l2
 // --
 
-function packageJsonFormat( o )
+/* qqq : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */
+function format( o )
 {
   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
@@ -251,11 +283,437 @@ function packageJsonFormat( o )
   }
 }
 
-packageJsonFormat.defaults = Object.create( null );
-packageJsonFormat.defaults.filePath = null;
+format.defaults = Object.create( null );
+format.defaults.filePath = null;
+
+//
+
+/**
+ * @summary Fixates versions of the dependencies in provided config.
+ * @param {Object} o.config Object representation of package.json file.
+ * @param {String} o.tag Sets specified tag to all dependencies.
+ * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function structureFixate
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+function structureFixate( o )
+{
+
+  // let depSectionsNames =
+  // [
+  //   'dependencies',
+  //   'devDependencies',
+  //   'optionalDependencies',
+  //   'bundledDependencies',
+  //   'peerDependencies',
+  // ];
+
+  o = _.routineOptions( structureFixate, o );
+  o.changed = false;
+
+  if( !o.onDep )
+  o.onDep = function onDep( dep )
+  {
+    dep.version = o.tag;
+  }
+
+  _.assert( _.strDefined( o.tag ) );
+
+  this.DepSectionsNames.forEach( ( s ) =>
+  {
+    if( o.config[ s ] )
+    for( let depName in o.config[ s ] )
+    {
+      let depVersion = o.config[ s ][ depName ];
+      let dep = Object.create( null );
+      dep.name = depName;
+      dep.version = depVersion;
+      dep.config = o.config;
+      if( dep.version )
+      continue;
+      let r = o.onDep( dep );
+      _.assert( r === undefined );
+      if( dep.version === depVersion && dep.name === depName )
+      continue;
+      o.changed = true;
+      delete o.config[ s ][ depName ];
+      if( dep.version === undefined || dep.name === undefined )
+      continue;
+      o.config[ s ][ dep.name ] = dep.version;
+    }
+  });
+
+  return o.changed;
+}
+
+structureFixate.defaults =
+{
+  config : null,
+  onDep : null,
+  tag : null,
+}
+
+//
+
+/**
+ * @summary Fixates versions of the dependencies in provided package.
+ * @param {String} o.localPath Path to package directory.
+ * @param {String} o.configPath Path to package.json file.
+ * @param {String} o.tag Sets specified tag to all dependencies.
+ * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function fixate
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+const fixate = _readChangeWrite_functor( structureFixate );
+
+var defaults = fixate.defaults;
+defaults.verbosity = 0;
+defaults.dry = 0;
+defaults.localPath = null;
+defaults.configPath = null;
+
+_.assert( defaults === structureFixate.body.defaults );
+_.assert( defaults.onDep !== undefined );
+
+// function fixate( o )
+// {
+//   let self = this;
+//
+//   o = _.routineOptions( fixate, o );
+//   if( !o.verbosity || o.verbosity < 0 )
+//   o.verbosity = 0;
+//
+//   try
+//   {
+//     let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+//     o2.onChange = onChange;
+//     self._readChangeWrite( o2 );
+//     _.mapExtend( o, o2 );
+//     return o;
+//   }
+//   catch( err )
+//   {
+//     throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+//   }
+//
+//   function onChange( op )
+//   {
+//     let o2 = Object.create( null );
+//     _.mapOnly_( o2, o, self.structureFixate.defaults );
+//     _.mapOnly_( o2, op, self.structureFixate.defaults );
+//     self.structureFixate( o2 );
+//     return o2.changed;
+//   }
+//
+// }
+//
+// fixate.defaults =
+// {
+//   localPath : null,
+//   configPath : null,
+//   onDep : null,
+//   dry : 0,
+//   tag : null,
+//   verbosity : 0,
+// }
+
+//
+
+/**
+ * @summary Bumps package version using provided config.
+ * @param {Object} o.config Object representation of package.json file.
+ * @function structureBump
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+function structureBump( o )
+{
+
+  o = _.routineOptions( structureBump, o );
+  o.changed = false;
+
+  let version = o.config.version || '0.0.0';
+  let versionArray = version.split( '.' );
+  versionArray[ 2 ] = Number( versionArray[ 2 ] );
+  _.sure( _.intIs( versionArray[ 2 ] ), `Cant deduce current version : ${version}` );
+
+  versionArray[ 2 ] += 1;
+  version = versionArray.join( '.' );
+
+  o.changed = true;
+  o.config.version = version;
+
+  return version;
+
+  function depVersionPatch( dep )
+  {
+    return o.tag;
+  }
+
+}
+
+structureBump.defaults =
+{
+  config : null,
+}
+
+//
+
+/**
+ * @summary Bumps package version.
+ * @param {String} o.localPath Path to package directory.
+ * @param {Object} o.configPath Path to package.json file.
+ * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
+ * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
+ * @param {Number} [o.verbosity=2] Verbosity control.
+ * @function bump
+ * @namespace wTools.npm
+ * @module Tools/mid/NpmTools
+ */
+
+// function bump( o )
+// {
+//   let self = this;
+//
+//   o = _.routineOptions( bump, o );
+//   if( !o.verbosity || o.verbosity < 0 )
+//   o.verbosity = 0;
+//   try
+//   {
+//     let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+//     o2.onChange = onChange;
+//     self._readChangeWrite( o2 );
+//     _.mapExtend( o, o2 );
+//   }
+//   catch( err )
+//   {
+//     throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+//   }
+//
+//   return o;
+//
+//   function onChange( op )
+//   {
+//     let o2 = Object.create( null );
+//     _.mapOnly_( o2, o, self.structureBump.defaults );
+//     _.mapOnly_( o2, op, self.structureBump.defaults );
+//     self.structureBump( o2 );
+//     return o2.changed;
+//   }
+//
+// }
+//
+// bump.defaults =
+// {
+//   localPath : null,
+//   configPath : null,
+//   dry : 0,
+//   verbosity : 0,
+// }
+
+//
+
+function structureDepRemove( o )
+{
+  let self = this;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
+  o = _.routineOptions( structureDepRemove, o );
+
+
+
+}
+
+structureDepRemove.defaults =
+{
+  config : null,
+  depPath : null,
+  kind : null,
+}
+
+//
+
+function depRemove()
+{
+  let self = this;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
+  o = _.routineOptions( depRemove, o );
+  if( !o.verbosity || o.verbosity < 0 )
+  o.verbosity = 0;
+
+  try
+  {
+    let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+    o2.onChange = onChange;
+    self._readChangeWrite( o2 );
+    _.mapExtend( o, o2 );
+    return o;
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+  }
+
+  function onChange( op )
+  {
+    let o2 = Object.create( null );
+    _.mapOnly_( o2, o, self.structureFixate.defaults );
+    _.mapOnly_( o2, op, self.structureFixate.defaults );
+    self.structureDepRemove( o2 );
+    return o2.changed;
+  }
+
+}
+
+depRemove.defaults =
+{
+  configPath : null,
+  localPath : null,
+  dry : 0,
+  verbosity : 0,
+  ... structureDepRemove.defaults,
+}
+
+//
+
+function _readChangeWrite( o )
+{
+  let self = this;
+
+  o = _.routineOptions( _readChangeWrite, o );
+  if( !o.verbosity || o.verbosity < 0 )
+  o.verbosity = 0;
+
+  if( !o.configPath )
+  o.configPath = self.pathConfigFromLocal( o.localPath );
+  o.config = _.fileProvider.configRead( o.configPath );
+
+  o.changed = o.onChange( o );
+
+  _.assert( _.boolIs( o.changed ) );
+  if( !o.changed )
+  return o;
+
+  /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
+
+  let encoder = _.gdf.selectSingleContext
+  ({
+    inFormat : 'structure',
+    outFormat : 'string',
+    ext : 'json',
+    feature : { fine : 1 },
+  })
+
+  let str = encoder.encode({ data : o.config }).out.data;
+
+  str = str.replace( /\s\n/mg, '\n' ) + '\n';
+
+  if( o.verbosity >= 2 )
+  logger.log( str );
+
+  if( o.dry )
+  return o;
+
+  if( str )
+  _.fileProvider.fileWrite( o.configPath, str );
+  else
+  _.fileProvider.fileWrite( o.configPath, o.config );
+
+  return o;
+}
+
+_readChangeWrite.defaults =
+{
+  localPath : null,
+  configPath : null,
+  dry : 0,
+  verbosity : 0,
+  onChange : null,
+}
+
+//
+
+function _readChangeWrite_functor( fo )
+{
+
+  if( !_.mapIs( fo ) )
+  fo = { onChange : arguments[ 0 ] }
+
+  fo = _.routineOptions( _readChangeWrite_functor, fo );
+  fo.head = fo.head || head;
+  fo.body = fo.body || body;
+
+  if( !fo.body.defaults && onChange.defaults )
+  fo.body.defaults = _.mapExtend( null, onChange.defaults )
+
+  const onChange = fo.onChange;
+
+  _.assert( _.routineIs( onChange ) );
+
+  return _.routine.unite
+  ({
+    head : fo.head,
+    body : fo.body,
+  });
+
+  function head( routine, args )
+  {
+    o = _.routineOptions( routine, o );
+    if( routine.defaults.verbosity !== undefined )
+    if( !o.verbosity || o.verbosity < 0 )
+    o.verbosity = 0;
+    return o;
+  }
+
+  function body( o )
+  {
+    let self = this;
+
+    try
+    {
+      let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+      o2.onChange = onChangeCall;
+      self._readChangeWrite( o2 );
+      _.mapExtend( o, o2 );
+      return o;
+    }
+    catch( err )
+    {
+      throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+    }
+
+    function onChangeCall( op )
+    {
+      let o2 = Object.create( null );
+      _.mapOnly_( o2, o, onChange.defaults );
+      _.mapOnly_( o2, op, onChange.defaults );
+      onChange.call( self, o2 );
+      return o2.changed;
+    }
+  }
+
+}
+
+_readChangeWrite_functor.defaults =
+{
+  head : null,
+  body : null,
+  onChange : null,
+}
 
 // --
-// inter
+// write l3
 // --
 
 /**
@@ -312,250 +770,82 @@ publish.defaults =
   verbosity : 0,
 }
 
-//
+// --
+// read l3
+// --
 
-/**
- * @summary Fixates versions of the dependencies in provided package.
- * @param {String} o.localPath Path to package directory.
- * @param {String} o.configPath Path to package.json file.
- * @param {String} o.tag Sets specified tag to all dependencies.
- * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
- * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
- * @param {Number} [o.verbosity=2] Verbosity control.
- * @function fixate
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function fixate( o )
+function versionLog( o )
 {
   let self = this;
 
-  o = _.routineOptions( fixate, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
+  _.routineOptions( versionLog, o );
 
-  try
-  {
-    let o2 = _.mapOnly_( null, _.mapExtend( null, o ), self._readChangeWrite.defaults );
-    o2.onChange = onChange;
-    self._readChangeWrite( o2 );
-    _.mapExtend( o, o2 );
-    return o;
-  }
-  catch( err )
-  {
-    throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-  }
+  if( !o.configPath )
+  o.configPath = self.pathConfigFromLocal( o.localPath );
+  // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
 
-  function onChange( op )
+  _.assert( _.strDefined( o.configPath ) );
+  _.assert( _.strDefined( o.remotePath ) );
+
+  let logger = o.logger || _global_.logger;
+  let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+  // let remotePath = self.pathNativize( o.remotePath );
+  let remotePath = _.npm.path.nativize( o.remotePath );
+
+  _.assert( !o.logging || !!logger, 'No defined logger' );
+
+  return _.process.start
+  ({
+    execPath : `npm view ${remotePath} version`,
+    outputCollecting : 1,
+    outputPiping : 0,
+    inputMirroring : 0,
+    throwingExitCode : 0,
+  })
+  .then( ( got ) =>
   {
-    let o2 = Object.create( null );
-    _.mapExtend( o2, _.mapOnly_( null, o, self.structureFixate.defaults ) );
-    _.mapExtend( o2, _.mapOnly_( null, op, self.structureFixate.defaults ) );
-    self.structureFixate( o2 );
-    return o2.changed;
-  }
+    let current = packageJson ? packageJson.version : 'unknown';
+    let latest = _.strStrip( got.output );
+
+    if( got.exitCode || !latest )
+    latest = 'unknown'
+
+    let log = '';
+    log += `Current version : ${current}\n`;
+    log += `Latest version of ${o.remotePath} : ${latest}\n`;
+
+    if( o.logging )
+    logger.log( log );
+
+    return log;
+  })
 
 }
 
-fixate.defaults =
+versionLog.defaults =
 {
+  logger : null,
+  logging : 1,
+  remotePath : null,
   localPath : null,
   configPath : null,
-  onDependency : null,
-  dry : 0,
-  tag : null,
-  verbosity : 0,
 }
 
-//
-
-/**
- * @summary Fixates versions of the dependencies in provided config.
- * @param {Object} o.config Object representation of package.json file.
- * @param {String} o.tag Sets specified tag to all dependencies.
- * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
- * @param {Number} [o.verbosity=2] Verbosity control.
- * @function structureFixate
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function structureFixate( o )
-{
-
-  let dependencySectionsNames =
-  [
-    'dependencies',
-    'devDependencies',
-    'optionalDependencies',
-    'bundledDependencies',
-    'peerDependencies',
-  ];
-
-  o = _.routineOptions( structureFixate, o );
-  o.changed = false;
-
-  if( !o.onDependency )
-  o.onDependency = function onDependency( dep )
-  {
-    dep.version = o.tag;
-  }
-
-  _.assert( _.strDefined( o.tag ) );
-
-  dependencySectionsNames.forEach( ( s ) =>
-  {
-    if( o.config[ s ] )
-    for( let depName in o.config[ s ] )
-    {
-      let depVersion = o.config[ s ][ depName ];
-      let dep = Object.create( null );
-      dep.name = depName;
-      dep.version = depVersion;
-      dep.config = o.config;
-      if( dep.version )
-      continue;
-      let r = o.onDependency( dep );
-      _.assert( r === undefined );
-      if( dep.version === depVersion && dep.name === depName )
-      continue;
-      o.changed = true;
-      delete o.config[ s ][ depName ];
-      if( dep.version === undefined || dep.name === undefined )
-      continue;
-      o.config[ s ][ dep.name ] = dep.version;
-    }
-  });
-
-  return o.changed;
-}
-
-structureFixate.defaults =
-{
-  config : null,
-  onDependency : null,
-  tag : null,
-}
-
-//
-
-/**
- * @summary Bumps package version.
- * @param {String} o.localPath Path to package directory.
- * @param {Object} o.configPath Path to package.json file.
- * @param {Routine} o.onDependency Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
- * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
- * @param {Number} [o.verbosity=2] Verbosity control.
- * @function bump
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function bump( o )
-{
-  let self = this;
-
-  o = _.routineOptions( bump, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-  try
-  {
-    let o2 = _.mapOnly_( null, _.mapExtend( null, o ), self._readChangeWrite.defaults );
-    o2.onChange = onChange;
-    self._readChangeWrite( o2 );
-    _.mapExtend( o, o2 );
-  }
-  catch( err )
-  {
-    throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-  }
-
-  return o;
-
-  function onChange( op )
-  {
-    let o2 = Object.create( null );
-    _.mapExtend( o2, _.mapOnly_( null, o, self.structureBump.defaults ) );
-    _.mapExtend( o2, _.mapOnly_( null, op, self.structureBump.defaults ) );
-    self.structureBump( o2 );
-    return o2.changed;
-  }
-
-}
-
-bump.defaults =
-{
-  localPath : null,
-  configPath : null,
-  dry : 0,
-  verbosity : 0,
-}
-
-//
-
-/**
- * @summary Bumps package version using provided config.
- * @param {Object} o.config Object representation of package.json file.
- * @function structureBump
- * @namespace wTools.npm
- * @module Tools/mid/NpmTools
- */
-
-function structureBump( o )
-{
-
-  let dependencySectionsNames =
-  [
-    'dependencies',
-    'devDependencies',
-    'optionalDependencies',
-    'bundledDependencies',
-    'peerDependencies',
-  ];
-
-  o = _.routineOptions( structureBump, o );
-  o.changed = false;
-
-  let version = o.config.version || '0.0.0';
-  let versionArray = version.split( '.' );
-  versionArray[ 2 ] = Number( versionArray[ 2 ] );
-  _.sure( _.intIs( versionArray[ 2 ] ), `Cant deduce current version : ${version}` );
-
-  versionArray[ 2 ] += 1;
-  version = versionArray.join( '.' );
-
-  o.changed = true;
-  o.config.version = version;
-
-  return version;
-
-  function depVersionPatch( dep )
-  {
-    return o.tag;
-  }
-
-}
-
-structureBump.defaults =
-{
-  config : null,
-}
-
-//
+// --
+// remote
+// --
 
 /**
  * @summary Gets package metadata from npm registry.
  * @param {String} o.name Package name
  * @param {Boolean} [o.sync=1] Controls sync/async execution mode
  * @param {Boolean} [o.throwing=0] Controls error throwing
- * @function aboutFromRemote
+ * @function remoteAbout
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-function aboutFromRemote( o )
+function remoteAbout( o )
 {
   const self = this;
   const packageServer = 'https://registry.npmjs.org/';
@@ -563,7 +853,7 @@ function aboutFromRemote( o )
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { name : arguments[ 0 ] };
-  o = _.routineOptions( aboutFromRemote, o );
+  o = _.routineOptions( remoteAbout, o );
 
   const splits = _.strIsolateLeftOrAll({ src : o.name, delimeter : '!' });
   o.name = splits[ 0 ];
@@ -627,7 +917,7 @@ function aboutFromRemote( o )
   }
 }
 
-aboutFromRemote.defaults =
+remoteAbout.defaults =
 {
   name : null,
   sync : 1,
@@ -638,72 +928,18 @@ aboutFromRemote.defaults =
 
 //
 
-function _readChangeWrite( o )
-{
-  let self = this;
-
-  o = _.routineOptions( _readChangeWrite, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-
-  if( !o.configPath )
-  o.configPath = _.path.join( o.localPath, 'package.json' );
-  o.config = _.fileProvider.configRead( o.configPath );
-
-  o.changed = o.onChange( o );
-
-  _.assert( _.boolIs( o.changed ) );
-  if( !o.changed )
-  return o;
-
-  let encoder = _.gdf.selectSingleContext
-  ({
-    inFormat : 'structure',
-    outFormat : 'string',
-    ext : 'json',
-    feature : { fine : 1 },
-  })
-  let str = encoder.encode({ data : o.config }).out.data;
-
-  str = str.replace( /\s\n/mg, '\n' ) + '\n';
-
-  if( o.verbosity >= 2 )
-  logger.log( str );
-
-  if( o.dry )
-  return o;
-
-  if( str )
-  _.fileProvider.fileWrite( o.configPath, str );
-  else
-  _.fileProvider.fileWrite( o.configPath, o.config );
-
-  return o;
-}
-
-_readChangeWrite.defaults =
-{
-  localPath : null,
-  configPath : null,
-  dry : 0,
-  verbosity : 0,
-  onChange : null,
-}
-
-//
-
 /**
  * @summary Retrieves package dependants number from npm storage.
  * @param {(string|string[])} o.remotePath Package name or array of names(the same as on npm storage).
  * @param {boolean} [o.sync=0] Controls sync/async execution mode.
  * @param {number} [o.verbosity=0] Verbosity control.
  * @returns {(number|number[])} Dependanst number for one package or array of dependants for array of packages.
- * @function dependantsRetrieve
+ * @function remoteDependants
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-function dependantsRetrieve( o )
+function remoteDependants( o )
 {
   const self = this;
   const prefixUri = 'https://www.npmjs.com/package/';
@@ -712,7 +948,7 @@ function dependantsRetrieve( o )
 
   if( !_.mapIs( o ) )
   o = { remotePath : o }
-  _.routineOptions( dependantsRetrieve, o );
+  _.routineOptions( remoteDependants, o );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
@@ -791,7 +1027,7 @@ function dependantsRetrieve( o )
 
 }
 
-dependantsRetrieve.defaults =
+remoteDependants.defaults =
 {
   remotePath : null,
   sync : 0,
@@ -800,85 +1036,65 @@ dependantsRetrieve.defaults =
   attemptDelay : 250,
 }
 
-//
+// --
+// local
+// --
 
-function versionLog( o )
+/* qqq : cover */
+function localName( o )
 {
   let self = this;
+  let path = _.uri;
+  /* xxx : qqq : for Dmytro : use path and fileProvider of self everywhere in module::NpmToools and module::GitTools */
 
-  _.routineOptions( versionLog, o );
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ] }
 
-  if( !o.configPath )
-  o.configPath = _.path.join( o.localPath, 'package.json' );
+  _.routineOptions( localName, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
-  _.assert( _.strDefined( o.configPath ) );
-  _.assert( _.strDefined( o.remotePath ) );
-
-  let logger = o.logger || _global_.logger;
-  let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
-  // let remotePath = self.pathNativize( o.remotePath );
-  let remotePath = _.npm.path.nativize( o.remotePath );
-
-  _.assert( !o.logging || !!logger, 'No defined logger' );
-
-  return _.process.start
-  ({
-    execPath : `npm view ${remotePath} version`,
-    outputCollecting : 1,
-    outputPiping : 0,
-    inputMirroring : 0,
-    throwingExitCode : 0,
-  })
-  .then( ( got ) =>
+  if( !o.config )
   {
-    let current = packageJson ? packageJson.version : 'unknown';
-    let latest = _.strStrip( got.output );
+    if( !o.configPath )
+    o.configPath = self.pathConfigFromLocal( o.localPath );
+    if( !_.fileProvider.fileExists( o.configPath ) )
+    return;
+    o.config = _.fileProvider.configRead( o.configPath );
+  }
 
-    if( got.exitCode || !latest )
-    latest = 'unknown'
-
-    let log = '';
-    log += `Current version : ${current}\n`;
-    log += `Latest version of ${o.remotePath} : ${latest}\n`;
-
-    if( o.logging )
-    logger.log( log );
-
-    return log;
-  })
-
+  return o.config.name;
 }
 
-versionLog.defaults =
+localName.defaults =
 {
-  logger : null,
-  logging : 1,
-  remotePath : null,
   localPath : null,
   configPath : null,
+  config : null,
 }
 
-//
+// --
+// vcs
+// --
 
 /**
  * @summary Returns version of npm package located at `o.localPath`.
  * @param {Object} o Options map.
  * @param {String} o.localPath Path to npm package on hard drive.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function versionLocalRetrive
+ * @function localVersion
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-function versionLocalRetrive( o )
+function localVersion( o )
 {
   let self = this;
   let path = _.uri;
 
   if( !_.mapIs( o ) )
-  o = { localPath : o }
+  o = { localPath : arguments[ 0 ] }
 
-  _.routineOptions( versionLocalRetrive, o );
+  _.routineOptions( localVersion, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -891,7 +1107,8 @@ function versionLocalRetrive( o )
 
     return _.fileProvider.fileRead
     ({
-      filePath : path.join( o.localPath, 'package.json' ),
+      // filePath : path.join( o.localPath, 'package.json' ),
+      filePath : self.pathConfigFromLocal( o.localPath ),
       encoding : 'json',
       sync : 0,
     });
@@ -916,7 +1133,7 @@ function versionLocalRetrive( o )
   return ready;
 }
 
-var defaults = versionLocalRetrive.defaults = Object.create( null );
+var defaults = localVersion.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.sync = 1;
 defaults.verbosity = 0;
@@ -928,12 +1145,12 @@ defaults.verbosity = 0;
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function versionRemoteLatestRetrive
+ * @function remoteVersionLatest
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-function versionRemoteLatestRetrive( o )
+function remoteVersionLatest( o )
 {
   let self = this;
   let path = _.uri;
@@ -941,7 +1158,7 @@ function versionRemoteLatestRetrive( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( versionRemoteLatestRetrive, o );
+  _.routineOptions( remoteVersionLatest, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -983,7 +1200,7 @@ function versionRemoteLatestRetrive( o )
   return ready;
 }
 
-var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
+var defaults = remoteVersionLatest.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.sync = 1;
 defaults.verbosity = 0;
@@ -996,12 +1213,12 @@ defaults.verbosity = 0;
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function versionRemoteCurrentRetrive
+ * @function remoteVersionCurrent
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-function versionRemoteCurrentRetrive( o )
+function remoteVersionCurrent( o )
 {
   let self = this;
   let path = _.uri;
@@ -1009,7 +1226,7 @@ function versionRemoteCurrentRetrive( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( versionRemoteCurrentRetrive, o );
+  _.routineOptions( remoteVersionCurrent, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -1020,7 +1237,7 @@ function versionRemoteCurrentRetrive( o )
     let parsed = self.path.parse( o.remotePath );
     if( parsed.isFixated )
     return parsed.hash;
-    return self.versionRemoteLatestRetrive( o );
+    return self.remoteVersionLatest( o );
   })
 
   if( o.sync )
@@ -1032,14 +1249,14 @@ function versionRemoteCurrentRetrive( o )
   return ready;
 }
 
-var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
+var defaults = remoteVersionCurrent.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.sync = 1;
 defaults.verbosity = 0;
 
 //
 
-function versionRemoteRetrive( o )
+function remoteVersion( o )
 {
   let self = this;
   let path = _.uri;
@@ -1047,7 +1264,7 @@ function versionRemoteRetrive( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( versionRemoteLatestRetrive, o );
+  _.routineOptions( remoteVersionLatest, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let ready = new _.Consequence().take( null );
@@ -1081,7 +1298,7 @@ function versionRemoteRetrive( o )
   return ready;
 }
 
-var defaults = versionRemoteRetrive.defaults = Object.create( null );
+var defaults = remoteVersion.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.sync = 1;
 defaults.verbosity = 0;
@@ -1112,7 +1329,7 @@ function isUpToDate( o )
 
   let ready = new _.Consequence().take( null );
 
-  ready.then( () => self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity, sync : 0 }) )
+  ready.then( () => self.localVersion({ localPath : o.localPath, verbosity : o.verbosity, sync : 0 }) )
   ready.then( ( currentVersion ) =>
   {
     if( !currentVersion )
@@ -1121,7 +1338,7 @@ function isUpToDate( o )
     if( parsed.hash === currentVersion )
     return true;
 
-    return self.versionRemoteRetrive({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
+    return self.remoteVersion({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
     .then( ( latestVersion ) => currentVersion === latestVersion )
   })
 
@@ -1199,7 +1416,8 @@ function isRepository( o )
     // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
     // return false;
 
-    if( !_.fileProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
+    // if( !_.fileProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
+    if( !_.fileProvider.isTerminal( self.pathConfigFromLocal( o.localPath ) ) )
     return false;
 
     return true;
@@ -1254,7 +1472,9 @@ function hasRemote( o )
       return result;
     }
 
-    let configPath = path.join( o.localPath, 'package.json' );
+    // self.pathConfigFromLocal( o.localPath )
+    // let configPath = path.join( o.localPath, 'package.json' );
+    let configPath = self.pathConfigFromLocal( o.localPath );
     let configExists = localProvider.fileExists( configPath );
 
     if( !configExists )
@@ -1312,10 +1532,20 @@ function hasLocalChanges( o )
 // declare
 // --
 
+let DepSectionsNames =
+[
+  'dependencies',
+  'devDependencies',
+  'optionalDependencies',
+  'bundledDependencies',
+  'peerDependencies',
+];
+
 let Extension =
 {
 
   protocols : [ 'npm' ],
+  DepSectionsNames,
 
   // path
 
@@ -1323,38 +1553,56 @@ let Extension =
   pathNativize,
   pathIsFixated,
   pathFixate,
+  pathConfigFromLocal, /* qqq : cover */
+  pathLocalFromConfig, /* qqq : cover */
+  pathDownloadFromLocal, /* qqq : cover */
+  pathLocalFromDownload, /* qqq : cover */
 
-  //
+  // write l2
 
-  packageJsonFormat,
-
-  //
-
-  publish,
+  format,
 
   fixate, /* qqq : cover please */
   structureFixate, /* qqq : cover please */
   bump, /* qqq : cover please */
   structureBump, /* qqq : cover please */
 
-  aboutFromRemote,
+  // structureDepAdd, /* qqq : implement and cover */
+  // depAdd, /* qqq : implement and cover */
+  structureDepRemove, /* qqq : implement and cover */
+  depRemove, /* qqq : cover */
 
   _readChangeWrite,
+  _readChangeWrite_functor,
 
-  dependantsRetrieve,
+  // write l3
+
+  publish,
+
+  // read l3
+
   versionLog,
+
+  // remote
+
+  remoteAbout,
+  remoteDependants,
+
+  // local
+
+  localName,
 
   // vcs
 
-  versionLocalRetrive,
-  versionRemoteLatestRetrive,
-  versionRemoteCurrentRetrive,
-  versionRemoteRetrive,
+  /* xxx : rename */
+  localVersion,
+  remoteVersionLatest,
+  remoteVersionCurrent,
+  remoteVersion,
   isUpToDate,
   hasFiles,
   isRepository,
   hasRemote,
-
   hasLocalChanges,
 
 }

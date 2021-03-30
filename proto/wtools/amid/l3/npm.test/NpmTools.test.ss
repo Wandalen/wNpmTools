@@ -6,8 +6,8 @@
 if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../wtools/Tools.s' );
-  _.include( 'wTesting' );
   require( '../npm/Include.ss' );
+  _.include( 'wTesting' );
 }
 
 let _ = _globals_.testing.wTools;
@@ -167,10 +167,10 @@ function pathFixate( test )
 
 //
 
-function packageJsonFormat( test )
+function format( test )
 {
   let self = this;
-  var a = test.assetFor( 'packageJsonFormat' );
+  var a = test.assetFor( 'format' );
 
   /* - */
 
@@ -184,7 +184,7 @@ function packageJsonFormat( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'bundledDependencies.json' ) });
+    var got = _.npm.format({ filePath : a.abs( 'bundledDependencies.json' ) });
     test.identical( got, true );
     return null;
   });
@@ -211,7 +211,7 @@ function packageJsonFormat( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'dependencies.json' ) });
+    var got = _.npm.format({ filePath : a.abs( 'dependencies.json' ) });
     test.identical( got, true );
     return null;
   });
@@ -238,7 +238,7 @@ function packageJsonFormat( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'devDependencies.json' ) });
+    var got = _.npm.format({ filePath : a.abs( 'devDependencies.json' ) });
     test.identical( got, true );
     return null;
   });
@@ -265,7 +265,7 @@ function packageJsonFormat( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'peerDependencies.json' ) });
+    var got = _.npm.format({ filePath : a.abs( 'peerDependencies.json' ) });
     test.identical( got, true );
     return null;
   });
@@ -292,7 +292,7 @@ function packageJsonFormat( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'peerDependenciesMeta.json' ) });
+    var got = _.npm.format({ filePath : a.abs( 'peerDependenciesMeta.json' ) });
     test.identical( got, true );
     return null;
   });
@@ -319,7 +319,7 @@ function packageJsonFormat( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.packageJsonFormat({ filePath : a.abs( 'package2.json' ) });
+    var got = _.npm.format({ filePath : a.abs( 'package2.json' ) });
     test.identical( got, true );
     return null;
   });
@@ -339,7 +339,7 @@ function packageJsonFormat( test )
   return a.ready;
 }
 
-packageJsonFormat.timeOut = 60000;
+format.timeOut = 60000;
 
 //
 
@@ -372,7 +372,7 @@ function fixate( test )
     'bundledDependencies' : [ 'package7', 'package8' ],
     'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
   }
-  /* aaa Artem : done. why fixateNotEmptyVersions is called only without callback onDependency? */
+  /* aaa Artem : done. why fixateNotEmptyVersions is called only without callback onDep? */
 
   test.identical( got, exp );
 
@@ -384,7 +384,7 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
-  var o = { localPath, tag, onDependency }
+  var o = { localPath, tag, onDep }
   var got = _.npm.fixate( o ).config;
   var exp =
   {
@@ -412,7 +412,7 @@ function fixate( test )
   test.true( _.strDefined( got.localPath ) );
   test.true( _.strDefined( got.configPath ) );
   test.identical( got.tag, '=' );
-  test.identical( got.onDependency, null );
+  test.identical( got.onDep, null );
   test.identical( got.dry, 0 );
   test.identical( got.verbosity, 0 );
   test.identical( got.changed, false );
@@ -497,7 +497,7 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateEmptyVersions' );
   var tag = '=';
-  var o = { localPath, tag, onDependency }
+  var o = { localPath, tag, onDep }
   var got = _.npm.fixate( o ).config;
   var exp =
   {
@@ -516,7 +516,7 @@ function fixate( test )
 
   /* callback */
 
-  function onDependency( dep )
+  function onDep( dep )
   {
     const depVersionsToFixate =
     {
@@ -613,14 +613,14 @@ Bumps package version
 
 //
 
-function aboutFromRemote( test )
+function remoteAbout( test )
 {
   let ready = _.take( null );
 
   ready.then( () =>
   {
     test.case = 'only name';
-    var got = _.npm.aboutFromRemote( 'wmodulefortesting1' );
+    var got = _.npm.remoteAbout( 'wmodulefortesting1' );
     test.identical( got.name, 'wmodulefortesting1' );
     test.identical( got.license, 'MIT' );
     return null;
@@ -630,7 +630,7 @@ function aboutFromRemote( test )
   {
     test.case = 'only name in map';
     var o = { name : 'wmodulefortesting1' };
-    var got = _.npm.aboutFromRemote( o );
+    var got = _.npm.remoteAbout( o );
     test.identical( got.name, 'wmodulefortesting1' );
     test.identical( got.license, 'MIT' );
     return null;
@@ -640,7 +640,7 @@ function aboutFromRemote( test )
   {
     test.case = 'package not exists, throwing - 0';
     var o = { name : 'notexists', throwing : 0 };
-    var got = _.npm.aboutFromRemote( o );
+    var got = _.npm.remoteAbout( o );
     test.identical( got, null );
     return null;
   });
@@ -650,7 +650,7 @@ function aboutFromRemote( test )
   ready.then( () =>
   {
     test.case = 'only name with tag ( dist version )';
-    var got = _.npm.aboutFromRemote( 'wmodulefortesting1!alpha' );
+    var got = _.npm.remoteAbout( 'wmodulefortesting1!alpha' );
     test.identical( got.name, 'wmodulefortesting1' );
     test.identical( got.license, 'MIT' );
     var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
@@ -662,7 +662,7 @@ function aboutFromRemote( test )
   {
     test.case = 'only name with tag ( dist version ) in map';
     var o = { name : 'wmodulefortesting1!alpha' };
-    var got = _.npm.aboutFromRemote( o );
+    var got = _.npm.remoteAbout( o );
     test.identical( got.name, 'wmodulefortesting1' );
     test.identical( got.license, 'MIT' );
     var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
@@ -674,7 +674,7 @@ function aboutFromRemote( test )
   {
     test.case = 'package not exists, name with tag ( dist version ), throwing - 0';
     var o = { name : 'notexists!alpha', throwing : 0 };
-    var got = _.npm.aboutFromRemote( o );
+    var got = _.npm.remoteAbout( o );
     test.identical( got, null );
     return null;
   });
@@ -684,7 +684,7 @@ function aboutFromRemote( test )
   ready.then( () =>
   {
     test.case = 'only name with tag ( version )';
-    var got = _.npm.aboutFromRemote( 'wmodulefortesting1!0.0.109' );
+    var got = _.npm.remoteAbout( 'wmodulefortesting1!0.0.109' );
     test.identical( got.name, 'wmodulefortesting1' );
     test.identical( got.license, 'MIT' );
     var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
@@ -696,7 +696,7 @@ function aboutFromRemote( test )
   {
     test.case = 'only name with tag ( version ) in map';
     var o = { name : 'wmodulefortesting1!0.0.109' };
-    var got = _.npm.aboutFromRemote( o );
+    var got = _.npm.remoteAbout( o );
     test.identical( got.name, 'wmodulefortesting1' );
     test.identical( got.license, 'MIT' );
     var exp = 'Module for testing. This module is a test asset and not intended to be used with another purpose.';
@@ -708,7 +708,7 @@ function aboutFromRemote( test )
   {
     test.case = 'package not exists, name with tag ( version ), throwing - 0';
     var o = { name : 'notexists!0.0.109', throwing : 0 };
-    var got = _.npm.aboutFromRemote( o );
+    var got = _.npm.remoteAbout( o );
     test.identical( got, null );
     return null;
   });
@@ -721,7 +721,7 @@ function aboutFromRemote( test )
     {
       test.case = 'unknown option in options map';
       var o = { name : 'notexists', unknown : 1 };
-      test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ) );
+      test.shouldThrowErrorSync( () => _.npm.remoteAbout( o ) );
       return null;
     });
 
@@ -734,7 +734,7 @@ function aboutFromRemote( test )
         test.identical( arg, undefined );
         test.identical( _.strCount( err.message, 'Failed to get information about remote module "notexists"' ), 1 );
       };
-      test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ), errCallback );
+      test.shouldThrowErrorSync( () => _.npm.remoteAbout( o ), errCallback );
       return null;
     });
 
@@ -747,7 +747,7 @@ function aboutFromRemote( test )
         test.identical( arg, undefined );
         test.identical( _.strCount( err.message, 'Wrong version tag "notexists"' ), 1 );
       };
-      test.shouldThrowErrorSync( () => _.npm.aboutFromRemote( o ), errCallback );
+      test.shouldThrowErrorSync( () => _.npm.remoteAbout( o ), errCallback );
       return null;
     });
   }
@@ -757,7 +757,7 @@ function aboutFromRemote( test )
 
 //
 
-function versionLocalRetrive( test )
+function localVersion( test )
 {
   let self = this;
   let a = test.assetFor( false );
@@ -766,85 +766,85 @@ function versionLocalRetrive( test )
   /* aaa Artem : done. avoid using _.path.* in tests, use a.abs() instead please */
 
   test.case = 'path doesn`t exist'
-  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  var got = _.npm.localVersion({ localPath : testPath })
   test.identical( got, '' );
 
   _.fileProvider.dirMake( testPath );
 
   test.case = 'no package'
-  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  var got = _.npm.localVersion({ localPath : testPath })
   test.identical( got, '' );
 
   test.case = 'after init'
   var data = { version : '1.0.0' }
   _.fileProvider.fileWrite({ filePath, data, encoding : 'json' })
-  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  var got = _.npm.localVersion({ localPath : testPath })
   test.identical( got, '1.0.0' );
 
   test.case = 'after init'
   var data = { version : null }
   _.fileProvider.fileWrite({ filePath, data, encoding : 'json' })
-  var got = _.npm.versionLocalRetrive({ localPath : testPath })
+  var got = _.npm.localVersion({ localPath : testPath })
   test.identical( got, null );
 }
 
-versionLocalRetrive.timeOut = 300000;
+localVersion.timeOut = 300000;
 
 //
 
-function versionRemoteLatestRetrive( test )
+function remoteVersionLatest( test )
 {
 
   /* aaa Artem : done. use modules for testing instead of production modules here and everywhere */
   var remotePath = 'npm:///wmodulefortesting1';
-  var got = _.npm.versionRemoteLatestRetrive( remotePath );
+  var got = _.npm.remoteVersionLatest( remotePath );
   test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1@latest';
-  var got = _.npm.versionRemoteLatestRetrive( remotePath );
+  var got = _.npm.remoteVersionLatest( remotePath );
   test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1@beta';
-  var got = _.npm.versionRemoteLatestRetrive( remotePath );
+  var got = _.npm.remoteVersionLatest( remotePath );
   test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1#0.0.3';
-  var got = _.npm.versionRemoteLatestRetrive( remotePath );
+  var got = _.npm.remoteVersionLatest( remotePath );
   test.true( _.strDefined( got ) );
 
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1' ))
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1@beta' ))
-  test.shouldThrowErrorSync( () => _.npm.versionRemoteLatestRetrive( 'npm:///wmodulefortestinggg1#0.0.3' ))
+  test.shouldThrowErrorSync( () => _.npm.remoteVersionLatest( 'npm:///wmodulefortestinggg1' ))
+  test.shouldThrowErrorSync( () => _.npm.remoteVersionLatest( 'npm:///wmodulefortestinggg1@beta' ))
+  test.shouldThrowErrorSync( () => _.npm.remoteVersionLatest( 'npm:///wmodulefortestinggg1#0.0.3' ))
 
 }
 
-versionRemoteLatestRetrive.timeOut = 30000;
+remoteVersionLatest.timeOut = 30000;
 
 //
 
-function versionRemoteCurrentRetrive( test )
+function remoteVersionCurrent( test )
 {
   var remotePath = 'npm:///wmodulefortesting1'
-  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  var got = _.npm.remoteVersionCurrent( remotePath );
   test.true( _.strDefined( got ) );
 
   var remotePath = 'npm:///wmodulefortesting1@latest'
-  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  var got = _.npm.remoteVersionCurrent( remotePath );
   test.true( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
   var remotePath = 'npm:///wmodulefortesting1@beta'
-  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  var got = _.npm.remoteVersionCurrent( remotePath );
   test.true( _.strDefined( got ) );
   test.notIdentical( got, remotePath );
 
   var remotePath = 'npm:///wmodulefortesting1#0.0.3'
-  var got = _.npm.versionRemoteCurrentRetrive( remotePath );
+  var got = _.npm.remoteVersionCurrent( remotePath );
   test.true( _.strDefined( got ) );
   test.identical( got, '0.0.3' );
 }
 
-versionRemoteCurrentRetrive.timeOut = 30000;
+remoteVersionCurrent.timeOut = 30000;
 
 //
 
@@ -1116,88 +1116,88 @@ hasRemote.timeOut = 60000;
 
 //
 
-async function dependantsRetrieve( test )
+async function remoteDependants( test )
 {
   test.open( 'string as a parameter' );
   {
     test.open( '0 dependants' );
     test.case = 'local relative';
-    let got = await _.npm.dependantsRetrieve( 'wmodulefortesting12ab' );
+    let got = await _.npm.remoteDependants( 'wmodulefortesting12ab' );
     let exp = 0;
     test.identical( got, exp );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( 'npm://wmodulefortesting12ab' );
+    got = await _.npm.remoteDependants( 'npm://wmodulefortesting12ab' );
     exp = 0;
     test.identical( got, exp );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( 'npm:///wmodulefortesting12ab' );
+    got = await _.npm.remoteDependants( 'npm:///wmodulefortesting12ab' );
     exp = 0;
     test.identical( got, exp );
     test.close( '0 dependants' );
 
     test.open( 'not 0 dependants' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( 'wmodulefortesting1a' );
+    got = await _.npm.remoteDependants( 'wmodulefortesting1a' );
     exp = 1;
     test.identical( got, exp );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( 'npm://wmodulefortesting1a' );
+    got = await _.npm.remoteDependants( 'npm://wmodulefortesting1a' );
     exp = 1;
     test.identical( got, exp );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( 'npm:///wmodulefortesting1a' );
+    got = await _.npm.remoteDependants( 'npm:///wmodulefortesting1a' );
     exp = 1;
     test.identical( got, exp );
     test.close( 'not 0 dependants' );
 
     test.open( 'pakage name has "/"' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( '@tensorflow/tfjs' );
+    got = await _.npm.remoteDependants( '@tensorflow/tfjs' );
     test.gt( got, 100 );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( 'npm://@tensorflow/tfjs' );
+    got = await _.npm.remoteDependants( 'npm://@tensorflow/tfjs' );
     test.gt( got, 100 );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( 'npm:///@tensorflow/tfjs' );
+    got = await _.npm.remoteDependants( 'npm:///@tensorflow/tfjs' );
     test.gt( got, 100 );
     test.close( 'pakage name has "/"' );
 
     test.open( 'dependants > 999' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( 'express' );
+    got = await _.npm.remoteDependants( 'express' );
     test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( 'npm://express' );
+    got = await _.npm.remoteDependants( 'npm://express' );
     test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( 'npm:///express' );
+    got = await _.npm.remoteDependants( 'npm:///express' );
     test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
     test.close( 'dependants > 999' );
 
     test.open( 'nonexistent package name' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( 'nonexistentPackageName' );
+    got = await _.npm.remoteDependants( 'nonexistentPackageName' );
     exp = NaN;
     test.identical( got, exp );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( 'npm://nonexistentPackageName' );
+    got = await _.npm.remoteDependants( 'npm://nonexistentPackageName' );
     exp = NaN;
     test.identical( got, exp );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( 'npm:///nonexistentPackageName' );
+    got = await _.npm.remoteDependants( 'npm:///nonexistentPackageName' );
     exp = NaN;
     test.identical( got, exp );
     test.close( 'nonexistent package name' );
@@ -1208,82 +1208,82 @@ async function dependantsRetrieve( test )
   {
     test.open( '0 dependants' );
     test.case = 'local relative';
-    let got = await _.npm.dependantsRetrieve( { remotePath : 'wmodulefortesting12ab' } );
+    let got = await _.npm.remoteDependants( { remotePath : 'wmodulefortesting12ab' } );
     let exp = 0;
     test.identical( got, exp );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm://wmodulefortesting12ab' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm://wmodulefortesting12ab' } );
     exp = 0;
     test.identical( got, exp );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///wmodulefortesting12ab' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm:///wmodulefortesting12ab' } );
     exp = 0;
     test.identical( got, exp );
     test.close( '0 dependants' );
 
     test.open( 'not 0 dependants' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'wmodulefortesting1a' } );
+    got = await _.npm.remoteDependants( { remotePath : 'wmodulefortesting1a' } );
     exp = 1;
     test.identical( got, exp );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm://wmodulefortesting1a' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm://wmodulefortesting1a' } );
     exp = 1;
     test.identical( got, exp );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///wmodulefortesting1a' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm:///wmodulefortesting1a' } );
     exp = 1;
     test.identical( got, exp );
     test.close( 'not 0 dependants' );
 
     test.open( 'pakage name has "/"' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : '@tensorflow/tfjs' } );
+    got = await _.npm.remoteDependants( { remotePath : '@tensorflow/tfjs' } );
     test.gt( got, 100 );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm://@tensorflow/tfjs' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm://@tensorflow/tfjs' } );
     test.gt( got, 100 );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///@tensorflow/tfjs' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm:///@tensorflow/tfjs' } );
     test.gt( got, 100 );
     test.close( 'pakage name has "/"' );
 
     test.open( 'dependants > 999' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'express' } );
+    got = await _.npm.remoteDependants( { remotePath : 'express' } );
     test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm://express' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm://express' } );
     test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///express' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm:///express' } );
     test.true( _.numberIs( got ) );
     test.gt( got, 10000 );
     test.close( 'dependants > 999' );
 
     test.open( 'nonexistent package name' );
     test.case = 'local relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'nonexistentPackageName' } );
+    got = await _.npm.remoteDependants( { remotePath : 'nonexistentPackageName' } );
     exp = NaN;
     test.identical( got, exp );
 
     test.case = 'global relative';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm://nonexistentPackageName' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm://nonexistentPackageName' } );
     exp = NaN;
     test.identical( got, exp );
 
     test.case = 'global absolute';
-    got = await _.npm.dependantsRetrieve( { remotePath : 'npm:///nonexistentPackageName' } );
+    got = await _.npm.remoteDependants( { remotePath : 'npm:///nonexistentPackageName' } );
     exp = NaN;
     test.identical( got, exp );
     test.close( 'nonexistent package name' );
@@ -1291,7 +1291,7 @@ async function dependantsRetrieve( test )
   test.close( 'map as a parameter' );
 }
 
-dependantsRetrieve.description =
+remoteDependants.description =
 `
 Retrieves the number of dependent packages
 `
@@ -1318,7 +1318,7 @@ function dependantsRetrieveMultipleRequests( test )
       'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
-    return _.npm.dependantsRetrieve( names )
+    return _.npm.remoteDependants( names )
     .then( ( got ) =>
     {
       var exp =
@@ -1353,7 +1353,7 @@ function dependantsRetrieveMultipleRequests( test )
       'wmodulefortesting1', 'wmodulefortesting1a', 'wmodulefortesting1b',
       'wmodulefortesting12', 'wmodulefortesting12ab', 'nonexistentPackageName',
     ];
-    return _.npm.dependantsRetrieve({ remotePath : names, attemptLimit : 20, attemptDelay : 500 })
+    return _.npm.remoteDependants({ remotePath : names, attemptLimit : 20, attemptDelay : 500 })
     .then( ( got ) =>
     {
       var exp =
@@ -1384,7 +1384,7 @@ function dependantsRetrieveMultipleRequests( test )
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
       'nonexistentName', 'nonexistentName1', 'nonexistentName2', 'nonexistentName', 'nonexistentName1', 'nonexistentName2',
     ];
-    return _.npm.dependantsRetrieve({ remotePath : wrongNames, attemptLimit : 20, attemptDelay : 500 })
+    return _.npm.remoteDependants({ remotePath : wrongNames, attemptLimit : 20, attemptDelay : 500 })
     .then( ( got ) =>
     {
       var exp =
@@ -1432,7 +1432,7 @@ async function dependantsRetrieveStress( test )
   }
 
   test.case = `${remotePath.length} packages`;
-  let got = await _.npm.dependantsRetrieve({ remotePath, verbosity : 3, attemptLimit : 20, attemptDelay : 500 });
+  let got = await _.npm.remoteDependants({ remotePath, verbosity : 3, attemptLimit : 20, attemptDelay : 500 });
   test.identical( got, exp );
 }
 
@@ -1474,24 +1474,24 @@ const Proto =
 
     //
 
-    packageJsonFormat,
+    format,
 
     //
 
     fixate,
     bump,
 
-    aboutFromRemote,
+    remoteAbout,
 
-    versionLocalRetrive,
-    versionRemoteLatestRetrive,
-    versionRemoteCurrentRetrive,
+    localVersion,
+    remoteVersionLatest,
+    remoteVersionCurrent,
 
     isUpToDate,
     isRepository,
     hasRemote,
 
-    dependantsRetrieve,
+    remoteDependants,
     dependantsRetrieveMultipleRequests,
     dependantsRetrieveStress,
 
