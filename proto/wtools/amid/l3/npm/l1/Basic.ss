@@ -71,13 +71,15 @@ function _readChangeWrite_functor( fo )
 {
 
   if( !_.mapIs( fo ) )
-  fo = { onChange : arguments[ 0 ] }
+  fo = { onChange : arguments[ 0 ], name : arguments[ 1 ] }
 
   fo = _.routineOptions( _readChangeWrite_functor, fo );
   fo.head = fo.head || head;
   fo.body = fo.body || body;
 
+  const name = fo.name;
   const onChange = fo.onChange;
+  _.assert( _.strDefined( name ) );
   _.assert( _.routineIs( onChange ) );
 
   if( !fo.body.defaults && fo.onChange.defaults )
@@ -112,7 +114,7 @@ function _readChangeWrite_functor( fo )
     }
     catch( err )
     {
-      throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+      throw _.err( err, `\nFailed to ${name} version of npm config ${o.configPath}` );
     }
 
     function onChangeCall( op )
@@ -132,6 +134,7 @@ _readChangeWrite_functor.defaults =
   head : null,
   body : null,
   onChange : null,
+  name : null,
 }
 
 // --
@@ -499,7 +502,7 @@ structureFixate.defaults =
  * @module Tools/mid/NpmTools
  */
 
-const fixate = _readChangeWrite_functor( structureFixate );
+const fixate = _readChangeWrite_functor( structureFixate, 'fixate' );
 
 var defaults = fixate.defaults;
 defaults.verbosity = 0;
@@ -648,7 +651,7 @@ structureBump.defaults =
 //   verbosity : 0,
 // }
 
-const bump = _readChangeWrite_functor( structureBump );
+const bump = _readChangeWrite_functor( structureBump, 'bump' );
 
 var defaults = bump.defaults;
 defaults.verbosity = 0;
