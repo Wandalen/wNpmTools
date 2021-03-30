@@ -673,8 +673,12 @@ function structureDepRemove( o )
   o = _.routine.options( structureDepRemove, o );
   _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
   _.assert( o.kind === null, 'not implemented' );
+  _.assert( _.objectIs( o.config ) );
 
-  x
+  self.DepSectionsNames.forEach( ( e ) =>
+  {
+    
+  });
 
 }
 
