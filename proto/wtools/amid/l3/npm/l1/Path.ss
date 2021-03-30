@@ -5,7 +5,6 @@
 
 const _ = _global_.wTools;
 const Parent = _.uri; /* qqq : for Dmytro : ? */
-debugger;
 const Self = _.npm.path = _.npm.path || Object.create( Parent );
 
 // --

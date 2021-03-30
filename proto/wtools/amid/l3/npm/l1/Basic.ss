@@ -16,7 +16,6 @@ function _readChangeWrite_functor( fo )
   {
     localPath : null,
     configPath : null,
-    nativize : 0,
     dry : 0,
     verbosity : 0,
     onChange : null,
@@ -109,12 +108,7 @@ function _readChangeWrite_functor( fo )
     if( !o.changed )
     return o;
 
-    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented option `nativize` that nativize output file to NPM utility */
-
-    if( o.nativize )
-    {
-      return _.npm.format({ filePath : o.packagePath })
-    }
+    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : it had sense only in previous realization, not callback onChange is used instead */
 
     let encoder = _.gdf.selectSingleContext
     ({
@@ -406,6 +400,8 @@ function structureFormat( o )
     o.config[ depSectionsNames[ i ] ] = result;
   }
 
+  o.changed = true;
+
   return o.config;
 
   /* */
@@ -424,21 +420,22 @@ structureFormat.defaults =
 //
 
 /* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : implemented and used */
-function format( o )
-{
-  let fileProvider = _.fileProvider;
-
-  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
-  _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
-
-  let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
-  config = _.npm.structureFormat( config );
-  fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
-  return true;
-}
-
-format.defaults = Object.create( null );
-format.defaults.filePath = null;
+const format = _readChangeWrite_functor( structureFormat, 'format' );
+// function format( o )
+// {
+//   let fileProvider = _.fileProvider;
+//
+//   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+//   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
+//
+//   let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
+//   config = _.npm.structureFormat( config );
+//   fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
+//   return true;
+// }
+//
+// format.defaults = Object.create( null );
+// format.defaults.filePath = null;
 
 //
 
