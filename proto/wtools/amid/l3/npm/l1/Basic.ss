@@ -30,24 +30,21 @@ function _readChangeWrite( o )
 
   /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented option `nativize` that nativize output file to NPM utility */
 
-  let str;
   if( o.nativize )
   {
-    o.config = regularDependenciesSort( o.config );
-    str = JSON.stringify( o.config, null, '  ' ) + '\n';
+    return _.npm.format({ filePath : o.packagePath })
   }
-  else
-  {
-    let encoder = _.gdf.selectSingleContext
-    ({
-      inFormat : 'structure',
-      outFormat : 'string',
-      ext : 'json',
-      feature : { fine : 1 },
-    })
-    str = encoder.encode({ data : o.config }).out.data;
-    str = str.replace( /\s\n/mg, '\n' ) + '\n';
-  }
+
+  let encoder = _.gdf.selectSingleContext
+  ({
+    inFormat : 'structure',
+    outFormat : 'string',
+    ext : 'json',
+    feature : { fine : 1 },
+  })
+  let str = encoder.encode({ data : o.config }).out.data;
+
+  str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
   if( o.verbosity >= 2 )
   logger.log( str );
@@ -61,41 +58,6 @@ function _readChangeWrite( o )
   _.fileProvider.fileWrite( o.configPath, o.config );
 
   return o;
-
-  /* */
-
-  function regularDependenciesSort( config )
-  {
-    const dependencies =
-    [
-      'dependencies',
-      'devDependencies',
-      'optionalDependencies',
-      'peerDependencies',
-    ];
-    for( let i = 0; i < dependencies.length; i++ )
-    if( config[ dependencies[ i ] ] )
-    {
-      const src = config[ dependencies[ i ] ];
-      const result = Object.create( null );
-      const keys = _.mapKeys( src );
-      keys.sort( sortElements );
-
-      for( let i = 0; i < keys.length; i++ )
-      result[ keys[ i ] ] = src[ keys[ i ] ];
-
-      config[ dependencies[ i ] ] = result;
-    }
-
-    return config;
-  }
-
-  /* */
-
-  function sortElements( a, b )
-  {
-    return a.toLowerCase().localeCompare( b.toLowerCase() );
-  }
 }
 
 _readChangeWrite.defaults =
@@ -421,73 +383,66 @@ function pathLocalFromDownload( configPath )
 // write l2
 // --
 
-/* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : in accordance to new consequences, the private routine _readChangeWrite is used instead. Routine _readChangeWrite is extended by option `nativize` to format config into native NPM format */
+function structureFormat( o )
+{
+  let depSectionsNames =
+  [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+    'peerDependencies',
+  ];
+
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+  _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
+
+  for( let i = 0; i < depSectionsNames.length; i++ )
+  if( o.config[ depSectionsNames[ i ] ] )
+  {
+    const src = o.config[ depSectionsNames[ i ] ];
+    const result = Object.create( null );
+    const keys = _.mapKeys( src );
+    keys.sort( sortElements );
+
+    for( let i = 0; i < keys.length; i++ )
+    result[ keys[ i ] ] = src[ keys[ i ] ];
+
+    o.config[ depSectionsNames[ i ] ] = result;
+  }
+
+  return o.config;
+
+  /* */
+
+  function sortElements( a, b )
+  {
+    return a.toLowerCase().localeCompare( b.toLowerCase() );
+  }
+}
+
+structureFormat.defaults =
+{
+  config : null,
+};
+
+//
+
+/* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : implemented and used */
 function format( o )
 {
-  let self = this;
+  let fileProvider = _.fileProvider;
 
   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
-  _.routineOptions( format, o );
 
-  self._readChangeWrite
-  ({
-    configPath : o.filePath,
-    nativize : 1,
-    verbosity : o.verbosity,
-    onChange
-  });
+  let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
+  config = _.npm.structureFormat( config );
+  fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
   return true;
-
-  // let fileProvider = _.fileProvider;
-  // let depSectionsNames =
-  // [
-  //   'dependencies',
-  //   'devDependencies',
-  //   'optionalDependencies',
-  //   'peerDependencies',
-  // ];
-  //
-  // _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
-  // _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
-  //
-  // let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
-  // config = regularDependenciesSort( config );
-  // fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
-  // return true;
-  //
-  // /* */
-  //
-  // function regularDependenciesSort( config )
-  // {
-  //   for( let i = 0; i < depSectionsNames.length; i++ )
-  //   if( config[ depSectionsNames[ i ] ] )
-  //   {
-  //     const src = config[ depSectionsNames[ i ] ];
-  //     const result = Object.create( null );
-  //     const keys = _.mapKeys( src );
-  //     keys.sort( sortElements );
-  //
-  //     for( let i = 0; i < keys.length; i++ )
-  //     result[ keys[ i ] ] = src[ keys[ i ] ];
-  //
-  //     config[ depSectionsNames[ i ] ] = result;
-  //   }
-  //
-  //   return config;
-  // }
-  //
-  // /* */
-  //
-  // function sortElements( a, b )
-  // {
-  //   return a.toLowerCase().localeCompare( b.toLowerCase() );
-  // }
 }
 
 format.defaults = Object.create( null );
 format.defaults.filePath = null;
-format.defaults.verbosity = 0;
 
 //
 
@@ -1676,6 +1631,7 @@ let Extension =
 
   // write l2
 
+  structureFormat,
   format,
 
   fixate, /* qqq : cover please */
