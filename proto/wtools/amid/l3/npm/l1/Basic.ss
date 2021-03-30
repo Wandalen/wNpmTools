@@ -156,6 +156,40 @@ _readChangeWrite_functor.defaults =
   name : null,
 }
 
+//
+
+function _read( routine, args )
+{
+  let self = this;
+  let path = _.uri;
+  let o = args[ 0 ];
+
+  if( _.strIs( o ) )
+  o = { localPath : o }
+
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine, o );
+  _.map.assertHasAll( o, _read.defaults );
+
+  if( o.config === null || o.config === undefined )
+  {
+    if( !o.configPath )
+    o.configPath = self.pathConfigFromLocal( o.localPath );
+    if( !_.fileProvider.fileExists( o.configPath ) )
+    return;
+    o.config = _.fileProvider.configRead( o.configPath );
+  }
+
+  return o;
+}
+
+_read.defaults =
+{
+  config : null,
+  localPath : null,
+  configPath : null,
+}
+
 // --
 // path
 // --
@@ -184,6 +218,7 @@ function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
   let self = this;
   let path = _.uri;
   let result = Object.create( null );
+  /* xxx : qqq : for Dmytro : use path and fileProvider of self everywhere in module::NpmToools and module::GitTools */
 
   if( _.mapIs( remotePath ) )
   return remotePath;
@@ -498,7 +533,8 @@ function structureFixate( o )
     }
   });
 
-  return o.changed;
+  // return o.changed;
+  return o;
 }
 
 structureFixate.defaults =
@@ -599,7 +635,8 @@ function structureBump( o )
   o.changed = true;
   o.config.version = version;
 
-  return version;
+  // return version;
+  return o;
 
   function depVersionPatch( dep )
   {
@@ -700,7 +737,7 @@ function structureDepRemove( o )
   _.assert( _.objectIs( o.config ) );
   _.assert( _.strDefined( o.depPath ) );
 
-  o.changed = false; debugger;
+  o.changed = false;
   self.DepSectionsNames.forEach( ( e ) =>
   {
     if( o.config[ e ] )
@@ -711,6 +748,7 @@ function structureDepRemove( o )
     }
   });
 
+  return o;
 }
 
 /* qqq : cover. take into account complex cases. */
@@ -719,7 +757,7 @@ structureDepRemove.defaults =
 {
   config : null,
   depPath : null,
-  kind : null,
+  kind : null, /* xxx : qqq : implement and make possible to path countable to select several kinds */
 }
 
 const depRemove = _readChangeWrite_functor
@@ -773,6 +811,55 @@ const depRemove = _readChangeWrite_functor
 //   verbosity : 0,
 //   ... structureDepRemove.defaults,
 // }
+
+//
+
+/* qqq : cover */
+
+function filePathAdd_head( routine, args )
+{
+  let o = args[ 0 ];
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ], filePath : arguments[ 1 ] }
+  o = _.routine.options( routine, args );
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1 );
+  if( routine.defaults.verbosity !== undefined )
+  if( !o.verbosity || o.verbosity < 0 )
+  o.verbosity = 0;
+  return o;
+}
+
+function structureFilePathAdd( o )
+{
+  let self = this;
+
+  _.assert( _.objectIs( o.config ) );
+  _.assert( _.strIs( o.filePath ) || _.strsAre( o.filePath ) );
+
+  o.changed = false;
+  o.config.files = o.config.files || [];
+
+  let length = o.config.files.length;
+  _.arrayAppendArraysOnce( o.config.files, o.filePath );
+  if( length !== o.config.files.length )
+  o.changed = true;
+
+  return o;
+}
+
+structureFilePathAdd.defaults =
+{
+  config : null,
+  filePath : null,
+}
+
+const filePathAdd = _readChangeWrite_functor
+({
+  name : 'filePathAdd',
+  head : filePathAdd_head,
+  onChange : structureFilePathAdd,
+});
 
 // --
 // write l3
@@ -1107,23 +1194,9 @@ function localName( o )
 {
   let self = this;
   let path = _.uri;
-  /* xxx : qqq : for Dmytro : use path and fileProvider of self everywhere in module::NpmToools and module::GitTools */
-
-  if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ] }
-
-  _.routine.options( localName, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
+  o = _read( localName, arguments );
   if( !o.config )
-  {
-    if( !o.configPath )
-    o.configPath = self.pathConfigFromLocal( o.localPath );
-    if( !_.fileProvider.fileExists( o.configPath ) )
-    return;
-    o.config = _.fileProvider.configRead( o.configPath );
-  }
-
+  return;
   return o.config.name;
 }
 
@@ -1140,26 +1213,32 @@ function localEntryPath( o )
 {
   let self = this;
   let path = _.uri;
-
-  if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ] }
-
-  _.routine.options( localEntryPath, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
+  o = _read( localEntryPath, arguments );
   if( !o.config )
-  {
-    if( !o.configPath )
-    o.configPath = self.pathConfigFromLocal( o.localPath );
-    if( !_.fileProvider.fileExists( o.configPath ) )
-    return;
-    o.config = _.fileProvider.configRead( o.configPath );
-  }
-
+  return;
   return o.config.main;
 }
 
 localEntryPath.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+}
+
+//
+
+function localFilePath( o )
+{
+  let self = this;
+  let path = _.uri;
+  o = _read( localFilePath, arguments );
+  if( !o.config )
+  return;
+  return o.config.files;
+}
+
+localFilePath.defaults =
 {
   localPath : null,
   configPath : null,
@@ -1645,6 +1724,7 @@ let Extension =
 
   _readChangeWrite,
   _readChangeWrite_functor,
+  _read,
 
   // path
 
@@ -1671,6 +1751,9 @@ let Extension =
   structureDepRemove, /* qqq : implement and cover */
   depRemove, /* qqq : cover */
 
+  structureFilePathAdd, /* qqq : implement and cover */
+  filePathAdd, /* qqq : cover */
+
   // write l3
 
   publish,
@@ -1688,6 +1771,7 @@ let Extension =
 
   localName,
   localEntryPath,
+  localFilePath,
 
   // vcs
 
