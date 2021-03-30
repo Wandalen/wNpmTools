@@ -158,6 +158,8 @@ module:
         path:
           - ../proto
           - ../proto/Integration.test.ss
+          - ../proto/node_modules
+          - ../proto/node_modules/wnpmtools
           - ../proto/wtools
           - ../proto/wtools/Tools.s
           - ../proto/wtools/abase
@@ -1541,3 +1543,4 @@ module:
         hash: 27a5b2907f117627bd011632511b8e7a
         size: 5144
       wNpmTools.out.will.yml: *ref_0
+
