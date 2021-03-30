@@ -6,14 +6,80 @@
 const _ = _global_.wTools;
 const Self = _.npm = _.npm || Object.create( null );
 
+_.assert( _.routineIs( _.strLinesIndentation ) );
+
 // --
 // meta
 // --
+
+// function _readChangeWrite( o )
+// {
+//   let self = this;
+//   let logger = o.logger || _global_.logger;
+//
+//   o = _.routine.options( _readChangeWrite, o );
+//   if( !o.verbosity || o.verbosity < 0 )
+//   o.verbosity = 0;
+//
+//   if( !o.configPath )
+//   o.configPath = self.pathConfigFromLocal( o.localPath );
+//   o.config = _.fileProvider.configRead( o.configPath );
+//
+//   o.changed = o.onChange.call( self, o );
+//
+//   _.assert( _.boolIs( o.changed ) );
+//   if( !o.changed )
+//   return o;
+//
+//   /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
+//
+//   let encoder = _.gdf.selectSingleContext
+//   ({
+//     inFormat : 'structure',
+//     outFormat : 'string',
+//     ext : 'json',
+//     feature : { fine : 1 },
+//   })
+//
+//   let str = encoder.encode({ data : o.config }).out.data;
+//
+//   _.assert( _.strIs( str ) );
+//
+//   str = str.replace( /\s\n/mg, '\n' ) + '\n';
+//
+//   if( o.verbosity )
+//   logger.log( `Rewriting ${o.configPath}` );
+//   if( o.verbosity >= 2 )
+//   logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
+//
+//   if( o.dry )
+//   return o;
+//
+//   // if( str )
+//   _.fileProvider.fileWrite( o.configPath, str );
+//   // else
+//   // _.fileProvider.fileWrite( o.configPath, o.config );
+//
+//   return o;
+// }
+//
+// _readChangeWrite.defaults =
+// {
+//   localPath : null,
+//   configPath : null,
+//   dry : 0,
+//   verbosity : 0,
+//   onChange : null,
+// }
+
+//
 
 function _readChangeWrite_functor( fo )
 {
   let defaults =
   {
+    logger : null,
+    nativize : null,
     localPath : null,
     configPath : null,
     dry : 0,
@@ -29,9 +95,9 @@ function _readChangeWrite_functor( fo )
   fo.body = fo.body || body;
 
   const name = fo.name;
-  const onChange = fo.onChange;
+  // const onChange = fo.onChange;
   _.assert( _.strDefined( name ) );
-  _.assert( _.routineIs( onChange ) );
+  _.assert( _.routineIs( fo.onChange ) );
   _.assert( _.aux.is( fo.onChange.defaults ) );
   _.assert( fo.onChange.defaults.config !== undefined );
 
@@ -68,9 +134,11 @@ function _readChangeWrite_functor( fo )
 
     try
     {
-      let o2 = _.mapOnly_( null, o, defaults );
-      o2.onChange = onChangeCall;
-      _readChangeWrite( o2 );
+      let o2 = _.mapExtend( null, o );
+      _.mapSupplement( null, o2, defaults );
+      o2.onChange = fo.onChange;
+      // o2.onChange = onChangeCall;
+      _readChangeWrite.call( self, o2 );
       _.mapExtend( o, o2 );
       return o;
     }
@@ -79,58 +147,73 @@ function _readChangeWrite_functor( fo )
       throw _.err( err, `\nFailed to ${name} version of npm config ${o.configPath}` );
     }
 
-    function onChangeCall( op )
-    {
-      let o2 = Object.create( null );
-      _.mapOnly_( o2, o, onChange.defaults );
-      _.mapOnly_( o2, op, onChange.defaults );
-      onChange.call( self, o2 );
-      _.assert( _.boolIs( o2.changed ) );
-      return o2.changed;
-    }
+    // function onChangeCall( op )
+    // {
+    //   let o2 = Object.create( null );
+    //   _.mapOnly_( o2, o, onChange.defaults );
+    //   _.mapOnly_( o2, op, onChange.defaults );
+    //   onChange.call( self, o2 );
+    //   _.assert( _.boolIs( o2.changed ) );
+    //   return o2.changed;
+    // }
   }
 
   /* */
 
   function _readChangeWrite( o )
   {
-    o = _.routine.options( defaults, o );
-    if( !o.verbosity || o.verbosity < 0 )
-    o.verbosity = 0;
+    let logger = o.logger || _global_.logger;
 
     if( !o.configPath )
-    o.configPath = self.pathConfigFromLocal( o.localPath );
+    o.configPath = _.npm.pathConfigFromLocal( o.localPath );
     o.config = _.fileProvider.configRead( o.configPath );
 
-    o.changed = o.onChange( o );
+    let o2 = Object.create( null );
+    _.mapOnly_( o2, o, o.onChange.defaults );
+    _.routine.options( o.onChange, o2 );
+    o.onChange.call( this, o2 );
+    _.assert( _.boolIs( o2.changed ) );
+    o.changed = o2.changed;
+    o.config = o2.config;
+    // o.changed = o.onChange.call( self, o );
 
-    _.assert( _.boolIs( o.changed ) );
     if( !o.changed )
     return o;
 
-    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : it had sense only in previous realization, not callback onChange is used instead */
+    /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
 
-    let encoder = _.gdf.selectSingleContext
-    ({
-      inFormat : 'structure',
-      outFormat : 'string',
-      ext : 'json',
-      feature : { fine : 1 },
-    })
-    let str = encoder.encode({ data : o.config }).out.data;
+    let str;
+    if( o.nativize )
+    {
+      o.config = _.npm.structureFormat({ config : o.config });
+      str = JSON.stringify( o.config, null, '  ' ) + '\n';
+    }
+    else
+    {
+      let encoder = _.gdf.selectSingleContext
+      ({
+        inFormat : 'structure',
+        outFormat : 'string',
+        ext : 'json',
+        feature : { fine : 1 },
+      });
 
-    str = str.replace( /\s\n/mg, '\n' ) + '\n';
+      str = encoder.encode({ data : o.config }).out.data;
+      str = str.replace( /\s\n/mg, '\n' ) + '\n';
+    };
 
+    _.assert( _.strIs( str ) );
+
+
+    if( o.verbosity )
+    logger.log( `Rewriting ${o.configPath}` );
     if( o.verbosity >= 2 )
-    logger.log( str );
+    logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
 
     if( o.dry )
     return o;
 
-    if( str )
     _.fileProvider.fileWrite( o.configPath, str );
-    else
-    _.fileProvider.fileWrite( o.configPath, o.config );
 
     return o;
   }
@@ -375,6 +458,9 @@ function pathLocalFromDownload( configPath )
 
 function structureFormat( o )
 {
+  if( o.changed === true )
+  return o.config;
+
   let depSectionsNames =
   [
     'dependencies',
@@ -382,6 +468,9 @@ function structureFormat( o )
     'optionalDependencies',
     'peerDependencies',
   ];
+
+  const npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
+  const sortElements = npmJsVersionIsNewer ? sortElementsForward : sortElementsBackward;
 
   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
@@ -406,9 +495,30 @@ function structureFormat( o )
 
   /* */
 
-  function sortElements( a, b )
+  function npmMajorVersionIsNewerOrSame( majorVersion )
+  {
+    let op = _.process.start
+    ({
+      execPath : 'npm --version',
+      outputCollecting : 1,
+      mode : 'shell',
+      sync : 1,
+    });
+    return _.number.from( op.output[ 0 ] ) >= majorVersion;
+  }
+
+  /* */
+
+  function sortElementsForward( a, b )
   {
     return a.toLowerCase().localeCompare( b.toLowerCase() );
+  }
+
+  /* */
+
+  function sortElementsBackward( a, b )
+  {
+    return b.toLowerCase().localeCompare( a.toLowerCase() );
   }
 }
 
@@ -421,6 +531,11 @@ structureFormat.defaults =
 
 /* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : implemented and used */
 const format = _readChangeWrite_functor( structureFormat, 'format' );
+format.defaults =
+{
+  configPath : null,
+  nativize : 1,
+};
 // function format( o )
 // {
 //   let fileProvider = _.fileProvider;
@@ -697,14 +812,16 @@ function structureDepRemove( o )
   _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
   _.assert( o.kind === null, 'not implemented' );
   _.assert( _.objectIs( o.config ) );
+  _.assert( _.strDefined( o.depPath ) );
 
   o.changed = false;
   self.DepSectionsNames.forEach( ( e ) =>
   {
     if( o.config[ e ] )
+    if( o.config[ e ][ o.depPath ] )
     {
       o.changed = true;
-      delete o.config[ e ][ depPath ];
+      delete o.config[ e ][ o.depPath ];
     }
   });
 
@@ -1125,6 +1242,38 @@ function localName( o )
 }
 
 localName.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+}
+
+//
+
+function localEntryPath( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ] }
+
+  _.routine.options( localEntryPath, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !o.config )
+  {
+    if( !o.configPath )
+    o.configPath = self.pathConfigFromLocal( o.localPath );
+    if( !_.fileProvider.fileExists( o.configPath ) )
+    return;
+    o.config = _.fileProvider.configRead( o.configPath );
+  }
+
+  return o.config.main;
+}
+
+localEntryPath.defaults =
 {
   localPath : null,
   configPath : null,
@@ -1652,6 +1801,7 @@ let Extension =
   // local
 
   localName,
+  localEntryPath,
 
   // vcs
 

@@ -184,8 +184,9 @@ function format( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.format({ filePath : a.abs( 'bundledDependencies.json' ) });
-    test.identical( got, true );
+    var o = { configPath : a.abs( 'bundledDependencies.json' ) }
+    var got = _.npm.format( o );
+    test.true( got === o );
     return null;
   });
 
@@ -211,8 +212,9 @@ function format( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.format({ filePath : a.abs( 'dependencies.json' ) });
-    test.identical( got, true );
+    var o = { configPath : a.abs( 'dependencies.json' ) };
+    var got = _.npm.format( o );
+    test.true( got === o );
     return null;
   });
 
@@ -238,8 +240,9 @@ function format( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.format({ filePath : a.abs( 'devDependencies.json' ) });
-    test.identical( got, true );
+    var o = { configPath : a.abs( 'devDependencies.json' ) };
+    var got = _.npm.format( o );
+    test.true( got === o );
     return null;
   });
 
@@ -265,8 +268,9 @@ function format( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.format({ filePath : a.abs( 'peerDependencies.json' ) });
-    test.identical( got, true );
+    var o = { configPath : a.abs( 'peerDependencies.json' ) };
+    var got = _.npm.format( o );
+    test.true( got === o );
     return null;
   });
 
@@ -292,8 +296,9 @@ function format( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.format({ filePath : a.abs( 'peerDependenciesMeta.json' ) });
-    test.identical( got, true );
+    var o = { configPath : a.abs( 'peerDependenciesMeta.json' ) };
+    var got = _.npm.format( o );
+    test.true( got === o );
     return null;
   });
 
@@ -319,8 +324,9 @@ function format( test )
 
   a.ready.then( () =>
   {
-    var got = _.npm.format({ filePath : a.abs( 'package2.json' ) });
-    test.identical( got, true );
+    var o = { configPath : a.abs( 'package2.json' ) };
+    var got = _.npm.format( o );
+    test.true( got === o );
     return null;
   });
 
@@ -339,7 +345,7 @@ function format( test )
   return a.ready;
 }
 
-format.timeOut = 120000;
+format.timeOut = 180000;
 
 //
 
