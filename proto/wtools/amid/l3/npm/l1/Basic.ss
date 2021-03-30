@@ -97,11 +97,14 @@ function _readChangeWrite_functor( fo )
   ({
     head : fo.head,
     body : fo.body,
+    name : fo.name,
   });
 
   function head( routine, args )
   {
     let o = _.routine.options( routine, args );
+    _.assert( arguments.length === 2 );
+    _.assert( args.length === 1 );
     if( routine.defaults.verbosity !== undefined )
     if( !o.verbosity || o.verbosity < 0 )
     o.verbosity = 0;
@@ -664,24 +667,38 @@ const bump = _readChangeWrite_functor( structureBump, 'bump' );
 
 //
 
+function depRemove_head( routine, args )
+{
+  let o = args[ 0 ];
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
+  o = _.routine.options( routine, args );
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1 );
+  if( routine.defaults.verbosity !== undefined )
+  if( !o.verbosity || o.verbosity < 0 )
+  o.verbosity = 0;
+  return o;
+}
+
 function structureDepRemove( o )
 {
   let self = this;
 
-  if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
-  o = _.routine.options( structureDepRemove, o );
   _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
   _.assert( o.kind === null, 'not implemented' );
   _.assert( _.objectIs( o.config ) );
 
   self.DepSectionsNames.forEach( ( e ) =>
   {
-    
+    if( o.config[ e ] )
+    delete o.config[ e ][ depPath ];
   });
 
 }
 
+/* qqq : cover. take into account complex cases. */
+/* qqq : take into account case like depPath:mapbox/gyp */
 structureDepRemove.defaults =
 {
   config : null,
@@ -689,7 +706,12 @@ structureDepRemove.defaults =
   kind : null,
 }
 
-const depRemove = _readChangeWrite_functor( structureDepRemove, 'depRemove' );
+const depRemove = _readChangeWrite_functor
+({
+  name : 'depRemove',
+  head : depRemove_head,
+  onChange : structureDepRemove,
+});
 
 // //
 //
