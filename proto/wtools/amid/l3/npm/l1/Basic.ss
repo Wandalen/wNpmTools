@@ -180,7 +180,7 @@ function _readChangeWrite_functor( fo )
     if( !o.changed )
     return o;
 
-    /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
+    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented */
 
     let str;
     if( o.nativize )
