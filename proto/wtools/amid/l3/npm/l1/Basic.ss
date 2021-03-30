@@ -6,6 +6,8 @@
 const _ = _global_.wTools;
 const Self = _.npm = _.npm || Object.create( null );
 
+_.assert( _.routineIs( _.strLinesIndentation ) );
+
 // --
 // meta
 // --
@@ -13,6 +15,7 @@ const Self = _.npm = _.npm || Object.create( null );
 function _readChangeWrite( o )
 {
   let self = this;
+  let logger = o.logger || _global_.logger;
 
   o = _.routine.options( _readChangeWrite, o );
   if( !o.verbosity || o.verbosity < 0 )
@@ -22,7 +25,7 @@ function _readChangeWrite( o )
   o.configPath = self.pathConfigFromLocal( o.localPath );
   o.config = _.fileProvider.configRead( o.configPath );
 
-  o.changed = o.onChange( o );
+  o.changed = o.onChange.call( self, o );
 
   _.assert( _.boolIs( o.changed ) );
   if( !o.changed )
@@ -40,18 +43,22 @@ function _readChangeWrite( o )
 
   let str = encoder.encode({ data : o.config }).out.data;
 
+  _.assert( _.strIs( str ) );
+
   str = str.replace( /\s\n/mg, '\n' ) + '\n';
 
+  if( o.verbosity )
+  logger.log( `Rewriting ${o.configPath}` );
   if( o.verbosity >= 2 )
-  logger.log( str );
+  logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
 
   if( o.dry )
   return o;
 
-  if( str )
+  // if( str )
   _.fileProvider.fileWrite( o.configPath, str );
-  else
-  _.fileProvider.fileWrite( o.configPath, o.config );
+  // else
+  // _.fileProvider.fileWrite( o.configPath, o.config );
 
   return o;
 }
@@ -691,14 +698,16 @@ function structureDepRemove( o )
   _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
   _.assert( o.kind === null, 'not implemented' );
   _.assert( _.objectIs( o.config ) );
+  _.assert( _.strDefined( o.depPath ) );
 
-  o.changed = false;
+  o.changed = false; debugger;
   self.DepSectionsNames.forEach( ( e ) =>
   {
     if( o.config[ e ] )
+    if( o.config[ e ][ o.depPath ] )
     {
       o.changed = true;
-      delete o.config[ e ][ depPath ];
+      delete o.config[ e ][ o.depPath ];
     }
   });
 
@@ -1119,6 +1128,38 @@ function localName( o )
 }
 
 localName.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+}
+
+//
+
+function localEntryPath( o )
+{
+  let self = this;
+  let path = _.uri;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ] }
+
+  _.routine.options( localEntryPath, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !o.config )
+  {
+    if( !o.configPath )
+    o.configPath = self.pathConfigFromLocal( o.localPath );
+    if( !_.fileProvider.fileExists( o.configPath ) )
+    return;
+    o.config = _.fileProvider.configRead( o.configPath );
+  }
+
+  return o.config.main;
+}
+
+localEntryPath.defaults =
 {
   localPath : null,
   configPath : null,
@@ -1646,6 +1687,7 @@ let Extension =
   // local
 
   localName,
+  localEntryPath,
 
   // vcs
 
