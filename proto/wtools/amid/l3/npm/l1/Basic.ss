@@ -7,6 +7,134 @@ const _ = _global_.wTools;
 const Self = _.npm = _.npm || Object.create( null );
 
 // --
+// meta
+// --
+
+function _readChangeWrite( o )
+{
+  let self = this;
+
+  o = _.routineOptions( _readChangeWrite, o );
+  if( !o.verbosity || o.verbosity < 0 )
+  o.verbosity = 0;
+
+  if( !o.configPath )
+  o.configPath = self.pathConfigFromLocal( o.localPath );
+  o.config = _.fileProvider.configRead( o.configPath );
+
+  o.changed = o.onChange( o );
+
+  _.assert( _.boolIs( o.changed ) );
+  if( !o.changed )
+  return o;
+
+  /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
+
+  let encoder = _.gdf.selectSingleContext
+  ({
+    inFormat : 'structure',
+    outFormat : 'string',
+    ext : 'json',
+    feature : { fine : 1 },
+  })
+
+  let str = encoder.encode({ data : o.config }).out.data;
+
+  str = str.replace( /\s\n/mg, '\n' ) + '\n';
+
+  if( o.verbosity >= 2 )
+  logger.log( str );
+
+  if( o.dry )
+  return o;
+
+  if( str )
+  _.fileProvider.fileWrite( o.configPath, str );
+  else
+  _.fileProvider.fileWrite( o.configPath, o.config );
+
+  return o;
+}
+
+_readChangeWrite.defaults =
+{
+  localPath : null,
+  configPath : null,
+  dry : 0,
+  verbosity : 0,
+  onChange : null,
+}
+
+//
+
+function _readChangeWrite_functor( fo )
+{
+
+  if( !_.mapIs( fo ) )
+  fo = { onChange : arguments[ 0 ] }
+
+  fo = _.routineOptions( _readChangeWrite_functor, fo );
+  fo.head = fo.head || head;
+  fo.body = fo.body || body;
+
+  const onChange = fo.onChange;
+  _.assert( _.routineIs( onChange ) );
+
+  if( !fo.body.defaults && fo.onChange.defaults )
+  fo.body.defaults = _.mapExtend( null, fo.onChange.defaults )
+
+  return _.routine.unite
+  ({
+    head : fo.head,
+    body : fo.body,
+  });
+
+  function head( routine, args )
+  {
+    o = _.routineOptions( routine, o );
+    if( routine.defaults.verbosity !== undefined )
+    if( !o.verbosity || o.verbosity < 0 )
+    o.verbosity = 0;
+    return o;
+  }
+
+  function body( o )
+  {
+    let self = this;
+
+    try
+    {
+      let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+      o2.onChange = onChangeCall;
+      self._readChangeWrite( o2 );
+      _.mapExtend( o, o2 );
+      return o;
+    }
+    catch( err )
+    {
+      throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+    }
+
+    function onChangeCall( op )
+    {
+      let o2 = Object.create( null );
+      _.mapOnly_( o2, o, onChange.defaults );
+      _.mapOnly_( o2, op, onChange.defaults );
+      onChange.call( self, o2 );
+      return o2.changed;
+    }
+  }
+
+}
+
+_readChangeWrite_functor.defaults =
+{
+  head : null,
+  body : null,
+  onChange : null,
+}
+
+// --
 // path
 // --
 
@@ -379,7 +507,8 @@ defaults.dry = 0;
 defaults.localPath = null;
 defaults.configPath = null;
 
-_.assert( defaults === structureFixate.body.defaults );
+_.assert( defaults === fixate.body.defaults );
+_.assert( defaults !== structureFixate.defaults );
 _.assert( defaults.onDep !== undefined );
 
 // function fixate( o )
@@ -519,6 +648,14 @@ structureBump.defaults =
 //   verbosity : 0,
 // }
 
+const bump = _readChangeWrite_functor( structureBump );
+
+var defaults = bump.defaults;
+defaults.verbosity = 0;
+defaults.dry = 0;
+defaults.localPath = null;
+defaults.configPath = null;
+
 //
 
 function structureDepRemove( o )
@@ -583,133 +720,6 @@ depRemove.defaults =
   dry : 0,
   verbosity : 0,
   ... structureDepRemove.defaults,
-}
-
-//
-
-function _readChangeWrite( o )
-{
-  let self = this;
-
-  o = _.routineOptions( _readChangeWrite, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-
-  if( !o.configPath )
-  o.configPath = self.pathConfigFromLocal( o.localPath );
-  o.config = _.fileProvider.configRead( o.configPath );
-
-  o.changed = o.onChange( o );
-
-  _.assert( _.boolIs( o.changed ) );
-  if( !o.changed )
-  return o;
-
-  /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
-
-  let encoder = _.gdf.selectSingleContext
-  ({
-    inFormat : 'structure',
-    outFormat : 'string',
-    ext : 'json',
-    feature : { fine : 1 },
-  })
-
-  let str = encoder.encode({ data : o.config }).out.data;
-
-  str = str.replace( /\s\n/mg, '\n' ) + '\n';
-
-  if( o.verbosity >= 2 )
-  logger.log( str );
-
-  if( o.dry )
-  return o;
-
-  if( str )
-  _.fileProvider.fileWrite( o.configPath, str );
-  else
-  _.fileProvider.fileWrite( o.configPath, o.config );
-
-  return o;
-}
-
-_readChangeWrite.defaults =
-{
-  localPath : null,
-  configPath : null,
-  dry : 0,
-  verbosity : 0,
-  onChange : null,
-}
-
-//
-
-function _readChangeWrite_functor( fo )
-{
-
-  if( !_.mapIs( fo ) )
-  fo = { onChange : arguments[ 0 ] }
-
-  fo = _.routineOptions( _readChangeWrite_functor, fo );
-  fo.head = fo.head || head;
-  fo.body = fo.body || body;
-
-  if( !fo.body.defaults && onChange.defaults )
-  fo.body.defaults = _.mapExtend( null, onChange.defaults )
-
-  const onChange = fo.onChange;
-
-  _.assert( _.routineIs( onChange ) );
-
-  return _.routine.unite
-  ({
-    head : fo.head,
-    body : fo.body,
-  });
-
-  function head( routine, args )
-  {
-    o = _.routineOptions( routine, o );
-    if( routine.defaults.verbosity !== undefined )
-    if( !o.verbosity || o.verbosity < 0 )
-    o.verbosity = 0;
-    return o;
-  }
-
-  function body( o )
-  {
-    let self = this;
-
-    try
-    {
-      let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
-      o2.onChange = onChangeCall;
-      self._readChangeWrite( o2 );
-      _.mapExtend( o, o2 );
-      return o;
-    }
-    catch( err )
-    {
-      throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-    }
-
-    function onChangeCall( op )
-    {
-      let o2 = Object.create( null );
-      _.mapOnly_( o2, o, onChange.defaults );
-      _.mapOnly_( o2, op, onChange.defaults );
-      onChange.call( self, o2 );
-      return o2.changed;
-    }
-  }
-
-}
-
-_readChangeWrite_functor.defaults =
-{
-  head : null,
-  body : null,
-  onChange : null,
 }
 
 // --
@@ -1547,6 +1557,11 @@ let Extension =
   protocols : [ 'npm' ],
   DepSectionsNames,
 
+  // meta
+
+  _readChangeWrite,
+  _readChangeWrite_functor,
+
   // path
 
   pathParse,
@@ -1571,9 +1586,6 @@ let Extension =
   // depAdd, /* qqq : implement and cover */
   structureDepRemove, /* qqq : implement and cover */
   depRemove, /* qqq : cover */
-
-  _readChangeWrite,
-  _readChangeWrite_functor,
 
   // write l3
 
