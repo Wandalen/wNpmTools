@@ -134,6 +134,7 @@ function _readChangeWrite_functor( fo )
       _.mapOnly_( o2, o, onChange.defaults );
       _.mapOnly_( o2, op, onChange.defaults );
       onChange.call( self, o2 );
+      _.assert( _.boolIs( o2.changed ) );
       return o2.changed;
     }
   }
@@ -689,10 +690,14 @@ function structureDepRemove( o )
   _.assert( o.kind === null, 'not implemented' );
   _.assert( _.objectIs( o.config ) );
 
+  o.changed = false;
   self.DepSectionsNames.forEach( ( e ) =>
   {
     if( o.config[ e ] )
-    delete o.config[ e ][ depPath ];
+    {
+      o.changed = true;
+      delete o.config[ e ][ depPath ];
+    }
   });
 
 }
