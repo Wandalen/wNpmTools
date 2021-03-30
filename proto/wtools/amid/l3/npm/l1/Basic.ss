@@ -10,70 +10,17 @@ const Self = _.npm = _.npm || Object.create( null );
 // meta
 // --
 
-function _readChangeWrite( o )
-{
-  let self = this;
-
-  o = _.routine.options( _readChangeWrite, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-
-  if( !o.configPath )
-  o.configPath = self.pathConfigFromLocal( o.localPath );
-  o.config = _.fileProvider.configRead( o.configPath );
-
-  o.changed = o.onChange( o );
-
-  _.assert( _.boolIs( o.changed ) );
-  if( !o.changed )
-  return o;
-
-  /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented option `nativize` that nativize output file to NPM utility */
-
-  if( o.nativize )
-  {
-    return _.npm.format({ filePath : o.packagePath })
-  }
-
-  let encoder = _.gdf.selectSingleContext
-  ({
-    inFormat : 'structure',
-    outFormat : 'string',
-    ext : 'json',
-    feature : { fine : 1 },
-  })
-  let str = encoder.encode({ data : o.config }).out.data;
-
-  str = str.replace( /\s\n/mg, '\n' ) + '\n';
-
-  if( o.verbosity >= 2 )
-  logger.log( str );
-
-  if( o.dry )
-  return o;
-
-  if( str )
-  _.fileProvider.fileWrite( o.configPath, str );
-  else
-  _.fileProvider.fileWrite( o.configPath, o.config );
-
-  return o;
-}
-
-_readChangeWrite.defaults =
-{
-  localPath : null,
-  configPath : null,
-  nativize : 0,
-  dry : 0,
-  verbosity : 0,
-  onChange : null,
-}
-
-//
-
 function _readChangeWrite_functor( fo )
 {
+  let defaults =
+  {
+    localPath : null,
+    configPath : null,
+    nativize : 0,
+    dry : 0,
+    verbosity : 0,
+    onChange : null,
+  };
 
   if( !_.mapIs( fo ) )
   fo = { onChange : arguments[ 0 ], name : arguments[ 1 ] }
@@ -122,9 +69,9 @@ function _readChangeWrite_functor( fo )
 
     try
     {
-      let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+      let o2 = _.mapOnly_( null, o, defaults );
       o2.onChange = onChangeCall;
-      self._readChangeWrite( o2 );
+      _readChangeWrite( o2 );
       _.mapExtend( o, o2 );
       return o;
     }
@@ -144,6 +91,55 @@ function _readChangeWrite_functor( fo )
     }
   }
 
+  /* */
+
+  function _readChangeWrite( o )
+  {
+    o = _.routine.options( defaults, o );
+    if( !o.verbosity || o.verbosity < 0 )
+    o.verbosity = 0;
+
+    if( !o.configPath )
+    o.configPath = self.pathConfigFromLocal( o.localPath );
+    o.config = _.fileProvider.configRead( o.configPath );
+
+    o.changed = o.onChange( o );
+
+    _.assert( _.boolIs( o.changed ) );
+    if( !o.changed )
+    return o;
+
+    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented option `nativize` that nativize output file to NPM utility */
+
+    if( o.nativize )
+    {
+      return _.npm.format({ filePath : o.packagePath })
+    }
+
+    let encoder = _.gdf.selectSingleContext
+    ({
+      inFormat : 'structure',
+      outFormat : 'string',
+      ext : 'json',
+      feature : { fine : 1 },
+    })
+    let str = encoder.encode({ data : o.config }).out.data;
+
+    str = str.replace( /\s\n/mg, '\n' ) + '\n';
+
+    if( o.verbosity >= 2 )
+    logger.log( str );
+
+    if( o.dry )
+    return o;
+
+    if( str )
+    _.fileProvider.fileWrite( o.configPath, str );
+    else
+    _.fileProvider.fileWrite( o.configPath, o.config );
+
+    return o;
+  }
 }
 
 _readChangeWrite_functor.defaults =
@@ -1615,7 +1611,6 @@ let Extension =
 
   // meta
 
-  _readChangeWrite,
   _readChangeWrite_functor,
 
   // path

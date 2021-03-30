@@ -339,7 +339,7 @@ function format( test )
   return a.ready;
 }
 
-format.timeOut = 60000;
+format.timeOut = 120000;
 
 //
 
