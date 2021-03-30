@@ -28,19 +28,26 @@ function _readChangeWrite( o )
   if( !o.changed )
   return o;
 
-  /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
+  /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented option `nativize` that nativize output file to NPM utility */
 
-  let encoder = _.gdf.selectSingleContext
-  ({
-    inFormat : 'structure',
-    outFormat : 'string',
-    ext : 'json',
-    feature : { fine : 1 },
-  })
-
-  let str = encoder.encode({ data : o.config }).out.data;
-
-  str = str.replace( /\s\n/mg, '\n' ) + '\n';
+  let str;
+  if( o.nativize )
+  {
+    o.config = regularDependenciesSort( o.config );
+    str = JSON.stringify( o.config, null, '  ' ) + '\n';
+  }
+  else
+  {
+    let encoder = _.gdf.selectSingleContext
+    ({
+      inFormat : 'structure',
+      outFormat : 'string',
+      ext : 'json',
+      feature : { fine : 1 },
+    })
+    str = encoder.encode({ data : o.config }).out.data;
+    str = str.replace( /\s\n/mg, '\n' ) + '\n';
+  }
 
   if( o.verbosity >= 2 )
   logger.log( str );
@@ -54,12 +61,48 @@ function _readChangeWrite( o )
   _.fileProvider.fileWrite( o.configPath, o.config );
 
   return o;
+
+  /* */
+
+  function regularDependenciesSort( config )
+  {
+    const dependencies =
+    [
+      'dependencies',
+      'devDependencies',
+      'optionalDependencies',
+      'peerDependencies',
+    ];
+    for( let i = 0; i < dependencies.length; i++ )
+    if( config[ dependencies[ i ] ] )
+    {
+      const src = config[ dependencies[ i ] ];
+      const result = Object.create( null );
+      const keys = _.mapKeys( src );
+      keys.sort( sortElements );
+
+      for( let i = 0; i < keys.length; i++ )
+      result[ keys[ i ] ] = src[ keys[ i ] ];
+
+      config[ dependencies[ i ] ] = result;
+    }
+
+    return config;
+  }
+
+  /* */
+
+  function sortElements( a, b )
+  {
+    return a.toLowerCase().localeCompare( b.toLowerCase() );
+  }
 }
 
 _readChangeWrite.defaults =
 {
   localPath : null,
   configPath : null,
+  nativize : 0,
   dry : 0,
   verbosity : 0,
   onChange : null,
@@ -378,58 +421,73 @@ function pathLocalFromDownload( configPath )
 // write l2
 // --
 
-/* qqq : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */
+/* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : in accordance to new consequences, the private routine _readChangeWrite is used instead. Routine _readChangeWrite is extended by option `nativize` to format config into native NPM format */
 function format( o )
 {
   let self = this;
-  let fileProvider = _.fileProvider;
-  let depSectionsNames =
-  [
-    'dependencies',
-    'devDependencies',
-    'optionalDependencies',
-    'peerDependencies',
-  ];
 
   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
+  _.routineOptions( format, o );
 
-  let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
-  config = regularDependenciesSort( config );
-  fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
+  self._readChangeWrite
+  ({
+    configPath : o.filePath,
+    nativize : 1,
+    verbosity : o.verbosity,
+    onChange
+  });
   return true;
 
-  /* */
-
-  function regularDependenciesSort( config )
-  {
-    for( let i = 0; i < depSectionsNames.length; i++ )
-    if( config[ depSectionsNames[ i ] ] )
-    {
-      const src = config[ depSectionsNames[ i ] ];
-      const result = Object.create( null );
-      const keys = _.mapKeys( src );
-      keys.sort( sortElements );
-
-      for( let i = 0; i < keys.length; i++ )
-      result[ keys[ i ] ] = src[ keys[ i ] ];
-
-      config[ depSectionsNames[ i ] ] = result;
-    }
-
-    return config;
-  }
-
-  /* */
-
-  function sortElements( a, b )
-  {
-    return a.toLowerCase().localeCompare( b.toLowerCase() );
-  }
+  // let fileProvider = _.fileProvider;
+  // let depSectionsNames =
+  // [
+  //   'dependencies',
+  //   'devDependencies',
+  //   'optionalDependencies',
+  //   'peerDependencies',
+  // ];
+  //
+  // _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+  // _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
+  //
+  // let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
+  // config = regularDependenciesSort( config );
+  // fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
+  // return true;
+  //
+  // /* */
+  //
+  // function regularDependenciesSort( config )
+  // {
+  //   for( let i = 0; i < depSectionsNames.length; i++ )
+  //   if( config[ depSectionsNames[ i ] ] )
+  //   {
+  //     const src = config[ depSectionsNames[ i ] ];
+  //     const result = Object.create( null );
+  //     const keys = _.mapKeys( src );
+  //     keys.sort( sortElements );
+  //
+  //     for( let i = 0; i < keys.length; i++ )
+  //     result[ keys[ i ] ] = src[ keys[ i ] ];
+  //
+  //     config[ depSectionsNames[ i ] ] = result;
+  //   }
+  //
+  //   return config;
+  // }
+  //
+  // /* */
+  //
+  // function sortElements( a, b )
+  // {
+  //   return a.toLowerCase().localeCompare( b.toLowerCase() );
+  // }
 }
 
 format.defaults = Object.create( null );
 format.defaults.filePath = null;
+format.defaults.verbosity = 0;
 
 //
 
