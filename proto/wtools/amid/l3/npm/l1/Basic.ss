@@ -1194,7 +1194,7 @@ function localName( o )
 {
   let self = this;
   let path = _.uri;
-  o = _read( localName, arguments );
+  o = self._read( localName, arguments );
   if( !o.config )
   return;
   return o.config.name;
@@ -1213,7 +1213,7 @@ function localEntryPath( o )
 {
   let self = this;
   let path = _.uri;
-  o = _read( localEntryPath, arguments );
+  o = self._read( localEntryPath, arguments );
   if( !o.config )
   return;
   return o.config.main;
@@ -1232,7 +1232,7 @@ function localFilePath( o )
 {
   let self = this;
   let path = _.uri;
-  o = _read( localFilePath, arguments );
+  o = self._read( localFilePath, arguments );
   if( !o.config )
   return;
   return o.config.files;
