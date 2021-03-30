@@ -81,9 +81,17 @@ function _readChangeWrite_functor( fo )
   const onChange = fo.onChange;
   _.assert( _.strDefined( name ) );
   _.assert( _.routineIs( onChange ) );
+  _.assert( _.aux.is( fo.onChange.defaults ) );
+  _.assert( fo.onChange.defaults.config !== undefined );
 
   if( !fo.body.defaults && fo.onChange.defaults )
   fo.body.defaults = _.mapExtend( null, fo.onChange.defaults )
+  let defaults2 = Object.create( null );
+  defaults2.verbosity = 0;
+  defaults2.dry = 0;
+  defaults2.localPath = null;
+  defaults2.configPath = null;
+  _.mapSupplement( fo.body.defaults, defaults2 )
 
   return _.routine.unite
   ({
@@ -505,11 +513,6 @@ structureFixate.defaults =
 const fixate = _readChangeWrite_functor( structureFixate, 'fixate' );
 
 var defaults = fixate.defaults;
-defaults.verbosity = 0;
-defaults.dry = 0;
-defaults.localPath = null;
-defaults.configPath = null;
-
 _.assert( defaults === fixate.body.defaults );
 _.assert( defaults !== structureFixate.defaults );
 _.assert( defaults.onDep !== undefined );
@@ -653,11 +656,11 @@ structureBump.defaults =
 
 const bump = _readChangeWrite_functor( structureBump, 'bump' );
 
-var defaults = bump.defaults;
-defaults.verbosity = 0;
-defaults.dry = 0;
-defaults.localPath = null;
-defaults.configPath = null;
+// var defaults = bump.defaults;
+// defaults.verbosity = 0;
+// defaults.dry = 0;
+// defaults.localPath = null;
+// defaults.configPath = null;
 
 //
 
@@ -680,50 +683,52 @@ structureDepRemove.defaults =
   kind : null,
 }
 
+const depRemove = _readChangeWrite_functor( structureDepRemove, 'depRemove' );
+
+// //
 //
-
-function depRemove()
-{
-  let self = this;
-
-  if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
-  o = _.routineOptions( depRemove, o );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-
-  try
-  {
-    let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
-    o2.onChange = onChange;
-    self._readChangeWrite( o2 );
-    _.mapExtend( o, o2 );
-    return o;
-  }
-  catch( err )
-  {
-    throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-  }
-
-  function onChange( op )
-  {
-    let o2 = Object.create( null );
-    _.mapOnly_( o2, o, self.structureFixate.defaults );
-    _.mapOnly_( o2, op, self.structureFixate.defaults );
-    self.structureDepRemove( o2 );
-    return o2.changed;
-  }
-
-}
-
-depRemove.defaults =
-{
-  configPath : null,
-  localPath : null,
-  dry : 0,
-  verbosity : 0,
-  ... structureDepRemove.defaults,
-}
+// function depRemove()
+// {
+//   let self = this;
+//
+//   if( !_.mapIs( o ) )
+//   o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
+//   o = _.routineOptions( depRemove, o );
+//   if( !o.verbosity || o.verbosity < 0 )
+//   o.verbosity = 0;
+//
+//   try
+//   {
+//     let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
+//     o2.onChange = onChange;
+//     self._readChangeWrite( o2 );
+//     _.mapExtend( o, o2 );
+//     return o;
+//   }
+//   catch( err )
+//   {
+//     throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
+//   }
+//
+//   function onChange( op )
+//   {
+//     let o2 = Object.create( null );
+//     _.mapOnly_( o2, o, self.structureFixate.defaults );
+//     _.mapOnly_( o2, op, self.structureFixate.defaults );
+//     self.structureDepRemove( o2 );
+//     return o2.changed;
+//   }
+//
+// }
+//
+// depRemove.defaults =
+// {
+//   configPath : null,
+//   localPath : null,
+//   dry : 0,
+//   verbosity : 0,
+//   ... structureDepRemove.defaults,
+// }
 
 // --
 // write l3
