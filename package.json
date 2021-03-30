@@ -39,8 +39,7 @@
   },
   "devDependencies": {
     "eslint": "7.1.0",
-    "wTesting": "delta",
-    "wnpmtools": "file:."
+    "wTesting": "delta"
   },
   "keywords": [
     "wTools"
