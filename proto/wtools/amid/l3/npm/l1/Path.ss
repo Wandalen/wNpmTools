@@ -4,7 +4,7 @@
 'use strict';
 
 const _ = _global_.wTools;
-const Parent = _.uri; /* aaa : for Dmytro : ? */ /* Dmytro : resolved */
+const Parent = _.uri; /* qqq : for Dmytro : not solved. see end of the file */ 
 const Self = _.npm.path = _.npm.path || Object.create( Parent );
 
 // --
@@ -453,6 +453,9 @@ let Extension =
 }
 
 _.mapExtend( Self, Extension );
+
+// _.assert( _.npm.path.s.single === _.npm.path );
+// qqq : for Dmytro : bad : uncomment
 
 //
 

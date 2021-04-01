@@ -828,6 +828,67 @@ const bump = _readChangeWrite_functor( structureBump, 'bump' );
 
 //
 
+function depAdd( o )
+{
+  let will = this;
+  let fileProvider = _.fileSystem;
+  let path = _.uri;
+
+  _.routine.options( depAdd, o );
+
+  let nodeModulesPath = _.npm.pathDownloadFromLocal( o.localPath );
+
+  _.assert( _.strDefined( o.depPath ) );
+  _.assert( _.boolLikeFalse( o.editing ), 'not implemented' );
+  _.assert( _.boolLikeTrue( o.downloading ), 'not implemented' );
+  _.assert( _.boolLikeTrue( o.linking ), 'not implemented' );
+  _.assert( path.parse( o.depPath ).protocol === 'hd', 'not implemented' );
+
+  _.sure( fileProvider.fileExists( _.npm.pathLocalFromDownload( nodeModulesPath ) ), `nodeModulesPath:${nodeModulesPath} does not exist` );
+  _.sure( fileProvider.fileExists( o.depPath ), `depPath:${o.depPath} does not exist` );
+  _.sure( _.strDefined( o.as ), '`as` is not specified' );
+  let dstPath = path.join( nodeModulesPath, o.as );
+
+  if( o.downloading )
+  {
+    if( o.linking )
+    {
+      if( o.logger )
+      {
+        o.logger.rbegin({ verbosity : -1 });
+        o.logger.log( `Linking ${_.ct.format( o.depPath, 'path' )} to ${_.ct.format( dstPath, 'path' )}` );
+        o.logger.rend({ verbosity : -1 });
+      }
+      if( !o.dry )
+      fileProvider.softLink
+      ({
+        dstPath : dstPath,
+        srcPath : o.depPath,
+        makingDirectory : 1,
+        rewritingDirs : 1,
+      });
+    }
+  }
+
+  return true;
+}
+
+depAdd.defaults =
+{
+  as : null,
+  localPath : null,
+  depPath : null,
+  editing : 1,
+  downloading : 1,
+  linking : 1,
+  dry : 0,
+  logger : null,
+}
+
+/* xxx : qqq : for Dmytro : replace each option::verbosity by option::logger */
+
+//
+
 function depRemove_head( routine, args )
 {
   let o = args[ 0 ];
@@ -978,6 +1039,89 @@ const filePathAdd = _readChangeWrite_functor
 // --
 // write l3
 // --
+
+/* qqq : cover */
+/* qqq : cover case o.localPath is soft link */
+function install( o )
+{
+  let self = this;
+  let ready = _.take( null );
+  let fileProvider = _.fileSystem;
+  let path = _.uri;
+  let abs = _.routineJoin( path, path.s.join, [ o.localPath ] );
+
+  _.routineOptions( install, o );
+  _.assert( _.strDefined( o.localPath ) );
+  _.sure( fileProvider.isDir( o.localPath ) );
+
+  if( o.locked === null )
+  {
+    o.locked = fileProvider.isTerminal( path.join( o.localPath, 'package-lock.json' ) )
+  }
+
+  fileProvider.filesDelete( path.join( o.localPath, 'node_modules' ) );
+  if( !o.locked )
+  fileProvider.filesDelete( path.join( o.localPath, 'package-lock.json' ) );
+
+  let execPath = o.locked ? 'npm ci' : 'npm install';
+
+  let o2 =
+  {
+    execPath,
+    currentPath : o.localPath,
+    inputMirroring : 1,
+    throwingExitCode : 1,
+    mode : 'shell',
+    deasync : 0,
+    sync : o.sync,
+    logger : o.logger,
+    dry : o.dry,
+    ready,
+  }
+
+  _.process.start( o2 );
+
+  ready.then( ( op ) =>
+  {
+
+    debugger;
+    if( o.linkingSelf )
+    return _.npm.depAdd
+    ({
+      localPath : o.localPath,
+      depPath : path.join( 'hd://.', o.localPath ),
+      as : _.npm.localName({ localPath : o.localPath }),
+      editing : 0,
+      downloading : 1,
+      linking : 1,
+      logger : o.logger,
+      dry : o.dry,
+    });
+
+    return null;
+  });
+
+  if( o.sync )
+  {
+    // ready.deasync();
+    return ready.sync();
+  }
+
+  return ready;
+}
+
+/* qqq : cover each option */
+install.defaults =
+{
+  locked : null,
+  localPath : null,
+  linkingSelf : null,
+  logger : null,
+  dry : 0,
+  sync : 1,
+}
+
+//
 
 /**
  * @summary Publishes a package to the npm registry.
@@ -1861,7 +2005,7 @@ let Extension =
   structureBump, /* qqq : cover please */
 
   // structureDepAdd, /* qqq : implement and cover */
-  // depAdd, /* qqq : implement and cover */
+  depAdd, /* qqq : implement and cover */
   structureDepRemove, /* qqq : implement and cover */
   depRemove, /* qqq : cover */
 
@@ -1870,6 +2014,7 @@ let Extension =
 
   // write l3
 
+  install,
   publish,
 
   // read l3
@@ -1883,6 +2028,7 @@ let Extension =
 
   // local
 
+  /* xxx qqq : all routines using package.json should also fallback to package-lock.json if package.json does not exist */
   localName,
   localEntryPath,
   localFilePath,

@@ -10,7 +10,8 @@ if( typeof module !== 'undefined' )
   require( '../npm/Include.ss' );
 }
 
-let _ = _globals_.testing.wTools;
+const _ = _global_.wTools;
+const __ = _globals_.testing.wTools;
 
 // --
 // tests
