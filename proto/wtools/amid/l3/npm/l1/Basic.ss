@@ -1024,6 +1024,8 @@ function install( o )
     currentPath : o.localPath,
     inputMirroring : 1,
     throwingExitCode : 1,
+    outputPiping : 1,
+    concurrent : 0,
     mode : 'shell',
     deasync : 0,
     sync : o.sync,
@@ -1033,6 +1035,7 @@ function install( o )
     ready,
   }
 
+  /* xxx : qqq : why not additive output? */
   debugger;
   _.process.start( o2 );
 
