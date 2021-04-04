@@ -6,7 +6,7 @@
 if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../wtools/Tools.s' );
-  require( '../npm/Include.ss' );
+  require( '../../l3/npm/Include.ss' );
   _.include( 'wTesting' );
 }
 
@@ -186,7 +186,7 @@ function format( test )
   a.ready.then( () =>
   {
     var o = { configPath : a.abs( 'bundledDependencies.json' ) }
-    var got = _.npm.format( o );
+    var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
   });
@@ -214,7 +214,7 @@ function format( test )
   a.ready.then( () =>
   {
     var o = { configPath : a.abs( 'dependencies.json' ) };
-    var got = _.npm.format( o );
+    var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
   });
@@ -242,7 +242,7 @@ function format( test )
   a.ready.then( () =>
   {
     var o = { configPath : a.abs( 'devDependencies.json' ) };
-    var got = _.npm.format( o );
+    var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
   });
@@ -270,7 +270,7 @@ function format( test )
   a.ready.then( () =>
   {
     var o = { configPath : a.abs( 'peerDependencies.json' ) };
-    var got = _.npm.format( o );
+    var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
   });
@@ -298,7 +298,7 @@ function format( test )
   a.ready.then( () =>
   {
     var o = { configPath : a.abs( 'peerDependenciesMeta.json' ) };
-    var got = _.npm.format( o );
+    var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
   });
@@ -326,7 +326,7 @@ function format( test )
   a.ready.then( () =>
   {
     var o = { configPath : a.abs( 'package2.json' ) };
-    var got = _.npm.format( o );
+    var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
   });
@@ -346,7 +346,7 @@ function format( test )
   return a.ready;
 }
 
-format.timeOut = 180000;
+format.timeOut = 3e5;
 
 //
 
@@ -365,7 +365,7 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
-  var got = _.npm.fixate({ localPath, tag }).config;
+  var got = _.npm.fileFixate({ localPath, tag }).config;
 
   /* aaa Artem : done. sperate case should test whole "got" map */
   /* aaa Artem : done. another case read written file and check it content */
@@ -383,7 +383,7 @@ function fixate( test )
 
   test.identical( got, exp );
 
-  //
+  /* */
 
   test.case = 'with callback';
 
@@ -392,7 +392,7 @@ function fixate( test )
   var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
   var o = { localPath, tag, onDep }
-  var got = _.npm.fixate( o ).config;
+  var got = _.npm.fileFixate( o ).config;
   var exp =
   {
     'name' : 'test package.json',
@@ -406,7 +406,7 @@ function fixate( test )
 
   test.identical( got, exp );
 
-  //
+  /* */
 
   test.case = 'check whole "got" map';
 
@@ -414,17 +414,17 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
-  var got = _.npm.fixate({ localPath, tag });
+  var got = _.npm.fileFixate({ localPath, tag });
 
   test.true( _.strDefined( got.localPath ) );
   test.true( _.strDefined( got.configPath ) );
   test.identical( got.tag, '=' );
   test.identical( got.onDep, null );
   test.identical( got.dry, 0 );
-  test.identical( got.verbosity, 0 );
+  test.identical( got.logger, false );
   test.identical( got.changed, false );
 
-  //
+  /* */
 
   test.case = 'read written config';
 
@@ -432,8 +432,8 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateNotEmptyVersions' );
   var tag = '=';
-  _.npm.fixate({ localPath, tag });
-  var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateNotEmptyVersions/package.json' ) });
+  _.npm.fileFixate({ localPath, tag });
+  var got = _.fileProvider.fileReadUnknown({ filePath : a.abs( 'fixateNotEmptyVersions/package.json' ) });
   var exp =
   {
     'name' : 'test package.json',
@@ -459,7 +459,7 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateEmptyVersions' );
   var tag = '=';
-  var got = _.npm.fixate( { localPath, tag } ).config;
+  var got = _.npm.fileFixate( { localPath, tag } ).config;
   var exp =
   { /* aaa Artem : done. fix styles, please */
     'name' : 'test package.json',
@@ -473,7 +473,7 @@ function fixate( test )
 
   test.identical( got, exp );
 
-  //
+  /* */
 
   test.case = 'read written config';
 
@@ -481,8 +481,8 @@ function fixate( test )
 
   var localPath = a.abs( 'fixateEmptyVersions' );
   var tag = '=';
-  _.npm.fixate({ localPath, tag });
-  var got = _.fileProvider.configRead({ filePath : a.abs( 'fixateEmptyVersions/package.json' ) });
+  _.npm.fileFixate({ localPath, tag });
+  var got = _.fileProvider.fileReadUnknown({ filePath : a.abs( 'fixateEmptyVersions/package.json' ) });
   var exp =
   {
     'name' : 'test package.json',
@@ -496,7 +496,7 @@ function fixate( test )
 
   test.identical( got, exp );
 
-  //
+  /* */
 
   test.case = 'with callback';
 
@@ -505,7 +505,7 @@ function fixate( test )
   var localPath = a.abs( 'fixateEmptyVersions' );
   var tag = '=';
   var o = { localPath, tag, onDep }
-  var got = _.npm.fixate( o ).config;
+  var got = _.npm.fileFixate( o ).config;
   var exp =
   {
     'name' : 'test package.json',
@@ -567,7 +567,7 @@ function bump( test )
   a.reflect();
 
   var localPath = a.abs( '.' );
-  var got = _.npm.bump( { localPath } ).config;
+  var got = _.npm.fileBump({ localPath }).config;
   var exp =
   {
     'name' : 'test package.json',
@@ -578,15 +578,15 @@ function bump( test )
 
   test.identical( got, exp );
 
-  //
+  /* */
 
   test.case = 'read written config';
 
   a.reflect();
 
   var localPath = a.abs( '.' );
-  _.npm.bump({ localPath });
-  var got = _.fileProvider.configRead({ filePath : a.abs( 'package.json' ) });
+  _.npm.fileBump({ localPath });
+  var got = _.fileProvider.fileReadUnknown({ filePath : a.abs( 'package.json' ) });
   var exp =
   {
     'name' : 'test package.json',
@@ -597,19 +597,19 @@ function bump( test )
 
   test.identical( got, exp );
 
-  //
+  /* */
 
   test.case = 'check whole "got" map';
 
   a.reflect();
 
   var localPath = a.abs( '.' );
-  var got = _.npm.bump({ localPath });
+  var got = _.npm.fileBump({ localPath });
 
   test.true( _.strDefined( got.localPath ) );
   test.true( _.strDefined( got.configPath ) );
   test.identical( got.dry, 0 );
-  test.identical( got.verbosity, 0 );
+  test.identical( got.logger, false );
   test.identical( got.changed, true );
 }
 
@@ -1439,7 +1439,7 @@ async function dependantsRetrieveStress( test )
   }
 
   test.case = `${remotePath.length} packages`;
-  let got = await _.npm.remoteDependants({ remotePath, verbosity : 3, attemptLimit : 20, attemptDelay : 500 });
+  let got = await _.npm.remoteDependants({ remotePath, logger : 3, attemptLimit : 20, attemptDelay : 500 });
   test.identical( got, exp );
 }
 
@@ -1479,11 +1479,11 @@ const Proto =
     pathIsFixated,
     pathFixate,
 
-    //
+    /* */
 
     format,
 
-    //
+    /* */
 
     fixate,
     bump,

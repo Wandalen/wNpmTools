@@ -9,7 +9,7 @@
     { "name" : "Artem Bohush", "email" : "art.bohush@gmail.com" }
   ],
   "license" : "MIT",
-  "main" : "proto/wtools/amid/l3/npm/Include.ss",
+  "main" : "proto/node_modules/wnpmtools",
   "files" : [ "proto/wtools/amid/l3/npm", "proto/wtools/Tools.s", "proto/node_modules" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen .build proto" },
   "repository" :

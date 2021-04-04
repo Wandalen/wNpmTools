@@ -12,78 +12,16 @@ _.assert( _.routineIs( _.strLinesIndentation ) );
 // meta
 // --
 
-// function _readChangeWrite( o )
-// {
-//   let self = this;
-//   let logger = o.logger || _global_.logger;
-//
-//   o = _.routine.options( _readChangeWrite, o );
-//   if( !o.verbosity || o.verbosity < 0 )
-//   o.verbosity = 0;
-//
-//   if( !o.configPath )
-//   o.configPath = self.pathConfigFromLocal( o.localPath );
-//   o.config = _.fileProvider.configRead( o.configPath );
-//
-//   o.changed = o.onChange.call( self, o );
-//
-//   _.assert( _.boolIs( o.changed ) );
-//   if( !o.changed )
-//   return o;
-//
-//   /* qqq : for Dmytro : use routine for adjusting formatting here. introduce option */
-//
-//   let encoder = _.gdf.selectSingleContext
-//   ({
-//     inFormat : 'structure',
-//     outFormat : 'string',
-//     ext : 'json',
-//     feature : { fine : 1 },
-//   })
-//
-//   let str = encoder.encode({ data : o.config }).out.data;
-//
-//   _.assert( _.strIs( str ) );
-//
-//   str = str.replace( /\s\n/mg, '\n' ) + '\n';
-//
-//   if( o.verbosity )
-//   logger.log( `Rewriting ${o.configPath}` );
-//   if( o.verbosity >= 2 )
-//   logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
-//
-//   if( o.dry )
-//   return o;
-//
-//   // if( str )
-//   _.fileProvider.fileWrite( o.configPath, str );
-//   // else
-//   // _.fileProvider.fileWrite( o.configPath, o.config );
-//
-//   return o;
-// }
-//
-// _readChangeWrite.defaults =
-// {
-//   localPath : null,
-//   configPath : null,
-//   dry : 0,
-//   verbosity : 0,
-//   onChange : null,
-// }
-
-//
-
 function _readChangeWrite_functor( fo )
 {
   let defaults =
   {
     logger : null,
-    nativize : null,
+    nativizing : 1,
     localPath : null,
     configPath : null,
     dry : 0,
-    verbosity : 0,
+    logger : 0,
     onChange : null,
   };
 
@@ -95,16 +33,17 @@ function _readChangeWrite_functor( fo )
   fo.body = fo.body || body;
 
   const name = fo.name;
-  // const onChange = fo.onChange;
+  const onChange = fo.onChange;
   _.assert( _.strDefined( name ) );
   _.assert( _.routineIs( fo.onChange ) );
   _.assert( _.aux.is( fo.onChange.defaults ) );
   _.assert( fo.onChange.defaults.config !== undefined );
 
-  if( !fo.body.defaults && fo.onChange.defaults )
-  fo.body.defaults = _.mapExtend( null, fo.onChange.defaults )
+  // if( !fo.body.defaults && fo.onChange.defaults )
+  if( fo.onChange.defaults )
+  fo.body.defaults = _.mapSupplement( fo.body.defaults || null, fo.onChange.defaults )
   let defaults2 = Object.create( null );
-  defaults2.verbosity = 0;
+  defaults2.logger = 0;
   defaults2.dry = 0;
   defaults2.localPath = null;
   defaults2.configPath = null;
@@ -122,9 +61,14 @@ function _readChangeWrite_functor( fo )
     let o = _.routine.options( routine, args );
     _.assert( arguments.length === 2 );
     _.assert( args.length === 1 );
-    if( routine.defaults.verbosity !== undefined )
-    if( !o.verbosity || o.verbosity < 0 )
-    o.verbosity = 0;
+    _.assert( o.logger !== undefined );
+    // if( routine.defaults.logger !== undefined )
+    {
+      o.logger = _.logger.from( o.logger );
+      // if( _.numberIs( o.logger ) || _.boolIs( o.logger ) )
+      // if( !o.logger || o.logger < 0 )
+      // o.logger = 0;
+    }
     return o;
   }
 
@@ -136,8 +80,7 @@ function _readChangeWrite_functor( fo )
     {
       let o2 = _.mapExtend( null, o );
       _.mapSupplement( null, o2, defaults );
-      o2.onChange = fo.onChange;
-      // o2.onChange = onChangeCall;
+      o2.onChange = onChange;
       _readChangeWrite.call( self, o2 );
       _.mapExtend( o, o2 );
       return o;
@@ -147,26 +90,18 @@ function _readChangeWrite_functor( fo )
       throw _.err( err, `\nFailed to ${name} version of npm config ${o.configPath}` );
     }
 
-    // function onChangeCall( op )
-    // {
-    //   let o2 = Object.create( null );
-    //   _.mapOnly_( o2, o, onChange.defaults );
-    //   _.mapOnly_( o2, op, onChange.defaults );
-    //   onChange.call( self, o2 );
-    //   _.assert( _.boolIs( o2.changed ) );
-    //   return o2.changed;
-    // }
   }
 
   /* */
 
   function _readChangeWrite( o )
   {
-    let logger = o.logger || _global_.logger;
+    let logger = o.logger;
+    _.assert( logger === false || _.logger.is( o.logger ) );
 
     if( !o.configPath )
     o.configPath = _.npm.pathConfigFromLocal( o.localPath );
-    o.config = _.fileProvider.configRead( o.configPath );
+    o.config = _.fileProvider.fileReadUnknown( o.configPath );
 
     let o2 = Object.create( null );
     _.mapOnly_( o2, o, o.onChange.defaults );
@@ -175,15 +110,12 @@ function _readChangeWrite_functor( fo )
     _.assert( _.boolIs( o2.changed ) );
     o.changed = o2.changed;
     o.config = o2.config;
-    // o.changed = o.onChange.call( self, o );
 
     if( !o.changed )
     return o;
 
-    /* aaa : for Dmytro : use routine for adjusting formatting here. introduce option */ /* Dmytro : implemented */
-
     let str;
-    if( o.nativize )
+    if( o.nativizing )
     {
       o.config = _.npm.structureFormat({ config : o.config });
       str = JSON.stringify( o.config, null, '  ' ) + '\n';
@@ -205,10 +137,10 @@ function _readChangeWrite_functor( fo )
     _.assert( _.strIs( str ) );
 
 
-    if( o.verbosity )
-    logger.log( `Rewriting ${o.configPath}` );
-    if( o.verbosity >= 2 )
-    logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
+    if( o.logger && o.logger.verbosity >= 1 )
+    o.logger.log( `Rewriting ${o.configPath}` );
+    if( o.logger && o.logger.verbosity >= 2 )
+    o.logger.log( '  ' + _.strLinesIndentation( str, '  ' ) );
 
     if( o.dry )
     return o;
@@ -248,7 +180,7 @@ function _read( routine, args )
     o.configPath = self.pathConfigFromLocal( o.localPath );
     if( !_.fileProvider.fileExists( o.configPath ) )
     return;
-    o.config = _.fileProvider.configRead( o.configPath );
+    o.config = _.fileProvider.fileReadUnknown( o.configPath );
   }
 
   return o;
@@ -418,7 +350,7 @@ function pathIsFixated( filePath )
  * @summary Changes version of package specified in path `o.remotePath` to latest available.
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of logger.
  * @function pathIsFixated
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -439,7 +371,7 @@ function pathFixate( o )
   let latestVersion = self.remoteVersionLatest
   ({
     remotePath : o.remotePath,
-    verbosity : o.verbosity,
+    logger : o.logger,
   });
 
   let result = path.str
@@ -454,7 +386,7 @@ function pathFixate( o )
 
 var defaults = pathFixate.defaults = Object.create( null );
 defaults.remotePath = null;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -491,54 +423,92 @@ function pathLocalFromDownload( configPath )
 // write l2
 // --
 
-function structureFormat( o )
+function structureFormat_functor()
 {
-  if( o.changed === true )
-  return o.config;
+  let npmJsVersionIsNewer;
 
-  let depSectionsNames =
-  [
-    'dependencies',
-    'devDependencies',
-    'optionalDependencies',
-    'peerDependencies',
-  ];
-
-  const npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
-  const sortElements = npmJsVersionIsNewer ? sortElementsForward : sortElementsBackward;
-
-  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
-  _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
-
-  for( let i = 0; i < depSectionsNames.length; i++ )
-  if( o.config[ depSectionsNames[ i ] ] )
+  structureFormat.defaults =
   {
-    const src = o.config[ depSectionsNames[ i ] ];
-    const result = Object.create( null );
-    const keys = _.mapKeys( src );
-    keys.sort( sortElements );
+    logger : 0,
+    nativizing : 1,
+    config : null,
+  };
 
-    for( let i = 0; i < keys.length; i++ )
-    result[ keys[ i ] ] = src[ keys[ i ] ];
+  return structureFormat;
 
-    o.config[ depSectionsNames[ i ] ] = result;
+  function structureFormat( o )
+  {
+    if( o.changed === true )
+    return o.config;
+
+    let depSectionsNames =
+    [
+      'dependencies',
+      'devDependencies',
+      'optionalDependencies',
+      'peerDependencies',
+    ];
+
+    // const npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
+    if( npmJsVersionIsNewer === undefined )
+    npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
+    // const sortElements = npmJsVersionIsNewer ? sortElementsBackward : sortElementsForward;
+    const sortElements = npmJsVersionIsNewer ? sortElementsForward : sortElementsBackward;
+
+    _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+    _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
+
+    for( let i = 0; i < depSectionsNames.length; i++ )
+    if( o.config[ depSectionsNames[ i ] ] )
+    {
+      const src = o.config[ depSectionsNames[ i ] ];
+      const result = Object.create( null );
+      const keys = _.mapKeys( src );
+      keys.sort( sortElements );
+      for( let i = 0; i < keys.length; i++ )
+      result[ keys[ i ] ] = src[ keys[ i ] ];
+      o.config[ depSectionsNames[ i ] ] = result;
+    }
+
+    o.changed = true;
+
+    return o.config;
+
+    /* */
+
+    // /* qqq : for Dmytro : very bad! */
+    // function npmMajorVersionIsNewerOrSame( majorVersion )
+    // {
+    //   let op = _.process.start
+    //   ({
+    //     execPath : 'npm --version',
+    //     outputCollecting : 1,
+    //     mode : 'shell',
+    //     sync : 1,
+    //   });
+    //   return _.number.from( op.output[ 0 ] ) >= majorVersion;
+    // }
+
   }
-
-  o.changed = true;
-
-  return o.config;
 
   /* */
 
+  /* qqq : for Dmytro : bad : poor and sloppy! */
   function npmMajorVersionIsNewerOrSame( majorVersion )
   {
+    debugger;
     let op = _.process.start
     ({
       execPath : 'npm --version',
       outputCollecting : 1,
-      mode : 'shell',
+      // mode : 'shell', /* qqq : for Dmytro : very bad! */
+      mode : 'spawn',
       sync : 1,
+      outputPiping : 0,
+      verbosity : 0,
+      logger : 0,
     });
+    debugger;
     return _.number.from( op.output[ 0 ] ) >= majorVersion;
   }
 
@@ -555,37 +525,40 @@ function structureFormat( o )
   {
     return b.toLowerCase().localeCompare( a.toLowerCase() );
   }
+
+  /* */
+
 }
 
-structureFormat.defaults =
-{
-  config : null,
-};
+let structureFormat = structureFormat_functor();
 
 //
 
 /* aaa : for Dmytro : bad : lack of routine _.npm.structureFormat() ! */ /* Dmytro : implemented and used */
-const format = _readChangeWrite_functor( structureFormat, 'format' );
-format.defaults =
-{
-  configPath : null,
-  nativize : 1,
-};
-// function format( o )
+const fileFormat = _readChangeWrite_functor( structureFormat, 'fileFormat' );
+
+// qqq : for Dmytro : sloppy!
+// fileFormat.defaults =
+// {
+//   configPath : null,
+//   nativizing : 1,
+// };
+
+// function fileFormat( o )
 // {
 //   let fileProvider = _.fileProvider;
 //
 //   _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
 //   _.assert( _.strDefined( o.filePath ), 'Expects path to JSON file {-o.filePath-}' );
 //
-//   let config = fileProvider.configRead({ filePath : o.filePath, encoding : 'json' });
+//   let config = fileProvider.fileReadUnknown({ filePath : o.filePath, encoding : 'json' });
 //   config = _.npm.structureFormat( config );
 //   fileProvider.fileWrite( o.filePath, JSON.stringify( config, null, '  ' ) + '\n' );
 //   return true;
 // }
 //
-// format.defaults = Object.create( null );
-// format.defaults.filePath = null;
+// fileFormat.defaults = Object.create( null );
+// fileFormat.defaults.filePath = null;
 
 //
 
@@ -594,7 +567,7 @@ format.defaults =
  * @param {Object} o.config Object representation of package.json file.
  * @param {String} o.tag Sets specified tag to all dependencies.
  * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
- * @param {Number} [o.verbosity=2] Verbosity control.
+ * @param {Number} [o.logger=2] Verbosity control.
  * @function structureFixate
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -667,60 +640,18 @@ structureFixate.defaults =
  * @param {String} o.tag Sets specified tag to all dependencies.
  * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
  * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
- * @param {Number} [o.verbosity=2] Verbosity control.
- * @function fixate
+ * @param {Number} [o.logger=2] Verbosity control.
+ * @function fileFixate
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-const fixate = _readChangeWrite_functor( structureFixate, 'fixate' );
+const fileFixate = _readChangeWrite_functor( structureFixate, 'fileFixate' );
 
-var defaults = fixate.defaults;
-_.assert( defaults === fixate.body.defaults );
+var defaults = fileFixate.defaults;
+_.assert( defaults === fileFixate.body.defaults );
 _.assert( defaults !== structureFixate.defaults );
 _.assert( defaults.onDep !== undefined );
-
-// function fixate( o )
-// {
-//   let self = this;
-//
-//   o = _.routine.options( fixate, o );
-//   if( !o.verbosity || o.verbosity < 0 )
-//   o.verbosity = 0;
-//
-//   try
-//   {
-//     let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
-//     o2.onChange = onChange;
-//     self._readChangeWrite( o2 );
-//     _.mapExtend( o, o2 );
-//     return o;
-//   }
-//   catch( err )
-//   {
-//     throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-//   }
-//
-//   function onChange( op )
-//   {
-//     let o2 = Object.create( null );
-//     _.mapOnly_( o2, o, self.structureFixate.defaults );
-//     _.mapOnly_( o2, op, self.structureFixate.defaults );
-//     self.structureFixate( o2 );
-//     return o2.changed;
-//   }
-//
-// }
-//
-// fixate.defaults =
-// {
-//   localPath : null,
-//   configPath : null,
-//   onDep : null,
-//   dry : 0,
-//   tag : null,
-//   verbosity : 0,
-// }
 
 //
 
@@ -773,60 +704,178 @@ structureBump.defaults =
  * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
  * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
  * @param {Number} [o.verbosity=2] Verbosity control.
- * @function bump
+ * @function fileBump
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
  */
 
-// function bump( o )
-// {
-//   let self = this;
-//
-//   o = _.routine.options( bump, o );
-//   if( !o.verbosity || o.verbosity < 0 )
-//   o.verbosity = 0;
-//   try
-//   {
-//     let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
-//     o2.onChange = onChange;
-//     self._readChangeWrite( o2 );
-//     _.mapExtend( o, o2 );
-//   }
-//   catch( err )
-//   {
-//     throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-//   }
-//
-//   return o;
-//
-//   function onChange( op )
-//   {
-//     let o2 = Object.create( null );
-//     _.mapOnly_( o2, o, self.structureBump.defaults );
-//     _.mapOnly_( o2, op, self.structureBump.defaults );
-//     self.structureBump( o2 );
-//     return o2.changed;
-//   }
-//
-// }
-//
-// bump.defaults =
-// {
-//   localPath : null,
-//   configPath : null,
-//   dry : 0,
-//   verbosity : 0,
-// }
-
-const bump = _readChangeWrite_functor( structureBump, 'bump' );
-
-// var defaults = bump.defaults;
-// defaults.verbosity = 0;
-// defaults.dry = 0;
-// defaults.localPath = null;
-// defaults.configPath = null;
+const fileBump = _readChangeWrite_functor( structureBump, 'fileBump' );
 
 //
+
+function fileReadFilePath( o )
+{
+  let self = this;
+  let path = _.uri;
+  o = self._read( fileReadFilePath, arguments );
+  if( !o.config )
+  return;
+  return o.config.files;
+}
+
+fileReadFilePath.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+}
+
+//
+
+/* qqq : cover */
+
+function fileAddfilePath_head( routine, args )
+{
+  let o = args[ 0 ];
+  if( !_.mapIs( o ) )
+  o = { localPath : arguments[ 0 ], filePath : arguments[ 1 ] }
+  o = _.routine.options( routine, args );
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1 );
+  // if( !o.verbosity || o.verbosity < 0 )
+  // o.verbosity = 0;
+  debugger;
+  o.logger = _.logger.from( o.logger );
+  return o;
+}
+
+//
+
+function structureAddFilePath( o )
+{
+  let self = this;
+
+  _.assert( _.objectIs( o.config ) );
+  _.assert( _.strIs( o.filePath ) || _.strsAreAll( o.filePath ) );
+
+  o.changed = false;
+  o.config.files = o.config.files || [];
+
+  let length = o.config.files.length;
+  _.arrayAppendArraysOnce( o.config.files, o.filePath );
+  if( length !== o.config.files.length )
+  o.changed = true;
+
+  return o;
+}
+
+structureAddFilePath.defaults =
+{
+  config : null,
+  filePath : null,
+}
+
+const fileAddfilePath = _readChangeWrite_functor
+({
+  name : 'fileAddfilePath',
+  head : fileAddfilePath_head,
+  onChange : structureAddFilePath,
+});
+
+//
+
+function fileReadField( o )
+{
+  let self = this;
+  let path = _.uri;
+  o = self._read( fileReadField, arguments );
+  if( !o.config )
+  return;
+  return o.config[ o.key ];
+}
+
+fileReadField.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+  key : null,
+}
+
+//
+
+function _structureWriteField( o )
+{
+  let self = this;
+
+  _.assert( _.objectIs( o.config ) );
+  _.assert( _.strDefined( o.key ) );
+
+  o.changed = false;
+  if( o.config[ o.key ] !== o.val )
+  {
+    o.config[ o.key ] = o.val;
+    o.changed = true;
+  }
+
+  return o;
+}
+
+_structureWriteField.defaults =
+{
+  config : null,
+  key : null,
+  val : null,
+}
+
+const fileWriteField = _readChangeWrite_functor
+({
+  name : 'fileWriteField',
+  onChange : _structureWriteField,
+});
+
+//
+
+/* qqq : cover */
+function fileReadName( o )
+{
+  let self = this;
+  let path = _.uri;
+  o = self._read( fileReadName, arguments );
+  if( !o.config )
+  return;
+  return o.config.name;
+}
+
+fileReadName.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+}
+
+//
+
+function fileReadEntryPath( o )
+{
+  let self = this;
+  let path = _.uri;
+  o = self._read( fileReadEntryPath, arguments );
+  if( !o.config )
+  return;
+  return o.config.main;
+}
+
+fileReadEntryPath.defaults =
+{
+  localPath : null,
+  configPath : null,
+  config : null,
+}
+
+// --
+// write l3
+// --
 
 function depAdd( o )
 {
@@ -897,9 +946,9 @@ function depRemove_head( routine, args )
   o = _.routine.options( routine, args );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 );
-  if( routine.defaults.verbosity !== undefined )
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
+  o.logger = _.logger.from( o.logger );
+  // if( !o.verbosity || o.verbosity < 0 )
+  // o.verbosity = 0;
   return o;
 }
 
@@ -942,103 +991,7 @@ const depRemove = _readChangeWrite_functor
   onChange : structureDepRemove,
 });
 
-// //
 //
-// function depRemove()
-// {
-//   let self = this;
-//
-//   if( !_.mapIs( o ) )
-//   o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
-//   o = _.routine.options( depRemove, o );
-//   if( !o.verbosity || o.verbosity < 0 )
-//   o.verbosity = 0;
-//
-//   try
-//   {
-//     let o2 = _.mapOnly_( null, o, self._readChangeWrite.defaults );
-//     o2.onChange = onChange;
-//     self._readChangeWrite( o2 );
-//     _.mapExtend( o, o2 );
-//     return o;
-//   }
-//   catch( err )
-//   {
-//     throw _.err( err, `\nFailed to bump version of npm config ${o.configPath}` );
-//   }
-//
-//   function onChange( op )
-//   {
-//     let o2 = Object.create( null );
-//     _.mapOnly_( o2, o, self.structureFixate.defaults );
-//     _.mapOnly_( o2, op, self.structureFixate.defaults );
-//     self.structureDepRemove( o2 );
-//     return o2.changed;
-//   }
-//
-// }
-//
-// depRemove.defaults =
-// {
-//   configPath : null,
-//   localPath : null,
-//   dry : 0,
-//   verbosity : 0,
-//   ... structureDepRemove.defaults,
-// }
-
-//
-
-/* qqq : cover */
-
-function filePathAdd_head( routine, args )
-{
-  let o = args[ 0 ];
-  if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ], filePath : arguments[ 1 ] }
-  o = _.routine.options( routine, args );
-  _.assert( arguments.length === 2 );
-  _.assert( args.length === 1 );
-  if( routine.defaults.verbosity !== undefined )
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
-  return o;
-}
-
-function structureFilePathAdd( o )
-{
-  let self = this;
-
-  _.assert( _.objectIs( o.config ) );
-  _.assert( _.strIs( o.filePath ) || _.strsAre( o.filePath ) );
-
-  o.changed = false;
-  o.config.files = o.config.files || [];
-
-  let length = o.config.files.length;
-  _.arrayAppendArraysOnce( o.config.files, o.filePath );
-  if( length !== o.config.files.length )
-  o.changed = true;
-
-  return o;
-}
-
-structureFilePathAdd.defaults =
-{
-  config : null,
-  filePath : null,
-}
-
-const filePathAdd = _readChangeWrite_functor
-({
-  name : 'filePathAdd',
-  head : filePathAdd_head,
-  onChange : structureFilePathAdd,
-});
-
-// --
-// write l3
-// --
 
 /* qqq : cover */
 /* qqq : cover case o.localPath is soft link */
@@ -1075,10 +1028,12 @@ function install( o )
     deasync : 0,
     sync : o.sync,
     logger : o.logger,
+    verbosity : o.logger ? o.logger.verbosity : 0,
     dry : o.dry,
     ready,
   }
 
+  debugger;
   _.process.start( o2 );
 
   ready.then( ( op ) =>
@@ -1090,7 +1045,7 @@ function install( o )
     ({
       localPath : o.localPath,
       depPath : path.join( 'hd://.', o.localPath ),
-      as : _.npm.localName({ localPath : o.localPath }),
+      as : _.npm.fileReadName({ localPath : o.localPath }),
       editing : 0,
       downloading : 1,
       linking : 1,
@@ -1102,11 +1057,7 @@ function install( o )
   });
 
   if( o.sync )
-  {
-    // ready.deasync();
-    return ready.sync();
-  }
-
+  return ready.sync();
   return ready;
 }
 
@@ -1116,6 +1067,39 @@ install.defaults =
   locked : null,
   localPath : null,
   linkingSelf : null,
+  logger : null,
+  dry : 0,
+  sync : 1,
+}
+
+//
+
+/* qqq : cover */
+/* qqq : cover case o.localPath is soft link */
+function clean( o )
+{
+  let self = this;
+  let ready = _.take( null );
+  let fileProvider = _.fileSystem;
+  let path = _.uri;
+  let abs = _.routineJoin( path, path.s.join, [ o.localPath ] );
+
+  _.routineOptions( clean, o );
+  _.assert( _.strDefined( o.localPath ) );
+  _.sure( fileProvider.isDir( o.localPath ) );
+
+  fileProvider.filesDelete( path.join( o.localPath, 'node_modules' ) );
+  fileProvider.filesDelete( path.join( o.localPath, 'package-lock.json' ) );
+
+  if( o.sync )
+  return ready.sync();
+  return ready;
+}
+
+/* qqq : cover each option */
+clean.defaults =
+{
+  localPath : null,
   logger : null,
   dry : 0,
   sync : 1,
@@ -1140,8 +1124,9 @@ function publish( o )
   let self = this;
 
   _.routine.options( publish, arguments );
-  if( !o.verbosity || o.verbosity < 0 )
-  o.verbosity = 0;
+  o.logger = _.logger.from( o.logger );
+  // if( !o.verbosity || o.verbosity < 0 )
+  // o.verbosity = 0;
 
   _.assert( _.path.isAbsolute( o.localPath ), 'Expects local path' );
   _.assert( _.strDefined( o.tag ), 'Expects tag' );
@@ -1154,8 +1139,10 @@ function publish( o )
     currentPath : o.localPath,
     outputCollecting : 1,
     outputGraying : 1,
-    outputPiping : o.verbosity >= 2,
-    inputMirroring : o.verbosity >= 2,
+    outputPiping : o.logger.verbosity >= 2,
+    inputMirroring : o.logger.verbosity >= 2,
+    verbosity : o.logger ? o.logger.verbosity : 0,
+    logger : o.logger,
     mode : 'shell',
     ready : o.ready
   });
@@ -1174,7 +1161,7 @@ publish.defaults =
   localPath : null,
   tag : null,
   ready : null,
-  verbosity : 0,
+  logger : 0,
 }
 
 // --
@@ -1194,12 +1181,12 @@ function versionLog( o )
   _.assert( _.strDefined( o.configPath ) );
   _.assert( _.strDefined( o.remotePath ) );
 
-  let logger = o.logger || _global_.logger;
+  // let logger = o.logger || _global_.logger;
   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
   // let remotePath = self.pathNativize( o.remotePath );
   let remotePath = _.npm.path.nativize( o.remotePath );
 
-  _.assert( !o.logging || !!logger, 'No defined logger' );
+  // _.assert( !o.logging || !!logger, 'No defined logger' );
 
   return _.process.start
   ({
@@ -1221,8 +1208,11 @@ function versionLog( o )
     log += `Current version : ${current}\n`;
     log += `Latest version of ${o.remotePath} : ${latest}\n`;
 
-    if( o.logging )
-    logger.log( log );
+    // if( o.logging )
+    // logger.log( log );
+
+    if( o.logger && o.logger.verbosity )
+    o.logger.log( log );
 
     return log;
   })
@@ -1232,7 +1222,7 @@ function versionLog( o )
 versionLog.defaults =
 {
   logger : null,
-  logging : 1,
+  // logging : 1,
   remotePath : null,
   localPath : null,
   configPath : null,
@@ -1339,7 +1329,7 @@ remoteAbout.defaults =
  * @summary Retrieves package dependants number from npm storage.
  * @param {(string|string[])} o.remotePath Package name or array of names(the same as on npm storage).
  * @param {boolean} [o.sync=0] Controls sync/async execution mode.
- * @param {number} [o.verbosity=0] Verbosity control.
+ * @param {number} [o.logger=0] Verbosity control.
  * @returns {(number|number[])} Dependanst number for one package or array of dependants for array of packages.
  * @function remoteDependants
  * @namespace wTools.npm
@@ -1369,7 +1359,7 @@ function remoteDependants( o )
   ({
     uri,
     sync : 0,
-    verbosity : o.verbosity,
+    verbosity : o.logger ? o.logger.verbosity : 0,
     attemptLimit : o.attemptLimit,
     attemptDelay : o.attemptDelay,
     successStatus : [ 200, 404 ],
@@ -1438,69 +1428,10 @@ remoteDependants.defaults =
 {
   remotePath : null,
   sync : 0,
-  verbosity : 0,
+  // verbosity : 0,
+  logger : 0,
   attemptLimit : 3,
   attemptDelay : 250,
-}
-
-// --
-// local
-// --
-
-/* qqq : cover */
-function localName( o )
-{
-  let self = this;
-  let path = _.uri;
-  o = self._read( localName, arguments );
-  if( !o.config )
-  return;
-  return o.config.name;
-}
-
-localName.defaults =
-{
-  localPath : null,
-  configPath : null,
-  config : null,
-}
-
-//
-
-function localEntryPath( o )
-{
-  let self = this;
-  let path = _.uri;
-  o = self._read( localEntryPath, arguments );
-  if( !o.config )
-  return;
-  return o.config.main;
-}
-
-localEntryPath.defaults =
-{
-  localPath : null,
-  configPath : null,
-  config : null,
-}
-
-//
-
-function localFilePath( o )
-{
-  let self = this;
-  let path = _.uri;
-  o = self._read( localFilePath, arguments );
-  if( !o.config )
-  return;
-  return o.config.files;
-}
-
-localFilePath.defaults =
-{
-  localPath : null,
-  configPath : null,
-  config : null,
 }
 
 // --
@@ -1511,7 +1442,7 @@ localFilePath.defaults =
  * @summary Returns version of npm package located at `o.localPath`.
  * @param {Object} o Options map.
  * @param {String} o.localPath Path to npm package on hard drive.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function localVersion
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1567,7 +1498,7 @@ function localVersion( o )
 var defaults = localVersion.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1575,7 +1506,7 @@ defaults.verbosity = 0;
  * @summary Returns latest version of npm package using its remote path `o.remotePath`.
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function remoteVersionLatest
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1595,7 +1526,8 @@ function remoteVersionLatest( o )
   let ready = new _.Consequence().take( null );
   let shell = _.process.starter
   ({
-    verbosity : o.verbosity - 1,
+    verbosity : o.logger ? o.logger.verbosity - 1 : 0,
+    logger : o.logger,
     outputCollecting : 1,
     sync : 0,
     deasync : 0,
@@ -1634,7 +1566,7 @@ function remoteVersionLatest( o )
 var defaults = remoteVersionLatest.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1643,7 +1575,7 @@ defaults.verbosity = 0;
  * @description Returns latest version if no version specified in remote path.
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function remoteVersionCurrent
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1683,7 +1615,7 @@ function remoteVersionCurrent( o )
 var defaults = remoteVersionCurrent.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1701,7 +1633,8 @@ function remoteVersion( o )
   let ready = new _.Consequence().take( null );
   let shell = _.process.starter
   ({
-    verbosity : o.verbosity - 1,
+    verbosity : o.logger ? o.logger.verbosity - 1 : o.logger,
+    logger : o.logger,
     outputCollecting : 1,
     sync : 0,
     deasync : 0,
@@ -1732,7 +1665,7 @@ function remoteVersion( o )
 var defaults = remoteVersion.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1741,7 +1674,7 @@ defaults.verbosity = 0;
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
  * @param {String} o.remotePath Remote path to package.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function isUpToDate
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1760,7 +1693,7 @@ function isUpToDate( o )
 
   let ready = new _.Consequence().take( null );
 
-  ready.then( () => self.localVersion({ localPath : o.localPath, verbosity : o.verbosity, sync : 0 }) )
+  ready.then( () => self.localVersion({ localPath : o.localPath, logger : o.logger, sync : 0 }) )
   ready.then( ( currentVersion ) =>
   {
     if( !currentVersion )
@@ -1769,7 +1702,7 @@ function isUpToDate( o )
     if( parsed.hash === currentVersion )
     return true;
 
-    return self.remoteVersion({ remotePath : o.remotePath, verbosity : o.verbosity, sync : 0 })
+    return self.remoteVersion({ remotePath : o.remotePath, logger : o.logger, sync : 0 })
     .then( ( latestVersion ) => currentVersion === latestVersion )
   })
 
@@ -1786,7 +1719,7 @@ var defaults = isUpToDate.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.remotePath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1794,7 +1727,7 @@ defaults.verbosity = 0;
  * @summary Returns true if path `o.localPath` contains npm package.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function hasFiles
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1817,7 +1750,7 @@ function hasFiles( o )
 
 var defaults = hasFiles.defaults = Object.create( null );
 defaults.localPath = null;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1825,7 +1758,7 @@ defaults.verbosity = 0;
  * @summary Returns true if path `o.localPath` contains a package.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function isRepository
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1863,7 +1796,7 @@ function isRepository( o )
 var defaults = isRepository.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1872,7 +1805,7 @@ defaults.verbosity = 0;
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
  * @param {String} o.remotePath Remote path to package.
- * @param {Number} o.verbosity=0 Level of verbosity.
+ * @param {Number} o.logger=0 Level of verbosity.
  * @function hasRemote
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1942,7 +1875,7 @@ var defaults = hasRemote.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.remotePath = null;
 defaults.sync = 1;
-defaults.verbosity = 0;
+defaults.logger = 0;
 
 //
 
@@ -1997,24 +1930,35 @@ let Extension =
   // write l2
 
   structureFormat,
-  format,
+  fileFormat,
 
-  fixate, /* qqq : cover please */
+  fileFixate, /* qqq : cover please */
   structureFixate, /* qqq : cover please */
-  bump, /* qqq : cover please */
+  fileBump, /* qqq : cover please */
   structureBump, /* qqq : cover please */
+
+  fileReadFilePath,
+  structureAddFilePath, /* qqq : implement and cover */
+  fileAddfilePath, /* qqq : cover */
+  /* qqq : implement structureRemoveFilePath and fileRemovefilePath */
+
+  fileReadField, /* xxx : qqq : implement and cover */
+  _structureWriteField,
+  fileWriteField, /* qqq : cover */
+
+  /* xxx qqq : all routines using package.json should also fallback to package-lock.json if package.json does not exist */
+  fileReadName,
+  fileReadEntryPath,
+
+  // write l3
 
   // structureDepAdd, /* qqq : implement and cover */
   depAdd, /* qqq : implement and cover */
   structureDepRemove, /* qqq : implement and cover */
   depRemove, /* qqq : cover */
 
-  structureFilePathAdd, /* qqq : implement and cover */
-  filePathAdd, /* qqq : cover */
-
-  // write l3
-
   install,
+  clean,
   publish,
 
   // read l3
@@ -2025,13 +1969,6 @@ let Extension =
 
   remoteAbout,
   remoteDependants,
-
-  // local
-
-  /* xxx qqq : all routines using package.json should also fallback to package-lock.json if package.json does not exist */
-  localName,
-  localEntryPath,
-  localFilePath,
 
   // vcs
 

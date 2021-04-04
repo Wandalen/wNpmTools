@@ -4,7 +4,7 @@
 'use strict';
 
 const _ = _global_.wTools;
-const Parent = _.uri; /* qqq : for Dmytro : not solved. see end of the file */ 
+const Parent = _.uri; /* qqq : for Dmytro : not solved. see end of the file */
 const Self = _.npm.path = _.npm.path || Object.create( Parent );
 
 // --
@@ -414,7 +414,7 @@ function fixate( o )
   let latestVersion = _.npm.remoteVersionLatest
   ({
     remotePath : o.remotePath,
-    verbosity : o.verbosity,
+    logger : o.logger,
   });
 
   let result = _.npm.path.str
@@ -430,7 +430,7 @@ function fixate( o )
 fixate.defaults =
 {
   remotePath : null,
-  verbosity : 0,
+  logger : 0,
 };
 
 // --
