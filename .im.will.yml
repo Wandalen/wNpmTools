@@ -81,8 +81,8 @@ path:
       raw: compiled
       content: prime
   npm.proto.entry:
-    - /pro/module/wNpmTools/proto/wtools/amid/l3/npm/Include.ss
-    - /pro/module/wNpmTools/proto/node_modules/wnpmtools
+    - proto/wtools/amid/l3/npm/Include.ss
+    - proto/node_modules/wnpmtools
 reflector:
   reflect.proto:
     inherit: predefined.*

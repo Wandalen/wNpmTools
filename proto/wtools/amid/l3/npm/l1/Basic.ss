@@ -16,7 +16,7 @@ function _readChangeWrite_functor( fo )
 {
   let defaults =
   {
-    logger : null,
+    logger : 0,
     nativizing : 1,
     localPath : null,
     configPath : null,
@@ -885,6 +885,7 @@ function depAdd( o )
 
   _.routine.options( depAdd, o );
 
+  o.logger = _.logger.from( o.logger );
   let nodeModulesPath = _.npm.pathDownloadFromLocal( o.localPath );
 
   _.assert( _.strDefined( o.depPath ) );
@@ -931,7 +932,7 @@ depAdd.defaults =
   downloading : 1,
   linking : 1,
   dry : 0,
-  logger : null,
+  logger : 0,
 }
 
 /* xxx : qqq : for Dmytro : replace each option::verbosity by option::logger */
@@ -1007,6 +1008,8 @@ function install( o )
   _.assert( _.strDefined( o.localPath ) );
   _.sure( fileProvider.isDir( o.localPath ) );
 
+  o.logger = _.logger.from( o.logger );
+
   if( o.locked === null )
   {
     o.locked = fileProvider.isTerminal( path.join( o.localPath, 'package-lock.json' ) )
@@ -1070,7 +1073,7 @@ install.defaults =
   locked : null,
   localPath : null,
   linkingSelf : null,
-  logger : null,
+  logger : 0,
   dry : 0,
   sync : 1,
 }
@@ -1103,7 +1106,7 @@ function clean( o )
 clean.defaults =
 {
   localPath : null,
-  logger : null,
+  // logger : 0, /* qqq : implement and cover the option */
   dry : 0,
   sync : 1,
 }
@@ -1181,6 +1184,8 @@ function versionLog( o )
   o.configPath = self.pathConfigFromLocal( o.localPath );
   // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
 
+  o.logger = _.logger.from( o.logger );
+
   _.assert( _.strDefined( o.configPath ) );
   _.assert( _.strDefined( o.remotePath ) );
 
@@ -1198,6 +1203,8 @@ function versionLog( o )
     outputPiping : 0,
     inputMirroring : 0,
     throwingExitCode : 0,
+    logger : o.logger,
+    verbosity : o.logger.verbosity,
   })
   .then( ( got ) =>
   {
@@ -1224,7 +1231,7 @@ function versionLog( o )
 
 versionLog.defaults =
 {
-  logger : null,
+  logger : 1,
   // logging : 1,
   remotePath : null,
   localPath : null,
@@ -1966,7 +1973,7 @@ let Extension =
 
   // read l3
 
-  versionLog,
+  versionLog, /* qqq : cover */
 
   // remote
 
