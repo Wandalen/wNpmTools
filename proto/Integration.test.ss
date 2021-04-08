@@ -97,11 +97,6 @@ function production( test )
   }
 
   let version = versionGet( isFork, remotePath );
-  // if( isFork )
-  // version = __.git.path.nativize( remotePath );
-  // else
-  // version = mdl.version;
-
   if( !version )
   throw _.err( 'Cannot obtain version to install' );
 
@@ -109,6 +104,8 @@ function production( test )
   a.fileProvider.fileWrite({ filePath : a.abs( 'package.json' ), data : structure, encoding : 'json' });
   let data = a.fileProvider.fileRead({ filePath : a.abs( 'package.json' ) });
   console.log( data );
+
+  let moduleDir = __.path.join( a.routinePath, 'node_modules', mdl.name );
 
   /* */
 
@@ -120,11 +117,13 @@ function production( test )
     test.identical( op.exitCode, 0 );
 
     test.case = 'no test files';
-    let moduleDir = __.path.join( a.routinePath, 'node_modules', mdl.name );
     let testFiles = a.fileProvider.filesFind({ filePath : __.path.join( moduleDir, '**.test*' ), outputFormat : 'relative' });
     test.identical( testFiles, [] );
     return null;
   });
+
+  if( isFork )
+  a.shell({ execPath : `will .npm.install`, currentPath : moduleDir })
 
   run( 'Sample.s' );
   run( 'Sample.ss' );
@@ -191,13 +190,9 @@ function production( test )
     if( isFork )
     return __.git.path.nativize( remotePath );
 
-    debugger;
-    let devDependencies = __.npm.fileReadField({ localPath : _.npm.pathLocalFromInside( __dirname ), key : 'devDependencies' });
-    debugger;
+    let devDependencies = __.npm.fileReadField({ localPath : __.npm.pathLocalFromInside( __dirname ), key : 'devDependencies' });
     if( devDependencies && devDependencies.wTesting && isNaN( devDependencies.wTesting[ 0 ] ) )
-    {
-      return devDependencies.wTesting;
-    }
+    return devDependencies.wTesting;
 
     return mdl.version;
   }
