@@ -405,6 +405,36 @@ function pathLocalFromConfig( configPath )
 
 //
 
+function pathLocalFromInside( insidePath )
+{
+  let fileProvider = _.fileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 1 );
+
+  insidePath = path.canonize( insidePath );
+
+  if( check( insidePath ) )
+  return insidePath;
+
+  let paths = path.traceToRoot( insidePath );
+  for( var i = paths.length - 1; i >= 0; i-- )
+  if( check( paths[ i ] ) )
+  return paths[ i ];
+
+  return null;
+
+  function check( dirPath )
+  {
+    if( !fileProvider.isTerminal( path.join( dirPath, 'package.json' ) ) )
+    return false
+    return true;
+  }
+
+}
+
+//
+
 /* xxx : qqq : implement and use similar routine for git */
 function pathDownloadFromLocal( localPath )
 {
@@ -1934,6 +1964,7 @@ let Extension =
   pathFixate,
   pathConfigFromLocal, /* qqq : cover */
   pathLocalFromConfig, /* qqq : cover */
+  pathLocalFromInside,  /* qqq : cover */
   pathDownloadFromLocal, /* qqq : cover */
   pathLocalFromDownload, /* qqq : cover */
 

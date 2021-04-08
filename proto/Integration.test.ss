@@ -7,7 +7,7 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( 'wTools' );
+  const _ = require( 'wTools' );
   _.include( 'wTesting' );
 }
 
@@ -17,7 +17,6 @@ const _ = _global_.wTools;
 const __ = _globals_.testing.wTools;
 const fileProvider = __.fileProvider;
 const path = fileProvider.path;
-
 
 // --
 // context
@@ -88,20 +87,20 @@ function production( test )
   if( __.git.insideRepository( a.abs( __dirname, '..' ) ) )
   remotePath = __.git.remotePathFromLocal( a.abs( __dirname, '..' ) );
 
+  let isFork = false;
   let mdlRepoParsed, remotePathParsed;
   if( remotePath )
   {
     mdlRepoParsed = __.git.path.parse( mdl.repository.url );
     remotePathParsed = __.git.path.parse( remotePath );
+    isFork = mdlRepoParsed.user !== remotePathParsed.user || mdlRepoParsed.repo !== remotePathParsed.repo;
   }
 
-  let isFork = mdlRepoParsed.user !== remotePathParsed.user || mdlRepoParsed.repo !== remotePathParsed.repo;
-
-  let version;
-  if( isFork )
-  version = __.git.path.nativize( remotePath );
-  else
-  version = mdl.version;
+  let version = versionGet( isFork, remotePath );
+  // if( isFork )
+  // version = __.git.path.nativize( remotePath );
+  // else
+  // version = mdl.version;
 
   if( !version )
   throw _.err( 'Cannot obtain version to install' );
@@ -183,6 +182,24 @@ function production( test )
         return null;
       })
     });
+  }
+
+  /* */
+
+  function versionGet( isFork )
+  {
+    if( isFork )
+    return __.git.path.nativize( remotePath );
+
+    debugger;
+    let devDependencies = __.npm.fileReadField({ localPath : _.npm.pathLocalFromInside( __dirname ), key : 'devDependencies' });
+    debugger;
+    if( devDependencies && devDependencies.wTesting && isNaN( devDependencies.wTesting[ 0 ] ) )
+    {
+      return devDependencies.wTesting;
+    }
+
+    return mdl.version;
   }
 
   /* */
