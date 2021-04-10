@@ -64,7 +64,7 @@ function _readChangeWrite_functor( fo )
     _.assert( o.logger !== undefined );
     // if( routine.defaults.logger !== undefined )
     {
-      o.logger = _.logger.from( o.logger );
+      o.logger = _.logger.maybe( o.logger );
       // if( _.numberIs( o.logger ) || _.boolIs( o.logger ) )
       // if( !o.logger || o.logger < 0 )
       // o.logger = 0;
@@ -775,7 +775,7 @@ function fileAddfilePath_head( routine, args )
   // if( !o.verbosity || o.verbosity < 0 )
   // o.verbosity = 0;
   debugger;
-  o.logger = _.logger.from( o.logger );
+  o.logger = _.logger.maybe( o.logger );
   return o;
 }
 
@@ -915,7 +915,7 @@ function depAdd( o )
 
   _.routine.options( depAdd, o );
 
-  o.logger = _.logger.from( o.logger );
+  o.logger = _.logger.maybe( o.logger );
   let nodeModulesPath = _.npm.pathDownloadFromLocal( o.localPath );
 
   _.assert( _.strDefined( o.depPath ) );
@@ -977,7 +977,7 @@ function depRemove_head( routine, args )
   o = _.routine.options( routine, args );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 );
-  o.logger = _.logger.from( o.logger );
+  o.logger = _.logger.maybe( o.logger );
   // if( !o.verbosity || o.verbosity < 0 )
   // o.verbosity = 0;
   return o;
@@ -1038,7 +1038,7 @@ function install( o )
   _.assert( _.strDefined( o.localPath ) );
   _.sure( fileProvider.isDir( o.localPath ) );
 
-  o.logger = _.logger.from( o.logger );
+  o.logger = _.logger.maybe( o.logger );
 
   if( o.locked === null )
   {
@@ -1160,7 +1160,7 @@ function publish( o )
   let self = this;
 
   _.routine.options( publish, arguments );
-  o.logger = _.logger.from( o.logger );
+  o.logger = _.logger.maybe( o.logger );
   // if( !o.verbosity || o.verbosity < 0 )
   // o.verbosity = 0;
 
@@ -1214,7 +1214,7 @@ function versionLog( o )
   o.configPath = self.pathConfigFromLocal( o.localPath );
   // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
 
-  o.logger = _.logger.from( o.logger );
+  o.logger = _.logger.maybe( o.logger );
 
   _.assert( _.strDefined( o.configPath ) );
   _.assert( _.strDefined( o.remotePath ) );
