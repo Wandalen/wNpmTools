@@ -1069,7 +1069,6 @@ function install( o )
   }
 
   /* xxx : qqq : why not additive output? */
-  debugger;
   _.process.start( o2 );
 
   ready.then( ( op ) =>
