@@ -1555,6 +1555,4 @@ module:
       ../.im.will.yml:
         hash: 9106d83db9b6e745ca5dc2d5cb15c2d8
         size: 5044
-      wNpmTools.out.will.yml:
-        hash: 342c2bb04ce387967d03fbb89edc1a8a
-        size: 40621
+      wNpmTools.out.will.yml: *ref_0
