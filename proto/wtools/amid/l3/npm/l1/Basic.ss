@@ -97,7 +97,7 @@ function _readChangeWrite_functor( fo )
   function _readChangeWrite( o )
   {
     let logger = o.logger;
-    _.assert( logger === false || _.logger.is( o.logger ) );
+    _.assert( logger === 0 || _.logger.is( o.logger ) );
 
     if( !o.configPath )
     o.configPath = _.npm.pathConfigFromLocal( o.localPath );
@@ -1015,6 +1015,11 @@ structureDepRemove.defaults =
   kind : null, /* xxx : qqq : implement and make possible to path countable to select several kinds */
 }
 
+/* qqq2 : for Dmytro : write test routines
+- make sure there is test wich delete submodule which already has a link. files which are referred by the link should not be deleted
+- duplicate tests in NpmTools and willbe
+*/
+
 const depRemove = _readChangeWrite_functor
 ({
   name : 'depRemove',
@@ -1096,7 +1101,11 @@ function install( o )
   return ready;
 }
 
-/* qqq : cover each option */
+/* qqq2 : for Dmytro : write test routines
+- make sure there is test wich delete submodule which already has a link. files which are referred by the link should not be deleted
+- duplicate tests in NpmTools and willbe
+*/
+
 install.defaults =
 {
   locked : null,
