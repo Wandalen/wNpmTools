@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 {
   const _ = require( '../../../../node_modules/Tools' );
   _.include( 'wTesting' );
-  require( '../npm/Include.ss' );
+  require( '../../l3/npm/include/Mid.ss' );
 }
 
 const _ = _global_.wTools;
@@ -2253,6 +2253,7 @@ let Proto =
 
   name : 'Tools.mid.NpmTools.path',
   silencing : 1,
+  enabled : 1,
 
   tests :
   {
