@@ -438,6 +438,7 @@ function pathLocalFromInside( insidePath )
 /* xxx : qqq : implement and use similar routine for git */
 function pathDownloadFromLocal( localPath )
 {
+  _.assert( arguments.length === 1, 'Expects single local path {-localPath-}' );
   return _.path.join( localPath, 'node_modules' );
 }
 
@@ -963,7 +964,7 @@ depAdd.defaults =
   linking : 1,
   dry : 0,
   logger : 0,
-}
+};
 
 /* xxx : qqq : for Dmytro : replace each option::verbosity by option::logger */
 
@@ -1046,9 +1047,7 @@ function install( o )
   o.logger = _.logger.maybe( o.logger );
 
   if( o.locked === null )
-  {
-    o.locked = fileProvider.isTerminal( path.join( o.localPath, 'package-lock.json' ) )
-  }
+  o.locked = fileProvider.isTerminal( path.join( o.localPath, 'package-lock.json' ) );
 
   fileProvider.filesDelete( path.join( o.localPath, 'node_modules' ) );
   if( !o.locked )
@@ -1071,7 +1070,7 @@ function install( o )
     verbosity : o.logger ? o.logger.verbosity : 0,
     dry : o.dry,
     ready,
-  }
+  };
 
   /* xxx : qqq : why not additive output? */
   _.process.start( o2 );
@@ -1079,7 +1078,6 @@ function install( o )
   ready.then( ( op ) =>
   {
 
-    debugger;
     if( o.linkingSelf )
     return _.npm.depAdd
     ({
@@ -1114,7 +1112,7 @@ install.defaults =
   logger : 0,
   dry : 0,
   sync : 1,
-}
+};
 
 //
 
@@ -1973,7 +1971,7 @@ let Extension =
   pathConfigFromLocal, /* qqq : cover */
   pathLocalFromConfig, /* qqq : cover */
   pathLocalFromInside,  /* qqq : cover */
-  pathDownloadFromLocal, /* qqq : cover */
+  pathDownloadFromLocal, /* aaa : cover */ /* Dmytro : covered */
   pathLocalFromDownload, /* qqq : cover */
 
   // write l2

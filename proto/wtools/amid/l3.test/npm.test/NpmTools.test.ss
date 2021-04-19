@@ -168,6 +168,89 @@ function pathFixate( test )
 
 //
 
+function pathDownloadFromLocal( test )
+{
+  test.case = 'local path - root';
+  var src = '/';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '/node_modules' );
+
+  test.case = 'local path - absolute path, file without extension';
+  var src = '/a/b/c';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '/a/b/c/node_modules' );
+
+  test.case = 'local path - absolute path, file with extension';
+  var src = '/a/b/c.d';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '/a/b/c.d/node_modules' );
+
+  test.case = 'local path - absolute path, directory';
+  var src = '/a/b/c/';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '/a/b/c/node_modules' );
+
+  /* */
+
+  test.case = 'local path - relative';
+  var src = './';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, './node_modules' );
+
+  test.case = 'local path - relative path, file without extension';
+  var src = './a/b/c';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, './a/b/c/node_modules' );
+
+  test.case = 'local path - relative path, file with extension';
+  var src = './a/b/c.d';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, './a/b/c.d/node_modules' );
+
+  test.case = 'local path - relative path, directory';
+  var src = './a/b/c/';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, './a/b/c/node_modules' );
+
+  /* */
+
+  test.case = 'local path - relative';
+  var src = '../';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '../node_modules' );
+
+  test.case = 'local path - relative path, file without extension';
+  var src = '../a/b/c';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '../a/b/c/node_modules' );
+
+  test.case = 'local path - relative path, file with extension';
+  var src = '../a/b/c.d';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '../a/b/c.d/node_modules' );
+
+  test.case = 'local path - relative path, directory';
+  var src = '../a/b/c/';
+  var got = _.npm.pathDownloadFromLocal( src );
+  test.identical( got, '../a/b/c/node_modules' );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.npm.pathDownloadFromLocal() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.npm.pathDownloadFromLocal( '/', '/' ) );
+
+  test.case = 'wrong type of localPath';
+  test.shouldThrowErrorSync( () => _.npm.pathDownloadFromLocal( [] ) );
+}
+
+//
+
 function format( test )
 {
   let self = this;
@@ -1478,6 +1561,7 @@ const Proto =
     pathParse,
     pathIsFixated,
     pathFixate,
+    pathDownloadFromLocal,
 
     /* */
 
