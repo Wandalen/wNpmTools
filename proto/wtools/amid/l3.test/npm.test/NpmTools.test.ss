@@ -504,7 +504,7 @@ function fixate( test )
   test.identical( got.tag, '=' );
   test.identical( got.onDep, null );
   test.identical( got.dry, 0 );
-  test.identical( got.logger, false );
+  test.identical( got.logger, 0 );
   test.identical( got.changed, false );
 
   /* */
