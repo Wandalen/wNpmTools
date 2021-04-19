@@ -2211,7 +2211,7 @@ function fixate( test )
 
   test.case = 'simple path, verbosity - 5';
   var remotePath = 'npm:///wmodulefortesting1';
-  var got = _.npm.path.fixate({ remotePath, verbosity : 5 });
+  var got = _.npm.path.fixate({ remotePath, logger : 5 });
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
   var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
