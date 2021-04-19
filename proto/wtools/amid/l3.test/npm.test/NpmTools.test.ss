@@ -461,7 +461,7 @@ function fixate( test )
     'optionalDependencies' : { 'package5' : '1.0.0', 'package6' : '1.0.0' },
     'bundledDependencies' : [ 'package7', 'package8' ],
     'peerDependencies' : { 'package9' : '1.0.0', 'package10' : '1.0.0' }
-  }
+  };
   /* aaa Artem : done. why fixateNotEmptyVersions is called only without callback onDep? */
 
   test.identical( got, exp );
@@ -700,6 +700,227 @@ bump.description =
 `
 Bumps package version
 `;
+
+//
+
+function depAdd( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+
+  /* - */
+
+  begin().then( () =>
+  {
+    test.case = 'as === module.name';
+    return null;
+  });
+  a.ready.then( () =>
+  {
+    var got = _.npm.depAdd
+    ({
+      as : 'wmodulefortesting1',
+      depPath : `hd://${ a.abs( 'wModuleForTesting1' ) }`,
+      localPath : a.abs( '.' ),
+      editing : 0,
+    });
+    test.identical( got, true );
+    test.true( a.fileProvider.areSoftLinked( a.abs( 'node_modules/wmodulefortesting1' ), a.abs( 'wModuleForTesting1' ) ) );
+    var files = a.fileProvider.filesFind
+    ({
+      filePath : a.abs( 'node_modules' ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting2' ] );
+
+    return null;
+  });
+
+  /* */
+
+  begin().then( () =>
+  {
+    test.case = 'as === module.name, dry - 1';
+    return null;
+  });
+  a.ready.then( () =>
+  {
+    var got = _.npm.depAdd
+    ({
+      as : 'wmodulefortesting1',
+      depPath : `hd://${ a.abs( 'wModuleForTesting1' ) }`,
+      localPath : a.abs( '.' ),
+      dry : 1,
+      editing : 0,
+    });
+    test.identical( got, true );
+    test.false( a.fileProvider.fileExists( a.abs( 'node_modules/wmodulefortesting1' ) ) );
+    test.false( a.fileProvider.areSoftLinked( a.abs( 'node_modules/wmodulefortesting1' ), a.abs( 'wModuleForTesting1' ) ) );
+    var files = a.fileProvider.filesFind
+    ({
+      filePath : a.abs( 'node_modules' ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( files, [ '.', './wmodulefortesting2' ] );
+
+    return null;
+  });
+
+  /* */
+
+  begin().then( () =>
+  {
+    test.case = 'as !== module.name';
+    return null;
+  });
+  a.ready.then( () =>
+  {
+    var got = _.npm.depAdd
+    ({
+      as : 'modulefortesting',
+      depPath : `hd://${ a.abs( 'wModuleForTesting1' ) }`,
+      localPath : a.abs( '.' ),
+      editing : 0,
+    });
+    test.identical( got, true );
+    test.true( a.fileProvider.areSoftLinked( a.abs( 'node_modules/modulefortesting' ), a.abs( 'wModuleForTesting1' ) ) );
+    var files = a.fileProvider.filesFind
+    ({
+      filePath : a.abs( 'node_modules' ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( files, [ '.', './modulefortesting', './wmodulefortesting2' ] );
+
+    return null;
+  });
+
+  /* */
+
+  let filesBefore;
+  begin().then( () =>
+  {
+    test.case = 'rewrite soft link to module by another link';
+    filesBefore = a.find( a.abs( 'wModuleForTesting1' ) );
+    return null;
+  });
+  a.ready.then( () =>
+  {
+    var got = _.npm.depAdd
+    ({
+      as : 'wmodulefortesting1',
+      depPath : `hd://${ a.abs( 'wModuleForTesting1' ) }`,
+      localPath : a.abs( '.' ),
+      editing : 0,
+    });
+    test.identical( got, true );
+    test.true( a.fileProvider.areSoftLinked( a.abs( 'node_modules/wmodulefortesting1' ), a.abs( 'wModuleForTesting1' ) ) );
+    var files = a.fileProvider.filesFind
+    ({
+      filePath : a.abs( 'node_modules' ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting2' ] );
+
+    return null;
+  });
+  a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting2.git wModuleForTesting2' );
+  a.ready.then( () =>
+  {
+    var got = _.npm.depAdd
+    ({
+      as : 'wmodulefortesting1',
+      depPath : `hd://${ a.abs( 'wModuleForTesting2' ) }`,
+      localPath : a.abs( '.' ),
+      editing : 0,
+    });
+    test.identical( got, true );
+    test.false( a.fileProvider.areSoftLinked( a.abs( 'node_modules/wmodulefortesting1' ), a.abs( 'wModuleForTesting1' ) ) );
+    test.true( a.fileProvider.areSoftLinked( a.abs( 'node_modules/wmodulefortesting1' ), a.abs( 'wModuleForTesting2' ) ) );
+    var files = a.fileProvider.filesFind
+    ({
+      filePath : a.abs( 'node_modules' ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting2' ] );
+    var filesAfter = a.find( a.abs( 'wModuleForTesting1' ) );
+    test.identical( filesBefore, filesAfter );
+
+    return null;
+  });
+
+  /* */
+
+  if( Config.debug )
+  begin().then( () =>
+  {
+    test.case = 'without arguments';
+    test.shouldThrowErrorSync( () => _.npm.depAdd() );
+
+    test.case = 'extra arguments';
+    var o = { as : 'wmodulefortesting1', depPath : `hd://${ a.abs( 'wmodulefortesting1' ) }`, localPath : a.abs( '.' ) };
+    test.shouldThrowErrorSync( () => _.npm.depAdd( o, o ) );
+
+    test.case = 'wrong type of options map o';
+    test.shouldThrowErrorSync( () => _.npm.depAdd( 'wrong' ) );
+
+    test.case = 'unknown option in options map o';
+    var o =
+    {
+      as : 'wmodulefortesting1',
+      depPath : `hd://${ a.abs( 'wmodulefortesting1' ) }`,
+      localPath : a.abs( '.' ),
+      unknown : 1,
+    };
+    test.shouldThrowErrorSync( () => _.npm.depAdd( o ) );
+
+    test.case = 'o.depPath is not defined string';
+    var o = { as : 'wmodulefortesting1', depPath : '', localPath : a.abs( '.' ) };
+    test.shouldThrowErrorSync( () => _.npm.depAdd( o ) );
+
+    test.case = 'o.localPath does not exists';
+    var o = { as : 'wmodulefortesting1', depPath : `hd://${ a.abs( 'wmodulefortesting1' ) }`, localPath : a.abs( 'not_existed' ) };
+    test.shouldThrowErrorSync( () => _.npm.depAdd( o) );
+
+    test.case = 'o.depPath does not exists';
+    var o = { as : 'wmodulefortesting1', depPath : `hd://${ a.abs( 'not_existed' ) }`, localPath : a.abs( '.' ) };
+    test.shouldThrowErrorSync( () => _.npm.depAdd( o) );
+
+    test.case = 'o.as is not defined string';
+    var o = { as : '', depPath : `hd://${ a.abs( 'wmodulefortesting1' ) }`, localPath : a.abs( '.' ) };
+    test.shouldThrowErrorSync( () => _.npm.depAdd( o) );
+
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin()
+  {
+    a.ready.then( () => { a.fileProvider.filesDelete( a.abs( '.' ) ); return null });
+    a.ready.then( () =>
+    {
+      a.fileProvider.dirMake( a.abs( 'node_modules' ) );
+      a.fileProvider.dirMake( a.abs( 'node_modules/wmodulefortesting2' ) );
+      return null
+    });
+    a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git wModuleForTesting1' );
+    return a.ready;
+  }
+}
 
 //
 
@@ -1051,24 +1272,22 @@ function isRepository( test )
   let localPath = a.abs( 'node_modules/wmodulefortesting1' );
   let ready = new _.Consequence().take( null );
 
-  _.fileProvider.dirMake( testPath )
+  a.fileProvider.dirMake( testPath )
 
   let install = _.process.starter
   ({
     execPath : 'npm install --no-package-lock --legacy-bundling --prefix ' + _.fileProvider.path.nativize( testPath ),
     currentPath : testPath,
     ready
-  })
+  });
 
-  ready
-
-  .then( () =>
+  ready.then( () =>
   {
     test.case = 'no package'
     var got = _.npm.isRepository({ localPath });
     test.identical( got, false );
     return null;
-  })
+  });
 
   install( 'wmodulefortesting1' )
   .then( () =>
@@ -1571,6 +1790,8 @@ const Proto =
 
     fixate,
     bump,
+
+    depAdd,
 
     remoteAbout,
 
