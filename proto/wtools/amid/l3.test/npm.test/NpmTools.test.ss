@@ -692,7 +692,7 @@ function bump( test )
   test.true( _.strDefined( got.localPath ) );
   test.true( _.strDefined( got.configPath ) );
   test.identical( got.dry, 0 );
-  test.identical( got.logger, false );
+  test.identical( got.logger, 0 );
   test.identical( got.changed, true );
 }
 
