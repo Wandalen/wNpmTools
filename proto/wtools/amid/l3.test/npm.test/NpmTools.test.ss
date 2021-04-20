@@ -429,7 +429,7 @@ function format( test )
   return a.ready;
 }
 
-format.timeOut = 3e5;
+format.timeOut = 4e5;
 
 //
 

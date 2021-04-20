@@ -529,8 +529,8 @@ function structureFormat_functor()
     ({
       execPath : 'npm --version',
       outputCollecting : 1,
-      // mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : fixed, not me */
-      mode : 'spawn',
+      mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` */
+      // mode : 'spawn',
       sync : 1,
       outputPiping : 1,
       verbosity : 0,
@@ -1028,6 +1028,7 @@ const depRemove = _readChangeWrite_functor
 
 /* qqq : cover */
 /* qqq : cover case o.localPath is soft link */
+
 function install( o )
 {
   let self = this;
