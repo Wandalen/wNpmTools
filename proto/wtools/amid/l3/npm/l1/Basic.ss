@@ -529,10 +529,10 @@ function structureFormat_functor()
     ({
       execPath : 'npm --version',
       outputCollecting : 1,
-      // mode : 'shell', /* qqq : for Dmytro : very bad! */
+      // mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : fixed, not me */
       mode : 'spawn',
       sync : 1,
-      outputPiping : 0,
+      outputPiping : 1,
       verbosity : 0,
       logger : 0,
     });
@@ -552,9 +552,6 @@ function structureFormat_functor()
   {
     return b.toLowerCase().localeCompare( a.toLowerCase() );
   }
-
-  /* */
-
 }
 
 let structureFormat = structureFormat_functor();
