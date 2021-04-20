@@ -758,7 +758,7 @@ fileReadFilePath.defaults =
 
 /* qqq : cover */
 
-function fileAddfilePath_head( routine, args )
+function fileAddFilePath_head( routine, args )
 {
   let o = args[ 0 ];
   if( !_.mapIs( o ) )
@@ -798,10 +798,10 @@ structureAddFilePath.defaults =
   filePath : null,
 }
 
-const fileAddfilePath = _readChangeWrite_functor
+const fileAddFilePath = _readChangeWrite_functor
 ({
-  name : 'fileAddfilePath',
-  head : fileAddfilePath_head,
+  name : 'fileAddFilePath',
+  head : fileAddFilePath_head,
   onChange : structureAddFilePath,
 });
 
@@ -1980,8 +1980,8 @@ let Extension =
 
   fileReadFilePath,
   structureAddFilePath, /* qqq : implement and cover */
-  fileAddfilePath, /* qqq : cover */
-  /* qqq : implement structureRemoveFilePath and fileRemovefilePath */
+  fileAddFilePath, /* qqq : cover */
+  /* qqq : implement structureRemoveFilePath and fileRemoveFilePath */
 
   fileReadField, /* xxx : qqq : implement and cover */
   _structureWriteField,
