@@ -1172,6 +1172,61 @@ install.timeOut = 60000;
 
 //
 
+function installLocalPathIsSoftLink( test )
+{
+  let self = this;
+  let a = test.assetFor( 'install' );
+
+  if( !Config.debug )
+  return test.true( true );
+
+  /* - */
+
+  begin().then( () =>
+  {
+    test.case = 'o.localPath - soft link';
+    var o =
+    {
+      localPath : a.abs( 'module/soft' ),
+      locked : 1,
+      linkingSelf : 1,
+      logger : 0,
+      dry : 0,
+      sync : 1,
+    };
+    test.shouldThrowErrorSync( () => _.npm.install( o ) );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin()
+  {
+    a.ready.then( () =>
+    {
+      let srcPath = a.abs( 'soft' );
+      a.fileProvider.dirMake( srcPath );
+      a.fileProvider.filesReflect({ reflectMap : { [ a.originalAssetPath ] : srcPath } });
+      a.fileProvider.dirMake( a.abs( 'module' ) );
+      a.fileProvider.softLink
+      ({
+        dstPath : a.abs( 'module/soft' ),
+        srcPath,
+        makingDirectory : 1,
+        rewritingDirs : 1,
+      });
+      return null;
+    });
+    return a.ready;
+  }
+}
+
+//
+
 function remoteAbout( test )
 {
   let ready = _.take( null );
@@ -2042,6 +2097,7 @@ const Proto =
     depAdd,
 
     install,
+    installLocalPathIsSoftLink,
 
     remoteAbout,
 

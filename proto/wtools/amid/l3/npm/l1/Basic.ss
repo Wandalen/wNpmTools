@@ -1027,7 +1027,7 @@ const depRemove = _readChangeWrite_functor
 //
 
 /* aaa : cover */ /* Dmytro : covered */
-/* qqq : cover case o.localPath is soft link */
+/* aaa : cover case o.localPath is soft link */ /* Dmytro : covered, throw error because it is not directory, test routine `installLocalPathIsSoftLink` */
 
 function install( o )
 {
