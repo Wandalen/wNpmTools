@@ -529,7 +529,7 @@ function structureFormat_functor()
     ({
       execPath : 'npm --version',
       outputCollecting : 1,
-      mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` */
+      mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
       // mode : 'spawn',
       sync : 1,
       outputPiping : 1,
@@ -1026,7 +1026,7 @@ const depRemove = _readChangeWrite_functor
 
 //
 
-/* qqq : cover */
+/* aaa : cover */ /* Dmytro : covered */
 /* qqq : cover case o.localPath is soft link */
 
 function install( o )
@@ -1037,6 +1037,7 @@ function install( o )
   let path = _.uri;
   let abs = _.routineJoin( path, path.s.join, [ o.localPath ] );
 
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.routineOptions( install, o );
   _.assert( _.strDefined( o.localPath ) );
   _.sure( fileProvider.isDir( o.localPath ) );
@@ -1096,9 +1097,13 @@ function install( o )
   return ready;
 }
 
-/* qqq2 : for Dmytro : write test routines
+/* aaa2 : for Dmytro : write test routines
 - make sure there is test wich delete submodule which already has a link. files which are referred by the link should not be deleted
 - duplicate tests in NpmTools and willbe
+*/
+/* Dmytro : covered
+- first case is actual for routine `depAdd`, this case was covered,
+- duplicate for willbe commands
 */
 
 install.defaults =
