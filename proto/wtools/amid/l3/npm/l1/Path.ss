@@ -60,7 +60,7 @@ function parse_head( routine, args )
   if( _.strIs( o ) )
   o = { remotePath : o };
 
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.assert( _.strIs( o.remotePath ) || _.mapIs( o.remotePath ), 'Expects file path {-o.remotePath-}' );
 
   return o;
@@ -81,7 +81,7 @@ function parse_body( o )
 
   let result = Object.create( null );
   let parsed = _.uri.parseConsecutive( o.remotePath );
-  _.mapExtend( result, parsed );
+  _.props.extend( result, parsed );
 
   if( o.full )
   result.protocols = parsed.protocols = parsed.protocol ? parsed.protocol.split( '+' ) : [];
@@ -101,7 +101,7 @@ function parse_body( o )
 
   /* */
 
-  // let parsed2 = _.mapExtend( null, parsed );
+  // let parsed2 = _.props.extend( null, parsed );
   // parsed2.protocol = null;
   // parsed2.hash = null;
   // parsed2.tag = null;
@@ -174,7 +174,7 @@ parse_body.defaults =
 
 //
 
-let parse = _.routine.uniteCloning_( parse_head, parse_body );
+let parse = _.routine.uniteCloning_replaceByUnite( parse_head, parse_body );
 
 //
 
@@ -408,7 +408,7 @@ function fixate( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o };
 
-  _.routineOptions( fixate, o );
+  _.routine.options_( fixate, o );
 
   let parsed = _.npm.path.parse( o.remotePath );
   let latestVersion = _.npm.remoteVersionLatest
@@ -452,7 +452,7 @@ let Extension =
 
 }
 
-_.mapExtend( Self, Extension );
+_.props.extend( Self, Extension );
 
 // _.assert( _.npm.path.s.single === _.npm.path );
 // qqq : for Dmytro : bad : uncomment

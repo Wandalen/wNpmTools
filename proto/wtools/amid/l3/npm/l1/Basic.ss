@@ -26,7 +26,7 @@ function _readChangeWrite_functor( fo )
   };
 
   if( !_.mapIs( fo ) )
-  fo = { onChange : arguments[ 0 ], name : arguments[ 1 ] }
+  fo = { onChange : arguments[ 0 ], name : ( arguments.length > 1 ? arguments[ 1 ] : null ) }
 
   fo = _.routine.options( _readChangeWrite_functor, fo );
   fo.head = fo.head || head;
@@ -41,13 +41,13 @@ function _readChangeWrite_functor( fo )
 
   // if( !fo.body.defaults && fo.onChange.defaults )
   if( fo.onChange.defaults )
-  fo.body.defaults = _.mapSupplement( fo.body.defaults || null, fo.onChange.defaults )
+  fo.body.defaults = _.props.supplement( fo.body.defaults || null, fo.onChange.defaults )
   let defaults2 = Object.create( null );
   defaults2.logger = 0;
   defaults2.dry = 0;
   defaults2.localPath = null;
   defaults2.configPath = null;
-  _.mapSupplement( fo.body.defaults, defaults2 )
+  _.props.supplement( fo.body.defaults, defaults2 )
 
   return _.routine.unite
   ({
@@ -78,11 +78,11 @@ function _readChangeWrite_functor( fo )
 
     try
     {
-      let o2 = _.mapExtend( null, o );
-      _.mapSupplement( null, o2, defaults );
+      let o2 = _.props.extend( null, o );
+      _.props.supplement( null, o2, defaults );
       o2.onChange = onChange;
       _readChangeWrite.call( self, o2 );
-      _.mapExtend( o, o2 );
+      _.props.extend( o, o2 );
       return o;
     }
     catch( err )
@@ -171,7 +171,7 @@ function _read( routine, args )
   o = { localPath : o }
 
   _.assert( arguments.length === 2 );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
   _.map.assertHasAll( o, _read.defaults );
 
   if( o.config === null || o.config === undefined )
@@ -233,7 +233,7 @@ function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
   /* */
 
   let parsed1 = path.parseConsecutive( remotePath );
-  _.mapExtend( result, parsed1 );
+  _.props.extend( result, parsed1 );
 
   if( !result.tag && !result.hash )
   result.tag = 'latest';
@@ -245,7 +245,7 @@ function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
 
   /* */
 
-  let parsed2 = _.mapExtend( null, parsed1 );
+  let parsed2 = _.props.extend( null, parsed1 );
   parsed2.protocol = null;
   parsed2.hash = null;
   parsed2.tag = null;
@@ -259,7 +259,7 @@ function pathParse( remotePath ) /* xxx : rename into pathAnalyze() */
 
   // /* */
   //
-  // let parsed3 = _.mapExtend( null, parsed1 );
+  // let parsed3 = _.props.extend( null, parsed1 );
   // parsed3.longPath = parsed2.longPath;
   // parsed3.protocol = null;
   // parsed3.hash = null;
@@ -493,7 +493,7 @@ function structureFormat_functor()
     {
       const src = o.config[ depSectionsNames[ i ] ];
       const result = Object.create( null );
-      const keys = _.mapKeys( src );
+      const keys = _.props.keys( src );
       keys.sort( sortElements );
       for( let i = 0; i < keys.length; i++ )
       result[ keys[ i ] ] = src[ keys[ i ] ];
@@ -768,7 +768,7 @@ function fileAddfilePath_head( routine, args )
 {
   let o = args[ 0 ];
   if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ], filePath : arguments[ 1 ] }
+  o = { localPath : arguments[ 0 ], filePath : ( arguments.length > 1 ? arguments[ 1 ] : null ) }
   o = _.routine.options( routine, args );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 );
@@ -973,7 +973,7 @@ function depRemove_head( routine, args )
 {
   let o = args[ 0 ];
   if( !_.mapIs( o ) )
-  o = { localPath : arguments[ 0 ], depPath : arguments[ 1 ] }
+  o = { localPath : arguments[ 0 ], depPath : ( arguments.length > 1 ? arguments[ 1 ] : null ) }
   o = _.routine.options( routine, args );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 );
@@ -1039,7 +1039,7 @@ function install( o )
   let path = _.uri;
   let abs = _.routineJoin( path, path.s.join, [ o.localPath ] );
 
-  _.routineOptions( install, o );
+  _.routine.options_( install, o );
   _.assert( _.strDefined( o.localPath ) );
   _.sure( fileProvider.isDir( o.localPath ) );
 
@@ -1128,7 +1128,7 @@ function clean( o )
   let path = _.uri;
   let abs = _.routineJoin( path, path.s.join, [ o.localPath ] );
 
-  _.routineOptions( clean, o );
+  _.routine.options_( clean, o );
   _.assert( _.strDefined( o.localPath ) );
   _.sure( fileProvider.isDir( o.localPath ) );
 
@@ -2034,7 +2034,7 @@ let Extension =
 
 }
 
-_.mapExtend( Self, Extension );
+_.props.extend( Self, Extension );
 
 //
 
