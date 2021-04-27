@@ -207,6 +207,10 @@ module:
             ../proto/wtools/amid/l3.test/npm.test/_asset/format/peerDependencies.json
           - >-
             ../proto/wtools/amid/l3.test/npm.test/_asset/format/peerDependenciesMeta.json
+          - ../proto/wtools/amid/l3.test/npm.test/_asset/install
+          - >-
+            ../proto/wtools/amid/l3.test/npm.test/_asset/install/package-lock.json
+          - ../proto/wtools/amid/l3.test/npm.test/_asset/install/package.json
           - ../proto/wtools/atop
     submodule:
       wTools:
