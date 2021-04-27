@@ -16,7 +16,6 @@ function _readChangeWrite_functor( fo )
 {
   let defaults =
   {
-    logger : 0,
     nativizing : 1,
     localPath : null,
     configPath : null,
@@ -63,12 +62,12 @@ function _readChangeWrite_functor( fo )
     _.assert( args.length === 1 );
     _.assert( o.logger !== undefined );
     // if( routine.defaults.logger !== undefined )
-    {
-      o.logger = _.logger.maybe( o.logger );
+    // {
+    o.logger = _.logger.maybe( o.logger );
       // if( _.numberIs( o.logger ) || _.boolIs( o.logger ) )
       // if( !o.logger || o.logger < 0 )
       // o.logger = 0;
-    }
+    // }
     return o;
   }
 
@@ -96,8 +95,8 @@ function _readChangeWrite_functor( fo )
 
   function _readChangeWrite( o )
   {
-    let logger = o.logger;
-    _.assert( logger === 0 || _.logger.is( o.logger ) );
+    o.logger = _.logger.maybe( o.logger );
+    _.assert( o.logger === 0 || _.logger.is( o.logger ) );
 
     if( !o.configPath )
     o.configPath = _.npm.pathConfigFromLocal( o.localPath );
@@ -136,7 +135,6 @@ function _readChangeWrite_functor( fo )
 
     _.assert( _.strIs( str ) );
 
-
     if( o.logger && o.logger.verbosity >= 1 )
     o.logger.log( `Rewriting ${o.configPath}` );
     if( o.logger && o.logger.verbosity >= 2 )
@@ -157,7 +155,7 @@ _readChangeWrite_functor.defaults =
   body : null,
   onChange : null,
   name : null,
-}
+};
 
 //
 
@@ -438,6 +436,7 @@ function pathLocalFromInside( insidePath )
 /* xxx : qqq : implement and use similar routine for git */
 function pathDownloadFromLocal( localPath )
 {
+  _.assert( arguments.length === 1, 'Expects single local path {-localPath-}' );
   return _.path.join( localPath, 'node_modules' );
 }
 
@@ -526,19 +525,17 @@ function structureFormat_functor()
   /* qqq : for Dmytro : bad : poor and sloppy! */
   function npmMajorVersionIsNewerOrSame( majorVersion )
   {
-    debugger;
     let op = _.process.start
     ({
       execPath : 'npm --version',
       outputCollecting : 1,
-      // mode : 'shell', /* qqq : for Dmytro : very bad! */
-      mode : 'spawn',
+      mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
+      // mode : 'spawn',
       sync : 1,
-      outputPiping : 0,
+      outputPiping : 1,
       verbosity : 0,
       logger : 0,
     });
-    debugger;
     return _.number.from( op.output[ 0 ] ) >= majorVersion;
   }
 
@@ -555,9 +552,6 @@ function structureFormat_functor()
   {
     return b.toLowerCase().localeCompare( a.toLowerCase() );
   }
-
-  /* */
-
 }
 
 let structureFormat = structureFormat_functor();
@@ -659,7 +653,7 @@ structureFixate.defaults =
   config : null,
   onDep : null,
   tag : null,
-}
+};
 
 //
 
@@ -733,7 +727,7 @@ structureBump.defaults =
  * @param {Object} o.configPath Path to package.json file.
  * @param {Routine} o.onDep Callback routine executed for each dependecy. Accepts single argument - dependecy descriptor.
  * @param {Boolean} [o.dry=0] Returns generated config without making changes in package.json.
- * @param {Number} [o.verbosity=2] Verbosity control.
+ * @param {Number} [o.logger=2] Verbosity control.
  * @function fileBump
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -764,7 +758,7 @@ fileReadFilePath.defaults =
 
 /* qqq : cover */
 
-function fileAddfilePath_head( routine, args )
+function fileAddFilePath_head( routine, args )
 {
   let o = args[ 0 ];
   if( !_.mapIs( o ) )
@@ -774,7 +768,6 @@ function fileAddfilePath_head( routine, args )
   _.assert( args.length === 1 );
   // if( !o.verbosity || o.verbosity < 0 )
   // o.verbosity = 0;
-  debugger;
   o.logger = _.logger.maybe( o.logger );
   return o;
 }
@@ -805,10 +798,10 @@ structureAddFilePath.defaults =
   filePath : null,
 }
 
-const fileAddfilePath = _readChangeWrite_functor
+const fileAddFilePath = _readChangeWrite_functor
 ({
-  name : 'fileAddfilePath',
-  head : fileAddfilePath_head,
+  name : 'fileAddFilePath',
+  head : fileAddFilePath_head,
   onChange : structureAddFilePath,
 });
 
@@ -913,6 +906,7 @@ function depAdd( o )
   let fileProvider = _.fileSystem;
   let path = _.uri;
 
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.routine.options( depAdd, o );
 
   o.logger = _.logger.maybe( o.logger );
@@ -924,7 +918,10 @@ function depAdd( o )
   _.assert( _.boolLikeTrue( o.linking ), 'not implemented' );
   _.assert( path.parse( o.depPath ).protocol === 'hd', 'not implemented' );
 
-  _.sure( fileProvider.fileExists( _.npm.pathLocalFromDownload( nodeModulesPath ) ), `nodeModulesPath:${nodeModulesPath} does not exist` );
+  _.sure
+  (
+    fileProvider.fileExists( _.npm.pathLocalFromDownload( nodeModulesPath ) ), `nodeModulesPath:${nodeModulesPath} does not exist`
+  );
   _.sure( fileProvider.fileExists( o.depPath ), `depPath:${o.depPath} does not exist` );
   _.sure( _.strDefined( o.as ), '`as` is not specified' );
   let dstPath = path.join( nodeModulesPath, o.as );
@@ -942,7 +939,7 @@ function depAdd( o )
       if( !o.dry )
       fileProvider.softLink
       ({
-        dstPath : dstPath,
+        dstPath,
         srcPath : o.depPath,
         makingDirectory : 1,
         rewritingDirs : 1,
@@ -963,9 +960,9 @@ depAdd.defaults =
   linking : 1,
   dry : 0,
   logger : 0,
-}
+};
 
-/* xxx : qqq : for Dmytro : replace each option::verbosity by option::logger */
+/* xxx : aaa : for Dmytro : replace each option::verbosity by option::logger */ /* Dmytro : replaced, not me, I added missed logger declaration and remove unused option */
 
 //
 
@@ -1029,8 +1026,9 @@ const depRemove = _readChangeWrite_functor
 
 //
 
-/* qqq : cover */
-/* qqq : cover case o.localPath is soft link */
+/* aaa : cover */ /* Dmytro : covered */
+/* aaa : cover case o.localPath is soft link */ /* Dmytro : covered, throw error because it is not directory, test routine `installLocalPathIsSoftLink` */
+
 function install( o )
 {
   let self = this;
@@ -1039,6 +1037,7 @@ function install( o )
   let path = _.uri;
   let abs = _.routineJoin( path, path.s.join, [ o.localPath ] );
 
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
   _.routine.options_( install, o );
   _.assert( _.strDefined( o.localPath ) );
   _.sure( fileProvider.isDir( o.localPath ) );
@@ -1046,9 +1045,7 @@ function install( o )
   o.logger = _.logger.maybe( o.logger );
 
   if( o.locked === null )
-  {
-    o.locked = fileProvider.isTerminal( path.join( o.localPath, 'package-lock.json' ) )
-  }
+  o.locked = fileProvider.isTerminal( path.join( o.localPath, 'package-lock.json' ) );
 
   fileProvider.filesDelete( path.join( o.localPath, 'node_modules' ) );
   if( !o.locked )
@@ -1071,7 +1068,7 @@ function install( o )
     verbosity : o.logger ? o.logger.verbosity : 0,
     dry : o.dry,
     ready,
-  }
+  };
 
   /* xxx : qqq : why not additive output? */
   _.process.start( o2 );
@@ -1079,7 +1076,6 @@ function install( o )
   ready.then( ( op ) =>
   {
 
-    debugger;
     if( o.linkingSelf )
     return _.npm.depAdd
     ({
@@ -1101,9 +1097,13 @@ function install( o )
   return ready;
 }
 
-/* qqq2 : for Dmytro : write test routines
+/* aaa2 : for Dmytro : write test routines
 - make sure there is test wich delete submodule which already has a link. files which are referred by the link should not be deleted
 - duplicate tests in NpmTools and willbe
+*/
+/* Dmytro : covered
+- first case is actual for routine `depAdd`, this case was covered,
+- duplicate for willbe commands
 */
 
 install.defaults =
@@ -1114,7 +1114,7 @@ install.defaults =
   logger : 0,
   dry : 0,
   sync : 1,
-}
+};
 
 //
 
@@ -1157,7 +1157,7 @@ clean.defaults =
  * @param {String} o.localPath Path to package directory.
  * @param {String} o.tag Registers the published package with the given tag.
  * @param {Object} o.ready Consequence instance.
- * @param {Number} o.verbosity Verbosity control.
+ * @param {Number} o.logger Verbosity control.
  * @function publish
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1183,12 +1183,12 @@ function publish( o )
     currentPath : o.localPath,
     outputCollecting : 1,
     outputGraying : 1,
-    outputPiping : o.logger.verbosity >= 2,
-    inputMirroring : o.logger.verbosity >= 2,
+    outputPiping : o.logger ? o.logger.verbosity >= 2 : 0,
+    inputMirroring : o.logger ? o.logger.verbosity >= 2 : 0,
     verbosity : o.logger ? o.logger.verbosity : 0,
     logger : o.logger,
     mode : 'shell',
-    ready : o.ready
+    ready : o.ready,
   });
 
   return start( `npm publish --tag ${o.tag}` )
@@ -1206,7 +1206,7 @@ publish.defaults =
   tag : null,
   ready : null,
   logger : 0,
-}
+};
 
 // --
 // read l3
@@ -1274,7 +1274,7 @@ versionLog.defaults =
   remotePath : null,
   localPath : null,
   configPath : null,
-}
+};
 
 // --
 // remote
@@ -1400,6 +1400,7 @@ function remoteDependants( o )
 
   let isSingle = !_.arrayIs( o.remotePath );
   o.remotePath = _.arrayAs( o.remotePath );
+  o.logger = _.logger.maybe( o.logger );
 
   let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
 
@@ -1467,9 +1468,6 @@ function remoteDependants( o )
 
     return dependants;
   }
-
-  /* */
-
 }
 
 remoteDependants.defaults =
@@ -1480,7 +1478,7 @@ remoteDependants.defaults =
   logger : 0,
   attemptLimit : 3,
   attemptDelay : 250,
-}
+};
 
 // --
 // vcs
@@ -1490,7 +1488,6 @@ remoteDependants.defaults =
  * @summary Returns version of npm package located at `o.localPath`.
  * @param {Object} o Options map.
  * @param {String} o.localPath Path to npm package on hard drive.
- * @param {Number} o.logger=0 Level of verbosity.
  * @function localVersion
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1546,7 +1543,7 @@ function localVersion( o )
 var defaults = localVersion.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.sync = 1;
-defaults.logger = 0;
+// defaults.logger = 0; /* Dmytro : unused option */
 
 //
 
@@ -1566,10 +1563,12 @@ function remoteVersionLatest( o )
   let path = _.uri;
 
   if( !_.mapIs( o ) )
-  o = { remotePath : o }
+  o = { remotePath : o };
 
   _.routine.options( remoteVersionLatest, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
+
+  o.logger = _.logger.maybe( o.logger );
 
   let ready = new _.Consequence().take( null );
   let shell = _.process.starter
@@ -1635,12 +1634,12 @@ function remoteVersionCurrent( o )
   let path = _.uri;
 
   if( !_.mapIs( o ) )
-  o = { remotePath : o }
+  o = { remotePath : o };
 
   _.routine.options( remoteVersionCurrent, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let ready = new _.Consequence().take( null );
+  let ready = _.take( null );
 
   ready.then( () =>
   {
@@ -1649,7 +1648,7 @@ function remoteVersionCurrent( o )
     if( parsed.isFixated )
     return parsed.hash;
     return self.remoteVersionLatest( o );
-  })
+  });
 
   if( o.sync )
   {
@@ -1673,10 +1672,12 @@ function remoteVersion( o )
   let path = _.uri;
 
   if( !_.mapIs( o ) )
-  o = { remotePath : o }
+  o = { remotePath : o };
 
-  _.routine.options( remoteVersionLatest, o );
+  _.routine.options( remoteVersion, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
+
+  o.logger = _.logger.maybe( o.logger );
 
   let ready = new _.Consequence().take( null );
   let shell = _.process.starter
@@ -1741,7 +1742,7 @@ function isUpToDate( o )
 
   let ready = new _.Consequence().take( null );
 
-  ready.then( () => self.localVersion({ localPath : o.localPath, logger : o.logger, sync : 0 }) )
+  ready.then( () => self.localVersion({ localPath : o.localPath, /* logger : o.logger, */ sync : 0 }) )
   ready.then( ( currentVersion ) =>
   {
     if( !currentVersion )
@@ -1775,7 +1776,6 @@ defaults.logger = 0;
  * @summary Returns true if path `o.localPath` contains npm package.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
- * @param {Number} o.logger=0 Level of verbosity.
  * @function hasFiles
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1798,7 +1798,7 @@ function hasFiles( o )
 
 var defaults = hasFiles.defaults = Object.create( null );
 defaults.localPath = null;
-defaults.logger = 0;
+// defaults.logger = 0; /* Dmytro : unused option */
 
 //
 
@@ -1806,7 +1806,6 @@ defaults.logger = 0;
  * @summary Returns true if path `o.localPath` contains a package.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
- * @param {Number} o.logger=0 Level of verbosity.
  * @function isRepository
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1844,7 +1843,7 @@ function isRepository( o )
 var defaults = isRepository.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.sync = 1;
-defaults.logger = 0;
+// defaults.logger = 0; /* Dmytro : unused option */
 
 //
 
@@ -1853,7 +1852,6 @@ defaults.logger = 0;
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
  * @param {String} o.remotePath Remote path to package.
- * @param {Number} o.logger=0 Level of verbosity.
  * @function hasRemote
  * @namespace wTools.npm
  * @module Tools/mid/NpmTools
@@ -1870,7 +1868,7 @@ function hasRemote( o )
   _.assert( _.strDefined( o.localPath ) );
   _.assert( _.strDefined( o.remotePath ) );
 
-  let ready = new _.Consequence().take( null );
+  let ready = _.take( null );
 
   ready.then( () =>
   {
@@ -1923,7 +1921,7 @@ var defaults = hasRemote.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.remotePath = null;
 defaults.sync = 1;
-defaults.logger = 0;
+// defaults.logger = 0; /* Dmytro : unused option */
 
 //
 
@@ -1973,7 +1971,7 @@ let Extension =
   pathConfigFromLocal, /* qqq : cover */
   pathLocalFromConfig, /* qqq : cover */
   pathLocalFromInside,  /* qqq : cover */
-  pathDownloadFromLocal, /* qqq : cover */
+  pathDownloadFromLocal, /* aaa : cover */ /* Dmytro : covered */
   pathLocalFromDownload, /* qqq : cover */
 
   // write l2
@@ -1988,8 +1986,8 @@ let Extension =
 
   fileReadFilePath,
   structureAddFilePath, /* qqq : implement and cover */
-  fileAddfilePath, /* qqq : cover */
-  /* qqq : implement structureRemoveFilePath and fileRemovefilePath */
+  fileAddFilePath, /* qqq : cover */
+  /* qqq : implement structureRemoveFilePath and fileRemoveFilePath */
 
   fileReadField, /* xxx : qqq : implement and cover */
   _structureWriteField,
@@ -2002,7 +2000,7 @@ let Extension =
   // write l3
 
   // structureDepAdd, /* qqq : implement and cover */
-  depAdd, /* qqq : implement and cover */
+  depAdd, /* qqq : implement and cover */ /* Dmytro : covered behavior that was written before, added no additional features */ /* qqq : for Dmytro : cover output of routine */
   structureDepRemove, /* qqq : implement and cover */
   depRemove, /* qqq : cover */
 

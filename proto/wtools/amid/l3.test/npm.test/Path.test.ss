@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 {
   const _ = require( '../../../../node_modules/Tools' );
   _.include( 'wTesting' );
-  require( '../npm/Include.ss' );
+  require( '../../l3/npm/include/Mid.ss' );
 }
 
 const _ = _global_.wTools;
@@ -2211,7 +2211,7 @@ function fixate( test )
 
   test.case = 'simple path, verbosity - 5';
   var remotePath = 'npm:///wmodulefortesting1';
-  var got = _.npm.path.fixate({ remotePath, verbosity : 5 });
+  var got = _.npm.path.fixate({ remotePath, logger : 5 });
   test.true( _.strHas( got, /npm:\/\/\/wmodulefortesting1#\d\.\d\.\d+/ ) );
   var gotVersion = got.replace( /.*(\d\.\d\.\d+)/, '$1' );
   var got = _.npm.remoteVersionLatest( 'npm:///wmodulefortesting1' );
@@ -2253,6 +2253,7 @@ let Proto =
 
   name : 'Tools.mid.NpmTools.path',
   silencing : 1,
+  enabled : 1,
 
   tests :
   {
