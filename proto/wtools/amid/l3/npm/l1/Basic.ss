@@ -778,7 +778,7 @@ function structureAddFilePath( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o.config ) );
+  _.assert( _.object.isBasic( o.config ) );
   _.assert( _.strIs( o.filePath ) || _.strsAreAll( o.filePath ) );
 
   o.changed = false;
@@ -831,7 +831,7 @@ function _structureWriteField( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o.config ) );
+  _.assert( _.object.isBasic( o.config ) );
   _.assert( _.strDefined( o.key ) );
 
   o.changed = false;
@@ -986,7 +986,7 @@ function structureDepRemove( o )
 
   _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
   _.assert( o.kind === null, 'not implemented' );
-  _.assert( _.objectIs( o.config ) );
+  _.assert( _.object.isBasic( o.config ) );
   _.assert( _.strDefined( o.depPath ) );
 
   o.changed = false;
@@ -1927,7 +1927,7 @@ defaults.sync = 1;
 
 function hasLocalChanges( o )
 {
-  if( _.objectIs( o ) )
+  if( _.object.isBasic( o ) )
   if( o.sync !== undefined )
   {
     if( o.sync )
