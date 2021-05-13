@@ -1118,8 +1118,8 @@ install.defaults =
 
 //
 
-/* qqq : cover */
-/* qqq : cover case o.localPath is soft link */
+/* qqq : for Dmytro : cover */
+/* qqq : for Dmytro : cover case o.localPath is soft link */
 function clean( o )
 {
   let self = this;
@@ -1144,7 +1144,7 @@ function clean( o )
 clean.defaults =
 {
   localPath : null,
-  // logger : 0, /* qqq : implement and cover the option */
+  logger : 0, /* qqq : implement and cover the option */
   dry : 0,
   sync : 1,
 }
