@@ -1399,7 +1399,7 @@ function remoteDependants( o )
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
 
   let isSingle = !_.arrayIs( o.remotePath );
-  o.remotePath = _.arrayAs( o.remotePath );
+  o.remotePath = _.array.as( o.remotePath );
   o.logger = _.logger.maybe( o.logger );
 
   let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
