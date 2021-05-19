@@ -1,4 +1,4 @@
-( function _Basic_ss_( )
+( function _Basic_ss_()
 {
 
 'use strict';
@@ -7,11 +7,11 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( '../../../../../dwtools/Tools.s' );
+  const _ = require( '../../../../../node_modules/Tools' );
   _.include( 'wHttp' );
   _.include( 'wProcess' );
   _.include( 'wFiles' );
   module[ 'exports' ] = _global_.wTools;
 }
 
-} )();
+})();

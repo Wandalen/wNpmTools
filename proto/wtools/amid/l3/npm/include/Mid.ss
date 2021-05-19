@@ -1,4 +1,4 @@
-( function _Mid_ss_( )
+( function _Mid_ss_()
 {
 
 'use strict';
@@ -7,9 +7,10 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( './Basic.ss' );
+  const _ = require( './Basic.ss' );
   require( '../l1/Basic.ss' );
+  require( '../l1/Path.ss' );
   module[ 'exports' ] = _global_.wTools;
 }
 
-} )();
+})();

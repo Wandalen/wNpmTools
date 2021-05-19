@@ -1,6 +1,6 @@
 {
   "name" : "wnpmtools",
-  "version" : "0.3.100",
+  "version" : "0.3.209",
   "description" : "Collection of tools to use npm programmatically.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors" :
@@ -9,9 +9,9 @@
     { "name" : "Artem Bohush", "email" : "art.bohush@gmail.com" }
   ],
   "license" : "MIT",
-  "main" : "proto/dwtools/amid/l3/npm/Include.ss",
-  "files" : [ "proto/dwtools/amid/l3", "proto/dwtools/Tools.s" ],
-  "scripts" : { "test" : "wtest .run proto rapidity:-3", "docgen" : "wdocgen .build proto" },
+  "main" : "proto/node_modules/wnpmtools",
+  "files" : [ "proto/wtools/amid/l3/npm", "proto/node_modules" ],
+  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen .build proto" },
   "repository" :
   {
     "type" : "git",
@@ -26,8 +26,7 @@
     "wTools" : "",
     "whttp" : "",
     "wFiles" : "",
-    "wprocess" : "",
-    "package-json" : "6.5.0"
+    "wprocess" : ""
   },
   "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0" },
   "keywords" : [ "wTools" ]
