@@ -1214,67 +1214,156 @@ publish.defaults =
 
 function versionLog( o )
 {
-  let self = this;
+  const self = this;
 
   _.routine.options( versionLog, o );
 
-  if( !o.configPath )
-  o.configPath = self.pathConfigFromLocal( o.localPath );
-  // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
+  if( !o.tags || o.tags.length === 0 )
+  o.tags = [ 'latest' ];
+
+  _.assert( _.strsAreAll( o.tags ), 'Expects strings {-o.tags-}.' );
 
   o.logger = _.logger.maybe( o.logger );
+
+  if( !o.configPath )
+  o.configPath = self.pathConfigFromLocal( o.localPath );
 
   _.assert( _.strDefined( o.configPath ) );
   _.assert( _.strDefined( o.remotePath ) );
 
-  // let logger = o.logger || _global_.logger;
-  let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
-  // let remotePath = self.pathNativize( o.remotePath );
-  let remotePath = _.npm.path.nativize( o.remotePath );
+  const packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+  const remotePath = _.npm.path.nativize( o.remotePath );
 
-  // _.assert( !o.logging || !!logger, 'No defined logger' );
+  /* */
 
-  return _.process.start
-  ({
-    execPath : `npm view ${remotePath} version`,
-    outputCollecting : 1,
-    outputPiping : 0,
-    inputMirroring : 0,
-    throwingExitCode : 0,
-    logger : o.logger,
-    verbosity : o.logger.verbosity,
-  })
-  .then( ( got ) =>
+  const unknownVersion = '-no-';
+  const currentVersion = packageJson ? packageJson.version : unknownVersion;
+  let log = `Current version : ${ currentVersion }\n`;
+
+  const prefixMap =
   {
-    let current = packageJson ? packageJson.version : 'unknown';
-    let latest = _.strStrip( got.output );
+    latest : 'Latest version of',
+    stable : 'Stable version of',
+  };
 
-    if( got.exitCode || !latest )
-    latest = 'unknown'
+  const ready = _.take( null );
 
-    let log = '';
-    log += `Current version : ${current}\n`;
-    log += `Latest version of ${o.remotePath} : ${latest}\n`;
+  for( let i = 0 ; i < o.tags.length ; i++ )
+  {
+    const tag = o.tags[ i ];
+    const version = `${ remotePath }@${ tag }`
+    _.process.start
+    ({
+      execPath : `npm view ${ version } version`,
+      outputCollecting : 1,
+      outputPiping : 0,
+      inputMirroring : 0,
+      throwingExitCode : 0,
+      logger : o.logger,
+      verbosity : o.logger.verbosity,
+      ready,
+    })
+    .then( ( got ) =>
+    {
+      let latest = _.strStrip( got.output );
+      if( got.exitCode || !latest )
+      latest = unknownVersion;
 
-    // if( o.logging )
-    // logger.log( log );
+      const postfix = `${ o.remotePath } : ${ latest }\n`;
+      if( tag in prefixMap )
+      log += `${ prefixMap[ tag ] } ${ postfix }`;
+      else
+      log += `${ tag } version of ${ postfix }`;
+
+      return log;
+    });
+  }
+
+  ready.finally( ( err, output ) =>
+  {
+    if( err )
+    throw _.err( err );
 
     if( o.logger && o.logger.verbosity )
-    o.logger.log( log );
+    o.logger.log( output );
+    return null;
+  });
 
-    return log;
-  })
-
+  return ready;
 }
 
 versionLog.defaults =
 {
   logger : 1,
-  // logging : 1,
   remotePath : null,
   localPath : null,
   configPath : null,
+  tags : null,
 };
+
+// function versionLog( o )
+// {
+//   let self = this;
+//
+//   _.routine.options( versionLog, o );
+//
+//   if( !o.configPath )
+//   o.configPath = self.pathConfigFromLocal( o.localPath );
+//   // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
+//
+//   o.logger = _.logger.maybe( o.logger );
+//
+//   _.assert( _.strDefined( o.configPath ) );
+//   _.assert( _.strDefined( o.remotePath ) );
+//
+//   // let logger = o.logger || _global_.logger;
+//   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+//   // let remotePath = self.pathNativize( o.remotePath );
+//   let remotePath = _.npm.path.nativize( o.remotePath );
+//
+//   // _.assert( !o.logging || !!logger, 'No defined logger' );
+//
+//   return _.process.start
+//   ({
+//     execPath : `npm view ${remotePath} version`,
+//     outputCollecting : 1,
+//     outputPiping : 0,
+//     inputMirroring : 0,
+//     throwingExitCode : 0,
+//     logger : o.logger,
+//     verbosity : o.logger.verbosity,
+//   })
+//   .then( ( got ) =>
+//   {
+//     let current = packageJson ? packageJson.version : 'unknown';
+//     let latest = _.strStrip( got.output );
+//
+//     if( got.exitCode || !latest )
+//     latest = 'unknown'
+//
+//     let log = '';
+//     log += `Current version : ${current}\n`;
+//     log += `Latest version of ${o.remotePath} : ${latest}\n`;
+//
+//     // if( o.logging )
+//     // logger.log( log );
+//
+//     if( o.logger && o.logger.verbosity )
+//     o.logger.log( log );
+//
+//     return log;
+//   })
+//
+// }
+//
+// versionLog.defaults =
+// {
+//   logger : 1,
+//   // logging : 1,
+//   remotePath : null,
+//   localPath : null,
+//   configPath : null,
+// };
 
 // --
 // remote
