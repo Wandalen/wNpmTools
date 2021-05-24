@@ -1227,6 +1227,128 @@ function installLocalPathIsSoftLink( test )
 
 //
 
+function versionLog( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+  begin();
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'default options, localPath and remotePath';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 : ' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - latest';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - stable';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'stable' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 0 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - latest, stable, alpha, all exist';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable', 'alpha' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'alpha version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - latest, stable, abcd, not all exist';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable', 'abcd' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'abcd version of wmodulefortesting1 : -no-' ), 1 );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin()
+  {
+    a.ready.then( () => { a.fileProvider.dirMake( a.abs( '.' ) ); return null });
+    a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git ./' );
+    return a.ready;
+  }
+}
+
+//
+
 function remoteAbout( test )
 {
   let ready = _.take( null );
@@ -2098,6 +2220,8 @@ const Proto =
 
     install,
     installLocalPathIsSoftLink,
+
+    versionLog,
 
     remoteAbout,
 

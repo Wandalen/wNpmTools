@@ -1286,7 +1286,7 @@ function versionLog( o )
 
     if( o.logger && o.logger.verbosity )
     o.logger.log( output );
-    return null;
+    return output;
   });
 
   return ready;
