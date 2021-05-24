@@ -1218,7 +1218,7 @@ function versionLog( o )
 
   _.routine.options( versionLog, o );
 
-  if( !o.tags || o.tags.length === 0 )
+  if( !o.tags )
   o.tags = [ 'latest' ];
 
   _.assert( _.strsAreAll( o.tags ), 'Expects strings {-o.tags-}.' );
@@ -1238,7 +1238,7 @@ function versionLog( o )
 
   const unknownVersion = '-no-';
   const currentVersion = packageJson ? packageJson.version : unknownVersion;
-  let log = `Current version : ${ currentVersion }\n`;
+  let ready = _.take( `Current version : ${ currentVersion }\n` );
 
   const prefixMap =
   {
@@ -1246,13 +1246,38 @@ function versionLog( o )
     stable : 'Stable version of',
   };
 
-  const ready = _.take( null );
+  // let start = _.process.starter
+  // ({
+  //   outputCollecting : 1,
+  //   outputPiping : 0,
+  //   inputMirroring : 0,
+  //   throwingExitCode : 0,
+  //   logger : o.logger,
+  //   verbosity : o.logger.verbosity,
+  // });
 
+  let readies = [];
   for( let i = 0 ; i < o.tags.length ; i++ )
+  readies.push( versionLogGet( o.tags[ i ] ) );
+
+  return ready.andTake( readies )
+  .finally( ( err, resolved ) =>
   {
-    const tag = o.tags[ i ];
+    if( err )
+    throw _.err( err );
+
+    let log = resolved.join( '' );
+    if( o.logger && o.logger.verbosity )
+    o.logger.log( log );
+    return log;
+  });
+
+  /* */
+
+  function versionLogGet( tag )
+  {
     const version = `${ remotePath }@${ tag }`
-    _.process.start
+    return _.process.start
     ({
       execPath : `npm view ${ version } version`,
       outputCollecting : 1,
@@ -1261,7 +1286,6 @@ function versionLog( o )
       throwingExitCode : 0,
       logger : o.logger,
       verbosity : o.logger.verbosity,
-      ready,
     })
     .then( ( got ) =>
     {
@@ -1271,25 +1295,11 @@ function versionLog( o )
 
       const postfix = `${ o.remotePath } : ${ latest }\n`;
       if( tag in prefixMap )
-      log += `${ prefixMap[ tag ] } ${ postfix }`;
+      return `${ prefixMap[ tag ] } ${ postfix }`;
       else
-      log += `${ tag } version of ${ postfix }`;
-
-      return log;
+      return `${ tag } version of ${ postfix }`;
     });
   }
-
-  ready.finally( ( err, output ) =>
-  {
-    if( err )
-    throw _.err( err );
-
-    if( o.logger && o.logger.verbosity )
-    o.logger.log( output );
-    return output;
-  });
-
-  return ready;
 }
 
 versionLog.defaults =
