@@ -173,12 +173,12 @@ function parseFull( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var exp =
   {
     'protocol' : 'npm',
     'protocols' : [ 'npm' ],
-    'tag' : 'alpha',
+    'tag' : 'delta',
     'longPath' : '/wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
     'localVcsPath' : 'out/wmodulefortesting1',
@@ -314,12 +314,12 @@ function parseFull( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
   var exp =
   {
     'protocol' : 'npm',
     'protocols' : [ 'npm' ],
-    'tag' : 'alpha',
+    'tag' : 'delta',
     'longPath' : 'wmodulefortesting1/out/wmodulefortesting1',
     'host' : 'wmodulefortesting1',
     'localVcsPath' : 'out/wmodulefortesting1',
@@ -616,11 +616,11 @@ function parseAtomic( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var exp =
   {
     'protocol' : 'npm',
-    'tag' : 'alpha',
+    'tag' : 'delta',
     'host' : 'wmodulefortesting1',
     'localVcsPath' : 'out/wmodulefortesting1',
     'isGlobal' : true,
@@ -739,11 +739,11 @@ function parseAtomic( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
   var exp =
   {
     'protocol' : 'npm',
-    'tag' : 'alpha',
+    'tag' : 'delta',
     'host' : 'wmodulefortesting1',
     'localVcsPath' : 'out/wmodulefortesting1',
     'isGlobal' : false,
@@ -964,10 +964,10 @@ function parseObjects( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var exp =
   {
-    'tag' : 'alpha',
+    'tag' : 'delta',
     'host' : 'wmodulefortesting1',
   };
   var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
@@ -1060,10 +1060,10 @@ function parseObjects( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
   var exp =
   {
-    'tag' : 'alpha',
+    'tag' : 'delta',
     'host' : 'wmodulefortesting1',
   };
   var got = _.npm.path.parse({ remotePath, full : 0, atomic : 0, objects : 1 });
@@ -1175,8 +1175,8 @@ function strFull( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var parsed = _.npm.path.parse( 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha' );
-  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var parsed = _.npm.path.parse( 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta' );
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var got = _.npm.path.str( parsed );
   test.identical( got, exp );
 
@@ -1235,8 +1235,8 @@ function strFull( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var parsed = _.npm.path.parse( 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha' );
-  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var parsed = _.npm.path.parse( 'npm://wmodulefortesting1/out/wmodulefortesting1!delta' );
+  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
   var got = _.npm.path.str( parsed );
   test.identical( got, exp );
 
@@ -1303,7 +1303,7 @@ function strFull( test )
   test.shouldThrowErrorSync( () => _.npm.path.str( src, src ) );
 
   test.case = 'not valid srcPath';
-  var src = { tag : 'alpha' };
+  var src = { tag : 'delta' };
   test.shouldThrowErrorSync( () => _.npm.path.str( src ) );
 
   test.case = 'tag and hash in path';
@@ -1385,8 +1385,8 @@ function strAtomic( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 1 });
-  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta', full : 0, atomic : 1 });
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var got = _.npm.path.str( parsed );
   test.identical( got, exp );
 
@@ -1445,8 +1445,8 @@ function strAtomic( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 1 });
-  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1!delta', full : 0, atomic : 1 });
+  var exp = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
   var got = _.npm.path.str( parsed );
   test.identical( got, exp );
 
@@ -1574,8 +1574,8 @@ function strObjects( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 0, objects : 1 });
-  var exp = 'wmodulefortesting1!alpha';
+  var parsed = _.npm.path.parse({ remotePath : 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!delta';
   var got = _.npm.path.str( parsed );
   test.identical( got, exp );
 
@@ -1634,8 +1634,8 @@ function strObjects( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha', full : 0, atomic : 0, objects : 1 });
-  var exp = 'wmodulefortesting1!alpha';
+  var parsed = _.npm.path.parse({ remotePath : 'npm://wmodulefortesting1/out/wmodulefortesting1!delta', full : 0, atomic : 0, objects : 1 });
+  var exp = 'wmodulefortesting1!delta';
   var got = _.npm.path.str( parsed );
   test.identical( got, exp );
 
@@ -1733,8 +1733,8 @@ function normalize( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
-  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var got = _.npm.path.normalize( remotePath );
   test.identical( got, exp );
 
@@ -1793,8 +1793,8 @@ function normalize( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
-  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
+  var exp = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
   var got = _.npm.path.normalize( remotePath );
   test.identical( got, exp );
 
@@ -1950,8 +1950,8 @@ function nativize( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!alpha';
-  var exp = 'wmodulefortesting1@alpha';
+  var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
+  var exp = 'wmodulefortesting1@delta';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
@@ -2010,8 +2010,8 @@ function nativize( test )
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
-  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!alpha';
-  var exp = 'wmodulefortesting1@alpha';
+  var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
+  var exp = 'wmodulefortesting1@delta';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 

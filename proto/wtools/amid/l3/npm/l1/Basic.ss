@@ -778,7 +778,7 @@ function structureAddFilePath( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o.config ) );
+  _.assert( _.object.isBasic( o.config ) );
   _.assert( _.strIs( o.filePath ) || _.strsAreAll( o.filePath ) );
 
   o.changed = false;
@@ -831,7 +831,7 @@ function _structureWriteField( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o.config ) );
+  _.assert( _.object.isBasic( o.config ) );
   _.assert( _.strDefined( o.key ) );
 
   o.changed = false;
@@ -986,7 +986,7 @@ function structureDepRemove( o )
 
   _.assert( o.kind === null || _.longHas( self.DepSectionsNames, o.kind ) );
   _.assert( o.kind === null, 'not implemented' );
-  _.assert( _.objectIs( o.config ) );
+  _.assert( _.object.isBasic( o.config ) );
   _.assert( _.strDefined( o.depPath ) );
 
   o.changed = false;
@@ -1118,8 +1118,8 @@ install.defaults =
 
 //
 
-/* qqq : cover */
-/* qqq : cover case o.localPath is soft link */
+/* qqq : for Dmytro : cover */
+/* qqq : for Dmytro : cover case o.localPath is soft link */
 function clean( o )
 {
   let self = this;
@@ -1144,7 +1144,7 @@ function clean( o )
 clean.defaults =
 {
   localPath : null,
-  // logger : 0, /* qqq : implement and cover the option */
+  logger : 0, /* qqq : implement and cover the option */
   dry : 0,
   sync : 1,
 }
@@ -1488,7 +1488,7 @@ function remoteDependants( o )
   _.assert( _.strsAreAll( o.remotePath ), 'Expects only strings as a package name' );
 
   let isSingle = !_.arrayIs( o.remotePath );
-  o.remotePath = _.arrayAs( o.remotePath );
+  o.remotePath = _.array.as( o.remotePath );
   o.logger = _.logger.maybe( o.logger );
 
   let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
@@ -2016,7 +2016,7 @@ defaults.sync = 1;
 
 function hasLocalChanges( o )
 {
-  if( _.objectIs( o ) )
+  if( _.object.isBasic( o ) )
   if( o.sync !== undefined )
   {
     if( o.sync )
