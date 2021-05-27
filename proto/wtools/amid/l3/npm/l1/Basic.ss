@@ -1216,6 +1216,7 @@ function versionLog( o )
 {
   const self = this;
 
+  _.assert( arguments.length === 1, 'Expects exactly one argument' );
   _.routine.options( versionLog, o );
 
   if( !o.tags )

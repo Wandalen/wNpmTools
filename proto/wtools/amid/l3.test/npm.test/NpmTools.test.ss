@@ -1333,6 +1333,43 @@ function versionLog( test )
     return null;
   });
 
+  /* */
+
+  if( Config.debug )
+  {
+    a.ready.then( () =>
+    {
+      test.case = 'without arguments';
+      test.shouldThrowErrorSync( () => _.npm.versionLog() );
+
+      test.case = 'extra arguments';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : 'wmodulefortesting1' };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o, o ) );
+
+      test.case = 'unknown option in options map';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : 'wmodulefortesting1', unknown : 1 };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'o.tags has invalid value';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : '', tags : [ 'stable', 1 ] };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'wrong type of o.tags';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : '', tags : { a : 'b' } };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'o.remotePath - undefined and o.localPath not path to module';
+      var o = { configPath : a.abs( 'package.json' ), localPath : a.abs( '../unknown' ) };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'o.remotePath is not defined';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : '' };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      return null;
+    });
+  }
+
   /* - */
 
   return a.ready;
@@ -1344,6 +1381,122 @@ function versionLog( test )
     a.ready.then( () => { a.fileProvider.dirMake( a.abs( '.' ) ); return null });
     a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git ./' );
     return a.ready;
+  }
+}
+
+//
+
+function versionLogWithOptions( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+  let programPath;
+  begin();
+
+  let programShell = _.process.starter
+  ({
+    currentPath : a.abs( '.' ),
+    mode : 'shell',
+    throwingExitCode : 1,
+    outputCollecting : 1,
+  });
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'configPath and remotePath';
+    return _.npm.versionLog
+    ({
+      configPath : a.abs( 'package.json' ),
+      remotePath : 'wmodulefortesting1',
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 : ' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'logger - 5';
+    const o =
+    {
+      configPath : a.abs( 'package.json' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable' ],
+      logger : 5,
+    };
+    programPath = programMake( o );
+    return null;
+  });
+
+  a.ready.then( () => programShell( `node ${ programPath }`) );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, 'Latest version of wmodulefortesting1 : ' ), 1 );
+    test.identical( _.strCount( op.output, 'Stable version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'logger - 0';
+    const o =
+    {
+      configPath : a.abs( 'package.json' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable' ],
+      logger : 0,
+    };
+    programPath = programMake( o );
+    return null;
+  });
+
+  a.ready.then( () => programShell( `node ${ programPath }`) );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, 'Latest version of wmodulefortesting1 : ' ), 0 );
+    test.identical( _.strCount( op.output, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin()
+  {
+    a.ready.then( () => { a.fileProvider.dirMake( a.abs( '.' ) ); return null });
+    a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git ./' );
+    return a.ready;
+  }
+
+  /* */
+
+  function programMake( options )
+  {
+    let locals = { toolsPath : _.module.resolve( 'wTools' ), o : options };
+    return a.program({ routine : testApp, locals });
+  }
+
+  /* */
+
+  function testApp()
+  {
+    const _ = require( toolsPath );
+    _.include( 'wNpmTools' );
+    return _.npm.versionLog( o );
   }
 }
 
@@ -2222,6 +2375,7 @@ const Proto =
     installLocalPathIsSoftLink,
 
     versionLog,
+    versionLogWithOptions,
 
     remoteAbout,
 
