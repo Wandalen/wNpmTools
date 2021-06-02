@@ -4,7 +4,7 @@
 'use strict';
 
 const _ = _global_.wTools;
-const Self = _.npm = _.npm || Object.create( null );
+_.npm = _.npm || Object.create( null );
 
 _.assert( _.routineIs( _.strLinesIndentation ) );
 
@@ -2132,7 +2132,7 @@ let Extension =
 
 }
 
-_.props.extend( Self, Extension );
+/* _.props.extend */Object.assign( _.npm, Extension );
 
 //
 

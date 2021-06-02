@@ -5,7 +5,7 @@
 
 const _ = _global_.wTools;
 const Parent = _.uri; /* qqq : for Dmytro : not solved. see end of the file */
-const Self = _.npm.path = _.npm.path || Object.create( Parent );
+_.npm.path = _.npm.path || Object.create( Parent );
 
 // --
 //
@@ -452,7 +452,7 @@ let Extension =
 
 }
 
-_.props.extend( Self, Extension );
+/* _.props.extend */Object.assign( _.npm.path, Extension );
 
 // _.assert( _.npm.path.s.single === _.npm.path );
 // qqq : for Dmytro : bad : uncomment
