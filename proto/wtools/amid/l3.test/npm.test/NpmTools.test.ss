@@ -1388,12 +1388,12 @@ function versionLog( test )
 
 function versionLogWithOptions( test )
 {
-  let self = this;
-  let a = test.assetFor( false );
+  const self = this;
+  const a = test.assetFor( false );
   let programPath;
   begin();
 
-  let programShell = _.process.starter
+  const programShell = _.process.starter
   ({
     currentPath : a.abs( '.' ),
     mode : 'shell',
@@ -1486,8 +1486,9 @@ function versionLogWithOptions( test )
 
   function programMake( options )
   {
-    let locals = { toolsPath : _.module.resolve( 'wTools' ), o : options };
-    return a.program({ routine : testApp, locals });
+    const locals = { toolsPath : _.module.resolve( 'wTools' ), o : options };
+    const path = a.program({ routine : testApp, locals });
+    return a.path.nativize( path );
   }
 
   /* */
