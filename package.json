@@ -1,6 +1,6 @@
 {
   "name" : "wnpmtools",
-  "version" : "0.3.214",
+  "version" : "0.3.215",
   "description" : "Collection of tools to use npm programmatically.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors" :
@@ -10,7 +10,7 @@
   ],
   "license" : "MIT",
   "main" : "proto/node_modules/wnpmtools",
-  "files" : [ "proto/wtools/amid/l3/npm", "proto/node_modules" ],
+  "files" : [ "proto/wtools/amid/l3/npm", "proto/node_modules", "proto/node_modules/Tools", "proto/node_modules/wnpmtools" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen .build proto" },
   "repository" :
   {
