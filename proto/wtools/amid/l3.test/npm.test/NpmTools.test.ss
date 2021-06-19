@@ -1487,7 +1487,7 @@ function versionLogWithOptions( test )
   function programMake( options )
   {
     const locals = { toolsPath : _.module.resolve( 'wTools' ), o : options };
-    const program = a.program({ routine : testApp, locals });
+    const program = a.program({ entry : testApp, locals });
     return a.path.nativize( program.programPath );
   }
 
