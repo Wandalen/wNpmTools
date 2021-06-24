@@ -918,11 +918,11 @@ function install( test )
   {
     test.case = 'default options, package-lock.json exists';
     var got = _.npm.install({ localPath : a.abs( '.' ) });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
-    if( files.length === 5 )
-    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -945,11 +945,11 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
-    if( files.length === 5 )
-    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -972,11 +972,11 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
-    if( files.length === 5 )
-    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.notIdentical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.notIdentical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -1000,11 +1000,11 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
-    if( files.length === 5 )
-    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.notIdentical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.notIdentical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -1027,11 +1027,11 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
-    if( files.length === 5 )
-    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -1190,6 +1190,182 @@ function install( test )
 }
 
 install.timeOut = 60000;
+
+//
+
+function installCheckOptionLinkingSelf( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+
+  let packageData =
+  {
+    dependencies :
+    {
+      wmodulefortesting1 : '',
+      wmodulefortesting12 : '',
+    }
+  };
+
+  /* - */
+
+  begin( packageData );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 0, name does not exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : 0,
+      sync : 1,
+    });
+    test.identical( got, null );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( _.map.extend( null, packageData, { name : 'test' } ) );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 0, name exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : 0,
+      sync : 1,
+    });
+    test.identical( got, null );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( packageData );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 1, name does not exists';
+    return test.shouldThrowErrorSync( () =>
+    {
+      return _.npm.install
+      ({
+        localPath : a.abs( '.' ),
+        linkingSelf : 1,
+        sync : 1,
+      });
+    });
+  });
+
+  /* */
+
+  begin( _.map.extend( null, packageData, { name : 'test' } ) );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 1, name exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : 1,
+      sync : 1,
+    });
+    test.identical( got, true );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( packageData );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - null, name does not exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : null,
+      sync : 1,
+    });
+    test.identical( got, null );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( _.map.extend( null, packageData, { name : 'test' } ) );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - null, name exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : null,
+      sync : 1,
+    });
+    test.identical( got, true );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin( data )
+  {
+    a.ready.then( () =>
+    {
+      a.fileProvider.filesDelete( a.abs( '.' ) );
+      a.fileProvider.fileWriteUnknown({ filePath : a.abs( 'package.json' ), data });
+      return null;
+    });
+    return a.ready;
+  }
+
+  /* */
+
+  function find( filePath )
+  {
+    return a.fileProvider.filesFind
+    ({
+      filePath : a.abs( filePath ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+  }
+}
+
+installCheckOptionLinkingSelf.timeOut = 60000;
 
 //
 
@@ -2394,6 +2570,7 @@ const Proto =
     depAdd,
 
     install,
+    installCheckOptionLinkingSelf,
     installLocalPathIsSoftLink,
 
     versionLog,
