@@ -922,7 +922,7 @@ function install( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -949,7 +949,7 @@ function install( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -976,7 +976,7 @@ function install( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.notIdentical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.notIdentical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -1004,7 +1004,7 @@ function install( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.notIdentical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.notIdentical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -1031,7 +1031,7 @@ function install( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
@@ -1284,7 +1284,7 @@ function installCheckOptionLinkingSelf( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
 
     return null;
@@ -1328,7 +1328,7 @@ function installCheckOptionLinkingSelf( test )
     var files = find( 'node_modules' );
     var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     if( files.length === 6 )
-    var exp = [ '.', './test', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
     test.identical( files, exp );
 
     return null;
