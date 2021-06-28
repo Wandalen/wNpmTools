@@ -791,7 +791,7 @@ function fileBumpCheckOptions( test )
   {
     test.case = 'bump with logger - 0';
     a.reflect();
-    programPath =  a.program({ entry : testApp, locals : { logger : 0 } }).filePath;
+    programPath = a.program({ entry : testApp, locals : { logger : 0 } }).filePath;
     return null;
   });
   a.shell( `node ${ programPath }` );
@@ -817,7 +817,7 @@ function fileBumpCheckOptions( test )
   {
     test.case = 'bump with logger - 1';
     a.reflect();
-    programPath =  a.program({ entry : testApp, locals : { logger : 1 } }).filePath;
+    programPath = a.program({ entry : testApp, locals : { logger : 1 } }).filePath;
     return null;
   });
   a.shell( `node ${ programPath }` );
@@ -844,7 +844,7 @@ function fileBumpCheckOptions( test )
   {
     test.case = 'bump with logger - 3';
     a.reflect();
-    programPath =  a.program({ entry : testApp, locals : { logger : 3 } }).filePath;
+    programPath = a.program({ entry : testApp, locals : { logger : 3 } }).filePath;
     return null;
   });
   a.shell( `node ${ programPath }` );

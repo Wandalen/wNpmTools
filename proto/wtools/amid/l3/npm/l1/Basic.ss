@@ -46,6 +46,7 @@ function _readChangeWrite_functor( fo )
   defaults2.dry = 0;
   defaults2.localPath = null;
   defaults2.configPath = null;
+  defaults2.nativizing = 1;
   _.props.supplement( fo.body.defaults, defaults2 )
 
   return _.routine.unite
@@ -533,7 +534,7 @@ function structureFormat_functor()
       mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
       // mode : 'spawn',
       sync : 1,
-      outputPiping : 1,
+      outputPiping : 0,
       verbosity : 0,
       logger : 0,
     });
@@ -2082,7 +2083,7 @@ let Extension =
 
   fileFixate, /* qqq : cover please */
   structureFixate, /* qqq : cover please */
-  fileBump, /* qqq : cover please */
+  fileBump, /* aaa : cover please */ /* Dmytro : covered */
   structureBump, /* qqq : cover please */
 
   fileReadFilePath,
