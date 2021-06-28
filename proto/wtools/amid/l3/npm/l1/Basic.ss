@@ -78,7 +78,7 @@ function _readChangeWrite_functor( fo )
     try
     {
       let o2 = _.props.extend( null, o );
-      _.props.supplement( null, o2, defaults );
+      _.props.supplement( o2, o2, defaults );
       o2.onChange = onChange;
       _readChangeWrite.call( self, o2 );
       _.props.extend( o, o2 );
@@ -100,6 +100,7 @@ function _readChangeWrite_functor( fo )
 
     if( !o.configPath )
     o.configPath = _.npm.pathConfigFromLocal( o.localPath );
+    if( !o.config )
     o.config = _.fileProvider.fileReadUnknown( o.configPath );
 
     let o2 = Object.create( null );
@@ -696,7 +697,7 @@ function structureBump( o )
   let version = o.config.version || '0.0.0';
   let versionArray = version.split( '.' );
   versionArray[ 2 ] = Number( versionArray[ 2 ] );
-  _.sure( _.intIs( versionArray[ 2 ] ), `Cant deduce current version : ${version}` );
+  _.sure( _.intIs( versionArray[ 2 ] ), `Can't deduce current version : ${version}` );
 
   versionArray[ 2 ] += 1;
   version = versionArray.join( '.' );
@@ -707,17 +708,17 @@ function structureBump( o )
   // return version;
   return o;
 
-  function depVersionPatch( dep )
-  {
-    return o.tag;
-  }
+  // function depVersionPatch( dep )
+  // {
+  //   return o.tag;
+  // }
 
 }
 
 structureBump.defaults =
 {
   config : null,
-}
+};
 
 //
 
