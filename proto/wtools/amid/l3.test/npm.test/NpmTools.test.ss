@@ -1587,7 +1587,7 @@ function versionLogWithOptions( test )
 {
   const self = this;
   const a = test.assetFor( false );
-  let programPath;
+  let filePath/*programPath*/;
   begin();
 
   const programShell = _.process.starter
@@ -1628,11 +1628,11 @@ function versionLogWithOptions( test )
       tags : [ 'latest', 'stable' ],
       logger : 5,
     };
-    programPath = programMake( o );
+    filePath/*programPath*/ = programMake( o );
     return null;
   });
 
-  a.ready.then( () => programShell( `node ${ programPath }`) );
+  a.ready.then( () => programShell( `node ${ filePath/*programPath*/ }`) );
   a.ready.then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -1653,11 +1653,11 @@ function versionLogWithOptions( test )
       tags : [ 'latest', 'stable' ],
       logger : 0,
     };
-    programPath = programMake( o );
+    filePath/*programPath*/ = programMake( o );
     return null;
   });
 
-  a.ready.then( () => programShell( `node ${ programPath }`) );
+  a.ready.then( () => programShell( `node ${ filePath/*programPath*/ }`) );
   a.ready.then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -1685,7 +1685,7 @@ function versionLogWithOptions( test )
   {
     const locals = { toolsPath : _.module.resolve( 'wTools' ), o : options };
     const program = a.program({ entry : testApp, locals });
-    return a.path.nativize( program.programPath );
+    return a.path.nativize( program.filePath/*programPath*/ );
   }
 
   /* */
