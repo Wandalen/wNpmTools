@@ -639,8 +639,8 @@ Fixates versions of the dependecies in provided package
 
 function fileBump( test )
 {
-  let context = this;
-  let a = test.assetFor( 'bump' );
+  const context = this;
+  const a = test.assetFor( 'bump' );
 
   /* */
 
@@ -758,6 +758,175 @@ fileBump.description =
 `
 Bumps package version
 `;
+
+//
+
+function fileBumpCheckOptions( test )
+{
+  const context = this;
+  const a = test.assetFor( 'bump' );
+  let programPath;
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'localPath, dry - 1';
+    a.reflect();
+    var got = _.npm.fileBump({ localPath : a.abs( '.' ), dry : 1 });
+    var exp = [ 'localPath', 'dry', 'config', 'logger', 'configPath', 'nativizing', 'onChange', 'changed' ];
+    test.identical( _.props.keys( got ), exp );
+    var expConfig = a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) );
+    test.notIdentical( got.config, expConfig );
+    test.identical( got.config.version, '0.0.1' );
+    test.identical( expConfig.version, '0.0.0' );
+    test.identical( got.localPath, a.abs( '.' ) );
+    test.identical( got.configPath, a.abs( 'package.json' ) );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 0';
+    a.reflect();
+    programPath =  a.program({ entry : testApp, locals : { logger : 0 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ programPath }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( op.output, '' );
+    var exp =
+    {
+      'name' : 'test',
+      'version' : '0.0.1',
+      'devDependencies' : { 'wTesting' : '', 'wmodulefortesting1' : 'alpha' },
+      'optionalDependencies' : { 'wmodulefortesting2b' : '', 'wmodulefortesting2a' : '' },
+      'bundledDependencies' : [ 'wmodulefortesting2', 'wmodulefortesting1b', 'wmodulefortesting1a' ]
+    };
+    test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ), exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 1';
+    a.reflect();
+    programPath =  a.program({ entry : testApp, locals : { logger : 1 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ programPath }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    var exp = `Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }`;
+    test.contains( op.output, exp );
+    var exp =
+    {
+      'name' : 'test',
+      'version' : '0.0.1',
+      'devDependencies' : { 'wTesting' : '', 'wmodulefortesting1' : 'alpha' },
+      'optionalDependencies' : { 'wmodulefortesting2b' : '', 'wmodulefortesting2a' : '' },
+      'bundledDependencies' : [ 'wmodulefortesting2', 'wmodulefortesting1b', 'wmodulefortesting1a' ]
+    };
+    test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ), exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 3';
+    a.reflect();
+    programPath =  a.program({ entry : testApp, locals : { logger : 3 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ programPath }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    var exp =
+`Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }
+  {
+    "name": "test",
+    "version": "0.0.1",
+    "devDependencies": {
+      "wTesting": "",
+      "wmodulefortesting1": "alpha"
+    },
+    "optionalDependencies": {
+      "wmodulefortesting2b": "",
+      "wmodulefortesting2a": ""
+    },
+    "bundledDependencies": [
+      "wmodulefortesting2",
+      "wmodulefortesting1b",
+      "wmodulefortesting1a"
+    ]
+  }`;
+    test.contains( op.output, exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'nativizing - 0';
+    a.reflect();
+    _.npm.fileBump({ localPath : a.abs( '.' ), nativizing : 0 });
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'original.json' ) } });
+    return null;
+  });
+  a.shell( `npm i` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
+    let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    test.notIdentical( originalConfig, newConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'nativizing - 1';
+    a.reflect();
+    _.npm.fileBump({ localPath : a.abs( '.' ), nativizing : 1 });
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'original.json' ) } });
+    return null;
+  });
+  a.shell( `npm i` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
+    let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    test.identical( originalConfig, newConfig );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function testApp()
+  {
+    const _ = require( toolsPath );
+    _.include( 'wNpmTools' );
+    _.npm.fileBump({ localPath : __dirname, logger });
+  }
+}
 
 //
 
@@ -2448,6 +2617,7 @@ const Proto =
 
     fileFixate,
     fileBump,
+    fileBumpCheckOptions,
 
     depAdd,
 
