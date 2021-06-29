@@ -794,7 +794,7 @@ function fileBumpCheckOptions( test )
     programPath = a.program({ entry : testApp, locals : { logger : 0 } }).filePath;
     return null;
   });
-  a.shell( `node ${ programPath }` );
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
   a.ready.then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -820,7 +820,7 @@ function fileBumpCheckOptions( test )
     programPath = a.program({ entry : testApp, locals : { logger : 1 } }).filePath;
     return null;
   });
-  a.shell( `node ${ programPath }` );
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
   a.ready.then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -847,7 +847,7 @@ function fileBumpCheckOptions( test )
     programPath = a.program({ entry : testApp, locals : { logger : 3 } }).filePath;
     return null;
   });
-  a.shell( `node ${ programPath }` );
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
   a.ready.then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
