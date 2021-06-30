@@ -46,6 +46,7 @@ function _readChangeWrite_functor( fo )
   defaults2.dry = 0;
   defaults2.localPath = null;
   defaults2.configPath = null;
+  defaults2.nativizing = 1;
   _.props.supplement( fo.body.defaults, defaults2 )
 
   return _.routine.unite
@@ -78,7 +79,7 @@ function _readChangeWrite_functor( fo )
     try
     {
       let o2 = _.props.extend( null, o );
-      _.props.supplement( null, o2, defaults );
+      _.props.supplement( o2, o2, defaults );
       o2.onChange = onChange;
       _readChangeWrite.call( self, o2 );
       _.props.extend( o, o2 );
@@ -100,6 +101,7 @@ function _readChangeWrite_functor( fo )
 
     if( !o.configPath )
     o.configPath = _.npm.pathConfigFromLocal( o.localPath );
+    if( !o.config )
     o.config = _.fileProvider.fileReadUnknown( o.configPath );
 
     let o2 = Object.create( null );
@@ -532,7 +534,7 @@ function structureFormat_functor()
       mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
       // mode : 'spawn',
       sync : 1,
-      outputPiping : 1,
+      outputPiping : 0,
       verbosity : 0,
       logger : 0,
     });
@@ -696,7 +698,7 @@ function structureBump( o )
   let version = o.config.version || '0.0.0';
   let versionArray = version.split( '.' );
   versionArray[ 2 ] = Number( versionArray[ 2 ] );
-  _.sure( _.intIs( versionArray[ 2 ] ), `Cant deduce current version : ${version}` );
+  _.sure( _.intIs( versionArray[ 2 ] ), `Can't deduce current version : ${version}` );
 
   versionArray[ 2 ] += 1;
   version = versionArray.join( '.' );
@@ -707,17 +709,17 @@ function structureBump( o )
   // return version;
   return o;
 
-  function depVersionPatch( dep )
-  {
-    return o.tag;
-  }
+  // function depVersionPatch( dep )
+  // {
+  //   return o.tag;
+  // }
 
 }
 
 structureBump.defaults =
 {
   config : null,
-}
+};
 
 //
 
@@ -2081,7 +2083,7 @@ let Extension =
 
   fileFixate, /* qqq : cover please */
   structureFixate, /* qqq : cover please */
-  fileBump, /* qqq : cover please */
+  fileBump, /* aaa : cover please */ /* Dmytro : covered */
   structureBump, /* qqq : cover please */
 
   fileReadFilePath,

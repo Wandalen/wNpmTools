@@ -251,10 +251,10 @@ function pathDownloadFromLocal( test )
 
 //
 
-function format( test )
+function fileFormat( test )
 {
   let self = this;
-  let a = test.assetFor();
+  let a = test.assetFor( 'format' );
 
   /* - */
 
@@ -429,11 +429,11 @@ function format( test )
   return a.ready;
 }
 
-format.timeOut = 4e5;
+fileFormat.timeOut = 4e5;
 
 //
 
-function fixate( test )
+function fileFixate( test )
 {
   let self = this;
   let a = test.assetFor( 'fixate' ); /* aaa Artem : done. should be single call of assetFor per test routine */
@@ -630,76 +630,303 @@ function fixate( test )
   }
 }
 
-fixate.description =
+fileFixate.description =
 `
 Fixates versions of the dependecies in provided package
 `;
 
-// //
+//
 
-function bump( test )
+function fileBump( test )
 {
-  let self = this;
-
-  let a = test.assetFor( 'bump' );
-
-  /* aaa Artem : done. similar problems here */
-
-  test.case = '`local path` option points to the config file';
-
-  a.reflect();
-
-  var localPath = a.abs( '.' );
-  var got = _.npm.fileBump({ localPath }).config;
-  var exp =
-  {
-    'name' : 'test package.json',
-    'version' : '1.0.1',
-    'dependencies' : { 'package1' : '1.1.1' },
-    'devDependencies' : { 'package2' : '2.2.2' }
-  }
-
-  test.identical( got, exp );
+  const context = this;
+  const a = test.assetFor( 'bump' );
 
   /* */
 
-  test.case = 'read written config';
-
+  test.case = 'package.json has no version, localPath';
   a.reflect();
-
-  var localPath = a.abs( '.' );
-  _.npm.fileBump({ localPath });
-  var got = _.fileProvider.fileReadUnknown({ filePath : a.abs( 'package.json' ) });
-  var exp =
-  {
-    'name' : 'test package.json',
-    'version' : '1.0.1',
-    'dependencies' : { 'package1' : '1.1.1' },
-    'devDependencies' : { 'package2' : '2.2.2' }
-  }
-
-  test.identical( got, exp );
+  a.fileProvider.fileWriteUnknown( a.abs( 'package.json' ), { name : 'test' } )
+  test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ).version, undefined );
+  var got = _.npm.fileBump({ localPath : a.abs( '.' ) });
+  var exp = [ 'localPath', 'config', 'logger', 'dry', 'configPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
 
   /* */
 
-  test.case = 'check whole "got" map';
-
+  test.case = 'only localPath';
   a.reflect();
+  var got = _.npm.fileBump({ localPath : a.abs( '.' ) });
+  var exp = [ 'localPath', 'config', 'logger', 'dry', 'configPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
 
-  var localPath = a.abs( '.' );
-  var got = _.npm.fileBump({ localPath });
+  /* */
 
-  test.true( _.strDefined( got.localPath ) );
-  test.true( _.strDefined( got.configPath ) );
-  test.identical( got.dry, 0 );
-  test.identical( got.logger, 0 );
-  test.identical( got.changed, true );
+  test.case = 'only configPath';
+  a.reflect();
+  var got = _.npm.fileBump({ configPath : a.abs( 'package.json' ) });
+  var exp = [ 'configPath', 'config', 'logger', 'dry', 'localPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, null );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* */
+
+  test.case = 'config and localPath';
+  a.reflect();
+  var got = _.npm.fileBump({ localPath : a.abs( '.' ), config : a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) });
+  var exp = [ 'localPath', 'config', 'logger', 'dry', 'configPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* */
+
+  test.case = 'config and configPath';
+  a.reflect();
+  var got = _.npm.fileBump({ configPath : a.abs( 'package.json' ), config : a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) });
+  var exp = [ 'configPath', 'config', 'logger', 'dry', 'localPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, null );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* */
+
+  test.case = 'config, localPath and configPath';
+  a.reflect();
+  var got = _.npm.fileBump
+  ({
+    localPath : a.abs( '.' ),
+    configPath : a.abs( 'package.json' ),
+    config : a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) )
+  });
+  var exp = [ 'localPath', 'configPath', 'config', 'logger', 'dry', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.npm.fileFormat() );
+
+  test.case = 'extra arguments';
+  var o = { localPath : a.abs( '.' ) };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o, o ) );
+
+  test.case = 'wrong type of options map';
+  var o = { localPath : a.abs( '.' ) };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat([ o ]) );
+
+  test.case = 'options map has unknown field';
+  var o = { localPath : a.abs( '.' ), unknown : 1 };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
+
+  test.case = 'none configPath and localPath exist';
+  var o = { config : { version : '0.0.1' } };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
+
+  test.case = 'option onChange, should not overwrite callback';
+  var o = { localPath : a.abs( '.' ), onChange : () => null };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
+
+  test.case = 'option changed, should not define before execution';
+  var o = { localPath : a.abs( '.' ), changed : true };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
 }
 
-bump.description =
+fileBump.description =
 `
 Bumps package version
 `;
+
+//
+
+function fileBumpCheckOptions( test )
+{
+  const context = this;
+  const a = test.assetFor( 'bump' );
+  let programPath;
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'localPath, dry - 1';
+    a.reflect();
+    var got = _.npm.fileBump({ localPath : a.abs( '.' ), dry : 1 });
+    var exp = [ 'localPath', 'dry', 'config', 'logger', 'configPath', 'nativizing', 'onChange', 'changed' ];
+    test.identical( _.props.keys( got ), exp );
+    var expConfig = a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) );
+    test.notIdentical( got.config, expConfig );
+    test.identical( got.config.version, '0.0.1' );
+    test.identical( expConfig.version, '0.0.0' );
+    test.identical( got.localPath, a.abs( '.' ) );
+    test.identical( got.configPath, a.abs( 'package.json' ) );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 0';
+    a.reflect();
+    programPath = a.program({ entry : testApp, locals : { logger : 0 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( op.output, '' );
+    var exp =
+    {
+      'name' : 'test',
+      'version' : '0.0.1',
+      'devDependencies' : { 'wTesting' : '', 'wmodulefortesting1' : 'alpha' },
+      'optionalDependencies' : { 'wmodulefortesting2b' : '', 'wmodulefortesting2a' : '' },
+      'bundledDependencies' : [ 'wmodulefortesting2', 'wmodulefortesting1b', 'wmodulefortesting1a' ]
+    };
+    test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ), exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 1';
+    a.reflect();
+    programPath = a.program({ entry : testApp, locals : { logger : 1 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    var exp = `Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }`;
+    test.contains( op.output, exp );
+    var exp =
+    {
+      'name' : 'test',
+      'version' : '0.0.1',
+      'devDependencies' : { 'wTesting' : '', 'wmodulefortesting1' : 'alpha' },
+      'optionalDependencies' : { 'wmodulefortesting2b' : '', 'wmodulefortesting2a' : '' },
+      'bundledDependencies' : [ 'wmodulefortesting2', 'wmodulefortesting1b', 'wmodulefortesting1a' ]
+    };
+    test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ), exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 3';
+    a.reflect();
+    programPath = a.program({ entry : testApp, locals : { logger : 3 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    var exp =
+`Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }
+  {
+    "name": "test",
+    "version": "0.0.1",
+    "devDependencies": {
+      "wTesting": "",
+      "wmodulefortesting1": "alpha"
+    },
+    "optionalDependencies": {
+      "wmodulefortesting2b": "",
+      "wmodulefortesting2a": ""
+    },
+    "bundledDependencies": [
+      "wmodulefortesting2",
+      "wmodulefortesting1b",
+      "wmodulefortesting1a"
+    ]
+  }`;
+    test.contains( op.output, exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'nativizing - 0';
+    a.reflect();
+    _.npm.fileBump({ localPath : a.abs( '.' ), nativizing : 0 });
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'original.json' ) } });
+    return null;
+  });
+  a.shell( `npm i` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
+    let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    test.notIdentical( originalConfig, newConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'nativizing - 1';
+    a.reflect();
+    _.npm.fileBump({ localPath : a.abs( '.' ), nativizing : 1 });
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'original.json' ) } });
+    return null;
+  });
+  a.shell( `npm i` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
+    let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    test.identical( originalConfig, newConfig );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function testApp()
+  {
+    const _ = require( toolsPath );
+    _.include( 'wNpmTools' );
+    _.npm.fileBump({ localPath : __dirname, logger });
+  }
+}
 
 //
 
@@ -2384,12 +2611,13 @@ const Proto =
 
     /* */
 
-    format,
+    fileFormat,
 
     /* */
 
-    fixate,
-    bump,
+    fileFixate,
+    fileBump,
+    fileBumpCheckOptions,
 
     depAdd,
 
