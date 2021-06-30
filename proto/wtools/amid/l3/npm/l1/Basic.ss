@@ -1077,13 +1077,19 @@ function install( o )
 
   ready.then( ( op ) =>
   {
+    if( !o.linkingSelf && o.linkingSelf !== null )
+    return null;
+
+    let linkAs = _.npm.fileReadName({ localPath : o.localPath });
+    if( o.linkingSelf === null )
+    o.linkingSelf = !!linkAs;
 
     if( o.linkingSelf )
     return _.npm.depAdd
     ({
       localPath : o.localPath,
       depPath : path.join( 'hd://.', o.localPath ),
-      as : _.npm.fileReadName({ localPath : o.localPath }),
+      as : linkAs,
       editing : 0,
       downloading : 1,
       linking : 1,
