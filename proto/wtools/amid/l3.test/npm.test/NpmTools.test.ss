@@ -2263,7 +2263,7 @@ function isUpToDate( test )
   return ready;
 }
 
-isUpToDate.timeOut = 60000;
+isUpToDate.timeOut = 120000;
 
 //
 
