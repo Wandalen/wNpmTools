@@ -2533,6 +2533,8 @@ async function remoteDependants( test )
   }
   test.close( 'string as a parameter' );
 
+  /* - */
+
   test.open( 'map as a parameter' );
   {
     test.open( '0 dependants' );
@@ -2624,6 +2626,54 @@ remoteDependants.description =
 `
 Retrieves the number of dependent packages
 `
+
+//
+
+function remoteDependantsWithOptionAttemptDelayMultiplier( test )
+{
+  let context = this;
+  let a = test.assetFor( false );
+
+  // if( process.platform !== 'linux' || !_.process.insideTestContainer() )
+  // return test.true( true );
+
+  /* - */
+  let netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
+  a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
+
+  var start;
+  a.ready.then( () =>
+  {
+    test.case = 'not existed package';
+    start = _.time.now();
+    return _.npm.remoteDependants
+    ({
+      remotePath : 'npm:///nonexistentPackageName',
+      attemptLimit : 4,
+      attemptDelay : 250,
+      attemptDelayMultiplier : 4,
+      sync : 1,
+    });
+  });
+  a.ready.finally( ( err, arg ) =>
+  {
+    var spent = _.time.now() - start;
+    test.ge( spent, 5250 );
+
+    test.true( _.error.is( err ) );
+    _.error.attend( err );
+    test.true( _.strHas( err.originalMessage, 'Attempts is exhausted, made 4 attempts' ) );
+    test.identical( arg, undefined );
+
+    return null;
+  });
+
+  a.ready.finally( () => __.test.netInterfacesUp({ interfaces : netInterfaces }) );
+
+  /* - */
+
+  return a.ready;
+}
 
 //
 
@@ -2832,6 +2882,7 @@ const Proto =
     hasRemote,
 
     remoteDependants,
+    remoteDependantsWithOptionAttemptDelayMultiplier,
     dependantsRetrieveMultipleRequests,
     dependantsRetrieveStress,
 
