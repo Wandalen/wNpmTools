@@ -2533,6 +2533,8 @@ async function remoteDependants( test )
   }
   test.close( 'string as a parameter' );
 
+  /* - */
+
   test.open( 'map as a parameter' );
   {
     test.open( '0 dependants' );

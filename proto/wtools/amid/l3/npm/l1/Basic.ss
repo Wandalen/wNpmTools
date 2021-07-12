@@ -1519,6 +1519,7 @@ function remoteDependants( o )
     verbosity : o.logger ? o.logger.verbosity : 0,
     attemptLimit : o.attemptLimit,
     attemptDelay : o.attemptDelay,
+    attemptDelayMultiplier : o.attemptDelayMultiplier,
     successStatus : [ 200, 404 ],
   });
 
@@ -1586,6 +1587,7 @@ remoteDependants.defaults =
   logger : 0,
   attemptLimit : 3,
   attemptDelay : 250,
+  attemptDelayMultiplier : 4,
 };
 
 // --
