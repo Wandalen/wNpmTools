@@ -2634,8 +2634,8 @@ function remoteDependantsWithOptionAttemptDelayMultiplier( test )
   let context = this;
   let a = test.assetFor( false );
 
-  // if( process.platform !== 'linux' || !_.process.insideTestContainer() )
-  // return test.true( true );
+  if( process.platform !== 'linux' || !_.process.insideTestContainer() )
+  return test.true( true );
 
   /* - */
   let netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
