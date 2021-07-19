@@ -292,8 +292,8 @@ submodule:
   wTools:
     path: 'npm:///wTools'
     enabled: 0
-  wFiles:
-    path: 'npm:///wFiles'
+  wFilesBasic:
+    path: 'npm:///wfilesbasic'
     enabled: 0
   wprocess:
     path: 'npm:///wprocess'
