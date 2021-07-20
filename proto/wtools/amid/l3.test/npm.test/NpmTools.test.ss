@@ -2339,7 +2339,7 @@ function isRepository( test )
   return ready;
 }
 
-isRepository.timeOut = 20000;
+isRepository.timeOut = 40000;
 
 //
 
