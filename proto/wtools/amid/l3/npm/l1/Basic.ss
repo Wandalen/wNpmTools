@@ -4,7 +4,7 @@
 'use strict';
 
 const _ = _global_.wTools;
-const Self = _.npm = _.npm || Object.create( null );
+_.npm = _.npm || Object.create( null );
 
 _.assert( _.routineIs( _.strLinesIndentation ) );
 
@@ -46,6 +46,7 @@ function _readChangeWrite_functor( fo )
   defaults2.dry = 0;
   defaults2.localPath = null;
   defaults2.configPath = null;
+  defaults2.nativizing = 1;
   _.props.supplement( fo.body.defaults, defaults2 )
 
   return _.routine.unite
@@ -78,7 +79,7 @@ function _readChangeWrite_functor( fo )
     try
     {
       let o2 = _.props.extend( null, o );
-      _.props.supplement( null, o2, defaults );
+      _.props.supplement( o2, o2, defaults );
       o2.onChange = onChange;
       _readChangeWrite.call( self, o2 );
       _.props.extend( o, o2 );
@@ -100,6 +101,7 @@ function _readChangeWrite_functor( fo )
 
     if( !o.configPath )
     o.configPath = _.npm.pathConfigFromLocal( o.localPath );
+    if( !o.config )
     o.config = _.fileProvider.fileReadUnknown( o.configPath );
 
     let o2 = Object.create( null );
@@ -532,7 +534,7 @@ function structureFormat_functor()
       mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
       // mode : 'spawn',
       sync : 1,
-      outputPiping : 1,
+      outputPiping : 0,
       verbosity : 0,
       logger : 0,
     });
@@ -696,7 +698,7 @@ function structureBump( o )
   let version = o.config.version || '0.0.0';
   let versionArray = version.split( '.' );
   versionArray[ 2 ] = Number( versionArray[ 2 ] );
-  _.sure( _.intIs( versionArray[ 2 ] ), `Cant deduce current version : ${version}` );
+  _.sure( _.intIs( versionArray[ 2 ] ), `Can't deduce current version : ${version}` );
 
   versionArray[ 2 ] += 1;
   version = versionArray.join( '.' );
@@ -707,17 +709,17 @@ function structureBump( o )
   // return version;
   return o;
 
-  function depVersionPatch( dep )
-  {
-    return o.tag;
-  }
+  // function depVersionPatch( dep )
+  // {
+  //   return o.tag;
+  // }
 
 }
 
 structureBump.defaults =
 {
   config : null,
-}
+};
 
 //
 
@@ -1075,13 +1077,19 @@ function install( o )
 
   ready.then( ( op ) =>
   {
+    if( !o.linkingSelf && o.linkingSelf !== null )
+    return null;
+
+    let linkAs = _.npm.fileReadName({ localPath : o.localPath });
+    if( o.linkingSelf === null )
+    o.linkingSelf = !!linkAs;
 
     if( o.linkingSelf )
     return _.npm.depAdd
     ({
       localPath : o.localPath,
       depPath : path.join( 'hd://.', o.localPath ),
-      as : _.npm.fileReadName({ localPath : o.localPath }),
+      as : linkAs,
       editing : 0,
       downloading : 1,
       linking : 1,
@@ -1214,67 +1222,167 @@ publish.defaults =
 
 function versionLog( o )
 {
-  let self = this;
+  const self = this;
 
+  _.assert( arguments.length === 1, 'Expects exactly one argument' );
   _.routine.options( versionLog, o );
+
+  if( !o.tags )
+  o.tags = [ 'latest' ];
+
+  _.assert( _.strsAreAll( o.tags ), 'Expects strings {-o.tags-}.' );
+
+  o.logger = _.logger.maybe( o.logger );
 
   if( !o.configPath )
   o.configPath = self.pathConfigFromLocal( o.localPath );
-  // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
-
-  o.logger = _.logger.maybe( o.logger );
 
   _.assert( _.strDefined( o.configPath ) );
   _.assert( _.strDefined( o.remotePath ) );
 
-  // let logger = o.logger || _global_.logger;
-  let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
-  // let remotePath = self.pathNativize( o.remotePath );
-  let remotePath = _.npm.path.nativize( o.remotePath );
+  const packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+  const remotePath = _.npm.path.nativize( o.remotePath );
 
-  // _.assert( !o.logging || !!logger, 'No defined logger' );
+  /* */
 
-  return _.process.start
-  ({
-    execPath : `npm view ${remotePath} version`,
-    outputCollecting : 1,
-    outputPiping : 0,
-    inputMirroring : 0,
-    throwingExitCode : 0,
-    logger : o.logger,
-    verbosity : o.logger.verbosity,
-  })
-  .then( ( got ) =>
+  const unknownVersion = '-no-';
+  const currentVersion = packageJson ? packageJson.version : unknownVersion;
+  let ready = _.take( `Current version : ${ currentVersion }\n` );
+
+  const prefixMap =
   {
-    let current = packageJson ? packageJson.version : 'unknown';
-    let latest = _.strStrip( got.output );
+    latest : 'Latest version of',
+    stable : 'Stable version of',
+  };
 
-    if( got.exitCode || !latest )
-    latest = 'unknown'
+  // let start = _.process.starter
+  // ({
+  //   outputCollecting : 1,
+  //   outputPiping : 0,
+  //   inputMirroring : 0,
+  //   throwingExitCode : 0,
+  //   logger : o.logger,
+  //   verbosity : o.logger.verbosity,
+  // });
 
-    let log = '';
-    log += `Current version : ${current}\n`;
-    log += `Latest version of ${o.remotePath} : ${latest}\n`;
+  let readies = [];
+  for( let i = 0 ; i < o.tags.length ; i++ )
+  readies.push( versionLogGet( o.tags[ i ] ) );
 
-    // if( o.logging )
-    // logger.log( log );
+  return ready.andTake( readies )
+  .finally( ( err, resolved ) =>
+  {
+    if( err )
+    throw _.err( err );
 
+    let log = resolved.join( '' );
     if( o.logger && o.logger.verbosity )
     o.logger.log( log );
-
     return log;
-  })
+  });
 
+  /* */
+
+  function versionLogGet( tag )
+  {
+    const version = `${ remotePath }@${ tag }`
+    return _.process.start
+    ({
+      execPath : `npm view ${ version } version`,
+      outputCollecting : 1,
+      outputPiping : 0,
+      inputMirroring : 0,
+      throwingExitCode : 0,
+      logger : o.logger,
+      verbosity : o.logger.verbosity,
+    })
+    .then( ( got ) =>
+    {
+      let latest = _.strStrip( got.output );
+      if( got.exitCode || !latest )
+      latest = unknownVersion;
+
+      const postfix = `${ o.remotePath } : ${ latest }\n`;
+      if( tag in prefixMap )
+      return `${ prefixMap[ tag ] } ${ postfix }`;
+      else
+      return `${ tag } version of ${ postfix }`;
+    });
+  }
 }
 
 versionLog.defaults =
 {
   logger : 1,
-  // logging : 1,
   remotePath : null,
   localPath : null,
   configPath : null,
+  tags : null,
 };
+
+// function versionLog( o )
+// {
+//   let self = this;
+//
+//   _.routine.options( versionLog, o );
+//
+//   if( !o.configPath )
+//   o.configPath = self.pathConfigFromLocal( o.localPath );
+//   // o.configPath = _.path.join( o.localPath, 'package.json' ); /* xxx : qqq for Dmytro : introduce routine::localPathToConfigPath and use everywhere */
+//
+//   o.logger = _.logger.maybe( o.logger );
+//
+//   _.assert( _.strDefined( o.configPath ) );
+//   _.assert( _.strDefined( o.remotePath ) );
+//
+//   // let logger = o.logger || _global_.logger;
+//   let packageJson =  _.fileProvider.fileRead({ filePath : o.configPath, encoding : 'json', throwing : 0 });
+//   // let remotePath = self.pathNativize( o.remotePath );
+//   let remotePath = _.npm.path.nativize( o.remotePath );
+//
+//   // _.assert( !o.logging || !!logger, 'No defined logger' );
+//
+//   return _.process.start
+//   ({
+//     execPath : `npm view ${remotePath} version`,
+//     outputCollecting : 1,
+//     outputPiping : 0,
+//     inputMirroring : 0,
+//     throwingExitCode : 0,
+//     logger : o.logger,
+//     verbosity : o.logger.verbosity,
+//   })
+//   .then( ( got ) =>
+//   {
+//     let current = packageJson ? packageJson.version : 'unknown';
+//     let latest = _.strStrip( got.output );
+//
+//     if( got.exitCode || !latest )
+//     latest = 'unknown'
+//
+//     let log = '';
+//     log += `Current version : ${current}\n`;
+//     log += `Latest version of ${o.remotePath} : ${latest}\n`;
+//
+//     // if( o.logging )
+//     // logger.log( log );
+//
+//     if( o.logger && o.logger.verbosity )
+//     o.logger.log( log );
+//
+//     return log;
+//   })
+//
+// }
+//
+// versionLog.defaults =
+// {
+//   logger : 1,
+//   // logging : 1,
+//   remotePath : null,
+//   localPath : null,
+//   configPath : null,
+// };
 
 // --
 // remote
@@ -1411,6 +1519,7 @@ function remoteDependants( o )
     verbosity : o.logger ? o.logger.verbosity : 0,
     attemptLimit : o.attemptLimit,
     attemptDelay : o.attemptDelay,
+    attemptDelayMultiplier : o.attemptDelayMultiplier,
     successStatus : [ 200, 404 ],
   });
 
@@ -1478,6 +1587,7 @@ remoteDependants.defaults =
   logger : 0,
   attemptLimit : 3,
   attemptDelay : 250,
+  attemptDelayMultiplier : 4,
 };
 
 // --
@@ -1981,7 +2091,7 @@ let Extension =
 
   fileFixate, /* qqq : cover please */
   structureFixate, /* qqq : cover please */
-  fileBump, /* qqq : cover please */
+  fileBump, /* aaa : cover please */ /* Dmytro : covered */
   structureBump, /* qqq : cover please */
 
   fileReadFilePath,
@@ -2032,7 +2142,7 @@ let Extension =
 
 }
 
-_.props.extend( Self, Extension );
+/* _.props.extend */Object.assign( _.npm, Extension );
 
 //
 

@@ -251,10 +251,10 @@ function pathDownloadFromLocal( test )
 
 //
 
-function format( test )
+function fileFormat( test )
 {
   let self = this;
-  let a = test.assetFor();
+  let a = test.assetFor( 'format' );
 
   /* - */
 
@@ -429,11 +429,11 @@ function format( test )
   return a.ready;
 }
 
-format.timeOut = 4e5;
+fileFormat.timeOut = 4e5;
 
 //
 
-function fixate( test )
+function fileFixate( test )
 {
   let self = this;
   let a = test.assetFor( 'fixate' ); /* aaa Artem : done. should be single call of assetFor per test routine */
@@ -630,76 +630,320 @@ function fixate( test )
   }
 }
 
-fixate.description =
+fileFixate.description =
 `
 Fixates versions of the dependecies in provided package
 `;
 
-// //
+//
 
-function bump( test )
+function fileBump( test )
 {
-  let self = this;
-
-  let a = test.assetFor( 'bump' );
-
-  /* aaa Artem : done. similar problems here */
-
-  test.case = '`local path` option points to the config file';
-
-  a.reflect();
-
-  var localPath = a.abs( '.' );
-  var got = _.npm.fileBump({ localPath }).config;
-  var exp =
-  {
-    'name' : 'test package.json',
-    'version' : '1.0.1',
-    'dependencies' : { 'package1' : '1.1.1' },
-    'devDependencies' : { 'package2' : '2.2.2' }
-  }
-
-  test.identical( got, exp );
+  const context = this;
+  const a = test.assetFor( 'bump' );
 
   /* */
 
-  test.case = 'read written config';
-
+  test.case = 'package.json has no version, localPath';
   a.reflect();
-
-  var localPath = a.abs( '.' );
-  _.npm.fileBump({ localPath });
-  var got = _.fileProvider.fileReadUnknown({ filePath : a.abs( 'package.json' ) });
-  var exp =
-  {
-    'name' : 'test package.json',
-    'version' : '1.0.1',
-    'dependencies' : { 'package1' : '1.1.1' },
-    'devDependencies' : { 'package2' : '2.2.2' }
-  }
-
-  test.identical( got, exp );
+  a.fileProvider.fileWriteUnknown( a.abs( 'package.json' ), { name : 'test' } )
+  test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ).version, undefined );
+  var got = _.npm.fileBump({ localPath : a.abs( '.' ) });
+  var exp = [ 'localPath', 'config', 'logger', 'dry', 'configPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
 
   /* */
 
-  test.case = 'check whole "got" map';
-
+  test.case = 'only localPath';
   a.reflect();
+  var got = _.npm.fileBump({ localPath : a.abs( '.' ) });
+  var exp = [ 'localPath', 'config', 'logger', 'dry', 'configPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
 
-  var localPath = a.abs( '.' );
-  var got = _.npm.fileBump({ localPath });
+  /* */
 
-  test.true( _.strDefined( got.localPath ) );
-  test.true( _.strDefined( got.configPath ) );
-  test.identical( got.dry, 0 );
-  test.identical( got.logger, 0 );
-  test.identical( got.changed, true );
+  test.case = 'only configPath';
+  a.reflect();
+  var got = _.npm.fileBump({ configPath : a.abs( 'package.json' ) });
+  var exp = [ 'configPath', 'config', 'logger', 'dry', 'localPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, null );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* */
+
+  test.case = 'config and localPath';
+  a.reflect();
+  var got = _.npm.fileBump({ localPath : a.abs( '.' ), config : a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) });
+  var exp = [ 'localPath', 'config', 'logger', 'dry', 'configPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* */
+
+  test.case = 'config and configPath';
+  a.reflect();
+  var got = _.npm.fileBump({ configPath : a.abs( 'package.json' ), config : a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) });
+  var exp = [ 'configPath', 'config', 'logger', 'dry', 'localPath', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, null );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* */
+
+  test.case = 'config, localPath and configPath';
+  a.reflect();
+  var got = _.npm.fileBump
+  ({
+    localPath : a.abs( '.' ),
+    configPath : a.abs( 'package.json' ),
+    config : a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) )
+  });
+  var exp = [ 'localPath', 'configPath', 'config', 'logger', 'dry', 'nativizing', 'onChange', 'changed' ];
+  test.identical( _.props.keys( got ), exp );
+  test.identical( got.config, a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ) );
+  test.identical( got.config.version, '0.0.1' );
+  test.identical( got.localPath, a.abs( '.' ) );
+  test.identical( got.configPath, a.abs( 'package.json' ) );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.npm.fileFormat() );
+
+  test.case = 'extra arguments';
+  var o = { localPath : a.abs( '.' ) };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o, o ) );
+
+  test.case = 'wrong type of options map';
+  var o = { localPath : a.abs( '.' ) };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat([ o ]) );
+
+  test.case = 'options map has unknown field';
+  var o = { localPath : a.abs( '.' ), unknown : 1 };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
+
+  test.case = 'none configPath and localPath exist';
+  var o = { config : { version : '0.0.1' } };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
+
+  test.case = 'option onChange, should not overwrite callback';
+  var o = { localPath : a.abs( '.' ), onChange : () => null };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
+
+  test.case = 'option changed, should not define before execution';
+  var o = { localPath : a.abs( '.' ), changed : true };
+  test.shouldThrowErrorSync( () => _.npm.fileFormat( o ) );
 }
 
-bump.description =
+fileBump.description =
 `
 Bumps package version
 `;
+
+//
+
+function fileBumpCheckOptions( test )
+{
+  const context = this;
+  const a = test.assetFor( 'bump' );
+  let programPath;
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'localPath, dry - 1';
+    a.reflect();
+    var got = _.npm.fileBump({ localPath : a.abs( '.' ), dry : 1 });
+    var exp = [ 'localPath', 'dry', 'config', 'logger', 'configPath', 'nativizing', 'onChange', 'changed' ];
+    test.identical( _.props.keys( got ), exp );
+    var expConfig = a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) );
+    test.notIdentical( got.config, expConfig );
+    test.identical( got.config.version, '0.0.1' );
+    test.identical( expConfig.version, '0.0.0' );
+    test.identical( got.localPath, a.abs( '.' ) );
+    test.identical( got.configPath, a.abs( 'package.json' ) );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 0';
+    a.reflect();
+    programPath = a.program({ entry : testApp, locals : { logger : 0 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( op.output, '' );
+    var exp =
+    {
+      'name' : 'test',
+      'version' : '0.0.1',
+      'devDependencies' : { 'wTesting' : '', 'wmodulefortesting1' : 'alpha' },
+      'optionalDependencies' : { 'wmodulefortesting2b' : '', 'wmodulefortesting2a' : '' },
+      'bundledDependencies' : [ 'wmodulefortesting2', 'wmodulefortesting1b', 'wmodulefortesting1a' ]
+    };
+    test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ), exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 1';
+    a.reflect();
+    programPath = a.program({ entry : testApp, locals : { logger : 1 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    var exp = `Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }`;
+    test.contains( op.output, exp );
+    var exp =
+    {
+      'name' : 'test',
+      'version' : '0.0.1',
+      'devDependencies' : { 'wTesting' : '', 'wmodulefortesting1' : 'alpha' },
+      'optionalDependencies' : { 'wmodulefortesting2b' : '', 'wmodulefortesting2a' : '' },
+      'bundledDependencies' : [ 'wmodulefortesting2', 'wmodulefortesting1b', 'wmodulefortesting1a' ]
+    };
+    test.identical( a.fileProvider.fileReadUnknown( a.abs( 'package.json' ) ), exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'bump with logger - 3';
+    a.reflect();
+    programPath = a.program({ entry : testApp, locals : { logger : 3 } }).filePath;
+    return null;
+  });
+  a.shell( `node ${ a.path.nativize( programPath ) }` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    var partForNpm6 =
+`   "devDependencies": {
+      "wTesting": "",
+      "wmodulefortesting1": "alpha"
+    },
+    "optionalDependencies": {
+      "wmodulefortesting2b": "",
+      "wmodulefortesting2a": ""
+    },
+    "bundledDependencies": [
+      "wmodulefortesting2",
+      "wmodulefortesting1b",
+      "wmodulefortesting1a"
+    ]`;
+    var partForNpm7 =
+`   "devDependencies": {
+      "wmodulefortesting1": "alpha",
+      "wTesting": ""
+    },
+    "optionalDependencies": {
+      "wmodulefortesting2a": "",
+      "wmodulefortesting2b": ""
+    },
+    "bundledDependencies": [
+      "wmodulefortesting2",
+      "wmodulefortesting1b",
+      "wmodulefortesting1a"
+    ]
+`;
+    var exp =
+`Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }
+  {
+    "name": "test",
+    "version": "0.0.1",
+    ${ Number( process.versions.node.substring( 0, 2 ) ) >= 15 ? partForNpm7 : partForNpm6 }
+  }`;
+    test.contains( op.output, exp );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'nativizing - 0';
+    a.reflect();
+    _.npm.fileBump({ localPath : a.abs( '.' ), nativizing : 0 });
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'original.json' ) } });
+    return null;
+  });
+  a.shell( `npm i` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
+    let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    test.notIdentical( originalConfig, newConfig );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'nativizing - 1';
+    a.reflect();
+    _.npm.fileBump({ localPath : a.abs( '.' ), nativizing : 1 });
+    a.fileProvider.filesReflect({ reflectMap : { [ a.abs( 'package.json' ) ] : a.abs( 'original.json' ) } });
+    return null;
+  });
+  a.shell( `npm i` );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
+    let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    test.identical( originalConfig, newConfig );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function testApp()
+  {
+    const _ = require( toolsPath );
+    _.include( 'wNpmTools' );
+    _.npm.fileBump({ localPath : __dirname, logger });
+  }
+}
 
 //
 
@@ -918,9 +1162,12 @@ function install( test )
   {
     test.case = 'default options, package-lock.json exists';
     var got = _.npm.install({ localPath : a.abs( '.' ) });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
     test.identical( versionGet( 'wmodulefortesting12' ), '0.0.125' );
@@ -942,9 +1189,12 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
     test.identical( versionGet( 'wmodulefortesting12' ), '0.0.125' );
@@ -966,9 +1216,12 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
     test.notIdentical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.notIdentical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
     test.notIdentical( versionGet( 'wmodulefortesting12' ), '0.0.125' );
@@ -991,9 +1244,12 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
     test.notIdentical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.notIdentical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
     test.notIdentical( versionGet( 'wmodulefortesting12' ), '0.0.125' );
@@ -1015,9 +1271,12 @@ function install( test )
       dry : 0,
       sync : 1,
     });
-    test.identical( got, null );
+    test.identical( got, true );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
     test.identical( versionGet( 'wmodulefortesting1' ), '0.0.134' );
     test.identical( versionGet( 'wmodulefortesting2' ), '0.0.125' );
     test.identical( versionGet( 'wmodulefortesting12' ), '0.0.125' );
@@ -1041,7 +1300,10 @@ function install( test )
     });
     test.identical( got, null );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
 
     return null;
   });
@@ -1062,7 +1324,10 @@ function install( test )
     });
     test.identical( got, true );
     var files = find( 'node_modules' );
-    test.identical( files, [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ] );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
 
     return null;
   });
@@ -1172,6 +1437,182 @@ install.timeOut = 60000;
 
 //
 
+function installCheckOptionLinkingSelf( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+
+  let packageData =
+  {
+    dependencies :
+    {
+      wmodulefortesting1 : '',
+      wmodulefortesting12 : '',
+    }
+  };
+
+  /* - */
+
+  begin( packageData );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 0, name does not exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : 0,
+      sync : 1,
+    });
+    test.identical( got, null );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( _.map.extend( null, packageData, { name : 'test' } ) );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 0, name exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : 0,
+      sync : 1,
+    });
+    test.identical( got, null );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( packageData );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 1, name does not exists';
+    return test.shouldThrowErrorSync( () =>
+    {
+      return _.npm.install
+      ({
+        localPath : a.abs( '.' ),
+        linkingSelf : 1,
+        sync : 1,
+      });
+    });
+  });
+
+  /* */
+
+  begin( _.map.extend( null, packageData, { name : 'test' } ) );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - 1, name exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : 1,
+      sync : 1,
+    });
+    test.identical( got, true );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( packageData );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - null, name does not exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : null,
+      sync : 1,
+    });
+    test.identical( got, null );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 5 )
+    var exp = [ '.', './.package-lock.json', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* */
+
+  begin( _.map.extend( null, packageData, { name : 'test' } ) );
+  a.ready.then( () =>
+  {
+    test.case = 'linkingSelf - null, name exists';
+    var got = _.npm.install
+    ({
+      localPath : a.abs( '.' ),
+      linkingSelf : null,
+      sync : 1,
+    });
+    test.identical( got, true );
+    var files = find( 'node_modules' );
+    var exp = [ '.', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    if( files.length === 6 )
+    var exp = [ '.', './.package-lock.json', './test', './wmodulefortesting1', './wmodulefortesting12', './wmodulefortesting2' ];
+    test.identical( files, exp );
+
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin( data )
+  {
+    a.ready.then( () =>
+    {
+      a.fileProvider.filesDelete( a.abs( '.' ) );
+      a.fileProvider.fileWriteUnknown({ filePath : a.abs( 'package.json' ), data });
+      return null;
+    });
+    return a.ready;
+  }
+
+  /* */
+
+  function find( filePath )
+  {
+    return a.fileProvider.filesFind
+    ({
+      filePath : a.abs( filePath ),
+      filter : { recursive : 1 },
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+  }
+}
+
+installCheckOptionLinkingSelf.timeOut = 60000;
+
+//
+
 function installLocalPathIsSoftLink( test )
 {
   let self = this;
@@ -1222,6 +1663,282 @@ function installLocalPathIsSoftLink( test )
       return null;
     });
     return a.ready;
+  }
+}
+
+//
+
+function versionLog( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+  begin();
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'default options, localPath and remotePath';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 : ' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - latest';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - stable';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'stable' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 0 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - latest, stable, alpha, all exist';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable', 'alpha' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'alpha version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'tags - latest, stable, abcd, not all exist';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable', 'abcd' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'abcd version of wmodulefortesting1 : -no-' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  if( Config.debug )
+  {
+    a.ready.then( () =>
+    {
+      test.case = 'without arguments';
+      test.shouldThrowErrorSync( () => _.npm.versionLog() );
+
+      test.case = 'extra arguments';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : 'wmodulefortesting1' };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o, o ) );
+
+      test.case = 'unknown option in options map';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : 'wmodulefortesting1', unknown : 1 };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'o.tags has invalid value';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : '', tags : [ 'stable', 1 ] };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'wrong type of o.tags';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : '', tags : { a : 'b' } };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'o.remotePath - undefined and o.localPath not path to module';
+      var o = { configPath : a.abs( 'package.json' ), localPath : a.abs( '../unknown' ) };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      test.case = 'o.remotePath is not defined';
+      var o = { configPath : a.abs( 'package.json' ), remotePath : '' };
+      test.shouldThrowErrorSync( () => _.npm.versionLog( o ) );
+
+      return null;
+    });
+  }
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin()
+  {
+    a.ready.then( () => { a.fileProvider.dirMake( a.abs( '.' ) ); return null });
+    a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git ./' );
+    return a.ready;
+  }
+}
+
+//
+
+function versionLogWithOptions( test )
+{
+  const self = this;
+  const a = test.assetFor( false );
+  let filePath/*programPath*/;
+  begin();
+
+  const programShell = _.process.starter
+  ({
+    currentPath : a.abs( '.' ),
+    mode : 'shell',
+    throwingExitCode : 1,
+    outputCollecting : 1,
+  });
+
+  /* - */
+
+  a.ready.then( () =>
+  {
+    test.case = 'configPath and remotePath';
+    return _.npm.versionLog
+    ({
+      configPath : a.abs( 'package.json' ),
+      remotePath : 'wmodulefortesting1',
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 : ' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'logger - 5';
+    const o =
+    {
+      configPath : a.abs( 'package.json' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable' ],
+      logger : 5,
+    };
+    filePath/*programPath*/ = programMake( o );
+    return null;
+  });
+
+  a.ready.then( () => programShell( `node ${ filePath/*programPath*/ }`) );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, 'Latest version of wmodulefortesting1 : ' ), 1 );
+    test.identical( _.strCount( op.output, 'Stable version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'logger - 0';
+    const o =
+    {
+      configPath : a.abs( 'package.json' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable' ],
+      logger : 0,
+    };
+    filePath/*programPath*/ = programMake( o );
+    return null;
+  });
+
+  a.ready.then( () => programShell( `node ${ filePath/*programPath*/ }`) );
+  a.ready.then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, 'Latest version of wmodulefortesting1 : ' ), 0 );
+    test.identical( _.strCount( op.output, 'Stable version of wmodulefortesting1 :' ), 0 );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
+
+  /* */
+
+  function begin()
+  {
+    a.ready.then( () => { a.fileProvider.dirMake( a.abs( '.' ) ); return null });
+    a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git ./' );
+    return a.ready;
+  }
+
+  /* */
+
+  function programMake( options )
+  {
+    const locals = { toolsPath : _.module.resolve( 'wTools' ), o : options };
+    const program = a.program({ entry : testApp, locals });
+    return a.path.nativize( program.filePath/*programPath*/ );
+  }
+
+  /* */
+
+  function testApp()
+  {
+    const _ = require( toolsPath );
+    _.include( 'wNpmTools' );
+    return _.npm.versionLog( o );
   }
 }
 
@@ -1563,7 +2280,7 @@ function isUpToDate( test )
   return ready;
 }
 
-isUpToDate.timeOut = 60000;
+isUpToDate.timeOut = 120000;
 
 //
 
@@ -1622,7 +2339,7 @@ function isRepository( test )
   return ready;
 }
 
-isRepository.timeOut = 20000;
+isRepository.timeOut = 40000;
 
 //
 
@@ -1816,6 +2533,8 @@ async function remoteDependants( test )
   }
   test.close( 'string as a parameter' );
 
+  /* - */
+
   test.open( 'map as a parameter' );
   {
     test.open( '0 dependants' );
@@ -1907,6 +2626,54 @@ remoteDependants.description =
 `
 Retrieves the number of dependent packages
 `
+
+//
+
+function remoteDependantsWithOptionAttemptDelayMultiplier( test )
+{
+  let context = this;
+  let a = test.assetFor( false );
+
+  if( process.platform !== 'linux' || !_.process.insideTestContainer() )
+  return test.true( true );
+
+  /* - */
+  let netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
+  a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
+
+  var start;
+  a.ready.then( () =>
+  {
+    test.case = 'not existed package';
+    start = _.time.now();
+    return _.npm.remoteDependants
+    ({
+      remotePath : 'npm:///nonexistentPackageName',
+      attemptLimit : 4,
+      attemptDelay : 250,
+      attemptDelayMultiplier : 4,
+      sync : 1,
+    });
+  });
+  a.ready.finally( ( err, arg ) =>
+  {
+    var spent = _.time.now() - start;
+    test.ge( spent, 5250 );
+
+    test.true( _.error.is( err ) );
+    _.error.attend( err );
+    test.true( _.strHas( err.originalMessage, 'Attempts is exhausted, made 4 attempts' ) );
+    test.identical( arg, undefined );
+
+    return null;
+  });
+
+  a.ready.finally( () => __.test.netInterfacesUp({ interfaces : netInterfaces }) );
+
+  /* - */
+
+  return a.ready;
+}
 
 //
 
@@ -2087,17 +2854,22 @@ const Proto =
 
     /* */
 
-    format,
+    fileFormat,
 
     /* */
 
-    fixate,
-    bump,
+    fileFixate,
+    fileBump,
+    fileBumpCheckOptions,
 
     depAdd,
 
     install,
+    installCheckOptionLinkingSelf,
     installLocalPathIsSoftLink,
+
+    versionLog,
+    versionLogWithOptions,
 
     remoteAbout,
 
@@ -2110,6 +2882,7 @@ const Proto =
     hasRemote,
 
     remoteDependants,
+    remoteDependantsWithOptionAttemptDelayMultiplier,
     dependantsRetrieveMultipleRequests,
     dependantsRetrieveStress,
 

@@ -2242,7 +2242,7 @@ function fixate( test )
   test.shouldThrowErrorSync( () => _.npm.path.fixate({ remotePath, unknown : 1 }) );
 }
 
-fixate.timeOut = 30000;
+fixate.timeOut = 60000;
 
 // --
 // declare
