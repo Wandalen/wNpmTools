@@ -2638,6 +2638,7 @@ function remoteDependantsWithOptionAttemptDelayMultiplier( test )
   return test.true( true );
 
   /* - */
+
   let netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
   a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
 
@@ -2651,14 +2652,14 @@ function remoteDependantsWithOptionAttemptDelayMultiplier( test )
       remotePath : 'npm:///nonexistentPackageName',
       attemptLimit : 4,
       attemptDelay : 250,
-      attemptDelayMultiplier : 4,
+      attemptDelayMultiplier : 3,
       sync : 1,
     });
   });
   a.ready.finally( ( err, arg ) =>
   {
     var spent = _.time.now() - start;
-    test.ge( spent, 5250 );
+    test.ge( spent, 3250 );
 
     test.true( _.error.is( err ) );
     _.error.attend( err );

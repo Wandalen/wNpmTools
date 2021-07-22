@@ -1475,9 +1475,9 @@ remoteAbout.defaults =
   name : null,
   sync : 1,
   throwing : 1,
-  attemptLimit : 3,
+  attemptLimit : null,
   attemptDelay : 500,
-}
+};
 
 //
 
@@ -1585,8 +1585,8 @@ remoteDependants.defaults =
   sync : 0,
   // verbosity : 0,
   logger : 0,
-  attemptLimit : 3,
-  attemptDelay : 250,
+  attemptLimit : null,
+  attemptDelay : null,
   attemptDelayMultiplier : 4,
 };
 
