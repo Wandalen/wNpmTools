@@ -1851,19 +1851,32 @@ function isUpToDate( o )
   let parsed = self.path.parse( o.remotePath );
 
   let ready = new _.Consequence().take( null );
+  let status = statusInit();
 
   ready.then( () => self.localVersion({ localPath : o.localPath, /* logger : o.logger, */ sync : 0 }) )
   ready.then( ( currentVersion ) =>
   {
-    if( !currentVersion )
+    status.currentVersion = currentVersion;
+    status.isRepository = !!currentVersion;
+
+    if( !status.isRepository )
     return false;
 
-    if( parsed.hash === currentVersion )
+    status.hasRemoteVersion = parsed.hash === currentVersion;
+
+    if( status.hasRemoteVersion )
     return true;
 
     return self.remoteVersion({ remotePath : o.remotePath, logger : o.logger, sync : 0 })
-    .then( ( latestVersion ) => currentVersion === latestVersion )
+    .then( ( latestVersion ) =>
+    {
+      status.latestVersion = latestVersion;
+      status.hasLatestVersion = currentVersion === latestVersion;
+      return status.hasLatestVersion;
+    })
   })
+
+  ready.then( end );
 
   if( o.sync )
   {
@@ -1872,6 +1885,33 @@ function isUpToDate( o )
   }
 
   return ready;
+
+  /* */
+
+  function statusInit()
+  {
+    let status = Object.create( null );
+    status.isRepository = null;
+    status.hasRemoteVersion = null;
+    status.hasLatestVersion = null;
+    return status;
+  }
+
+  /* */
+
+  function end( result )
+  {
+    status.result = result;
+    if( !o.detailing )
+    return result;
+    if( result )
+    return status;
+    if( status.isRepository === false )
+    status.reason = `No npm module at: ${o.localPath}`
+    else if( status.hasLatestVersion === false )
+    status.reason = `Local npm module is not up-to-date with remote.\nCurrent version: ${status.currentVersion}\nLatest version: ${status.latestVersion}`
+    return status;
+  }
 }
 
 var defaults = isUpToDate.defaults = Object.create( null );
@@ -1879,6 +1919,7 @@ defaults.localPath = null;
 defaults.remotePath = null;
 defaults.sync = 1;
 defaults.logger = 0;
+defaults.detailing = 0;
 
 //
 
