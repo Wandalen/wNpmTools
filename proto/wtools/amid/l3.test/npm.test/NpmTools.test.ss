@@ -2284,6 +2284,172 @@ isUpToDate.timeOut = 120000;
 
 //
 
+function isUpToDateDetailing( test )
+{
+  let self = this;
+  let a = test.assetFor( false );
+  let testPath = a.abs( '.' );
+  let localPath = a.abs( 'node_modules/wmodulefortesting1' );
+  let detailing = true;
+  let ready = new _.Consequence().take( null );
+
+  _.fileProvider.dirMake( testPath )
+
+  let install = _.process.starter
+  ({
+    execPath : 'npm install --no-package-lock --legacy-bundling --prefix ' + _.fileProvider.path.nativize( testPath ),
+    currentPath : testPath,
+    ready
+  })
+
+  ready
+
+  .then( () =>
+  {
+    test.case = 'no package'
+    let remotePath = 'npm:///wmodulefortesting1'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : false,
+      hasRemoteVersion : null,
+      hasLatestVersion : null,
+      result : false
+    }
+    test.contains( got, exp );
+    test.true( _.strDefined( got.reason ) );
+    return null;
+  })
+
+  install( 'wmodulefortesting1' )
+  .then( () =>
+  {
+    test.case = 'installed latest, remote points to latest'
+    let remotePath = 'npm:///wmodulefortesting1'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : false,
+      hasLatestVersion : true,
+      result : true
+    }
+    test.contains( got, exp );
+    return null;
+  })
+
+  install( 'wmodulefortesting1@beta' )
+  .then( () =>
+  {
+    test.case = 'installed beta, remote points to latest'
+    let remotePath = 'npm:///wmodulefortesting1'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : false,
+      hasLatestVersion : false,
+      result : false
+    }
+    test.contains( got, exp );
+    test.true( _.strDefined( got.reason ) );
+    return null;
+  })
+
+  install( 'wmodulefortesting1@beta' )
+  .then( () =>
+  {
+    test.case = 'installed beta, remote points to latest'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : false,
+      hasLatestVersion : true,
+      result : true
+    }
+    test.contains( got, exp );
+    return null;
+  })
+
+  install( 'wmodulefortesting1@latest' )
+  .then( () =>
+  {
+    test.case = 'installed latest, remote points to latest'
+    let remotePath = 'npm:///wmodulefortesting1'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : false,
+      hasLatestVersion : true,
+      result : true
+    }
+    test.contains( got, exp );
+    return null;
+  })
+
+  install( 'wmodulefortesting1@0.0.5' )
+  .then( () =>
+  {
+    test.case = 'installed version, remote points to latest'
+    let remotePath = 'npm:///wmodulefortesting1'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : false,
+      hasLatestVersion : false,
+      result : false
+    }
+    test.contains( got, exp );
+    test.true( _.strDefined( got.reason ) );
+    return null;
+  })
+
+  install( 'wmodulefortesting1@0.0.3' )
+  .then( () =>
+  {
+    test.case = 'installed version, remote points to beta'
+    let remotePath = 'npm:///wmodulefortesting1!beta'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : false,
+      hasLatestVersion : false,
+      result : false
+    }
+    test.contains( got, exp );
+    test.true( _.strDefined( got.reason ) );
+    return null;
+  })
+
+  install( 'wmodulefortesting1@0.0.3' )
+  .then( () =>
+  {
+    test.case = 'installed version, remote points to beta'
+    let remotePath = 'npm:///wmodulefortesting1#0.0.3'
+    var got = _.npm.isUpToDate({ localPath, remotePath, detailing });
+    let exp =
+    {
+      isRepository : true,
+      hasRemoteVersion : true,
+      hasLatestVersion : null,
+      result : true
+    }
+    test.contains( got, exp );
+    return null;
+  })
+
+  return ready;
+}
+
+isUpToDateDetailing.timeOut = 120000;
+
+//
+
 function isRepository( test )
 {
   let self = this;
@@ -2879,6 +3045,7 @@ const Proto =
     remoteVersionCurrent,
 
     isUpToDate,
+    isUpToDateDetailing,
     isRepository,
     hasRemote,
 
