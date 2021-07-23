@@ -1909,7 +1909,9 @@ function isUpToDate( o )
     if( status.isRepository === false )
     status.reason = `No npm module at: ${o.localPath}`
     else if( status.hasLatestVersion === false )
-    status.reason = `Local npm module is not up-to-date with remote.\nCurrent version: ${status.currentVersion}\nLatest version: ${status.latestVersion}`
+    status.reason = `Local npm module is not up-to-date with remote.`
+                    + `\nCurrent version: ${status.currentVersion}`
+                    + `\nLatest version: ${status.latestVersion}`
     return status;
   }
 }
