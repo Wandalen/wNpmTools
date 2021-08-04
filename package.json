@@ -1,6 +1,6 @@
 {
   "name": "wnpmtools",
-  "version": "0.3.233",
+  "version": "0.3.234",
   "description": "Collection of tools to use npm programmatically.",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors": [
@@ -33,13 +33,13 @@
     "url": "https://github.com/Wandalen/wNpmTools/issues"
   },
   "dependencies": {
-    "wTools": "latest",
-    "wprocess": "latest",
-    "whttp": "latest",
-    "wfilesbasic": "latest"
+    "wTools": "alpha",
+    "wprocess": "alpha",
+    "whttp": "alpha",
+    "wfilesbasic": "alpha"
   },
   "devDependencies": {
-    "wTesting": "latest",
+    "wTesting": "alpha",
     "eslint": "7.1.0"
   },
   "keywords": [
