@@ -454,99 +454,37 @@ function pathLocalFromDownload( configPath )
 // write l2
 // --
 
-function structureFormat_functor()
+function structureFormat( o )
 {
-  let npmJsVersionIsNewer;
+  if( o.changed === true )
+  return o.config;
 
-  structureFormat.defaults =
+  let depSectionsNames =
+  [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+    'peerDependencies',
+  ];
+
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+  _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
+
+  for( let i = 0; i < depSectionsNames.length; i++ )
+  if( o.config[ depSectionsNames[ i ] ] )
   {
-    logger : 0,
-    nativizing : 1,
-    config : null,
-  };
-
-  return structureFormat;
-
-  function structureFormat( o )
-  {
-    if( o.changed === true )
-    return o.config;
-
-    let depSectionsNames =
-    [
-      'dependencies',
-      'devDependencies',
-      'optionalDependencies',
-      'peerDependencies',
-    ];
-
-    // const npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
-    if( npmJsVersionIsNewer === undefined )
-    npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
-    // const sortElements = npmJsVersionIsNewer ? sortElementsBackward : sortElementsForward;
-    const sortElements = npmJsVersionIsNewer ? sortElementsForward : sortElementsBackward;
-
-    _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
-    _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
-
-    for( let i = 0; i < depSectionsNames.length; i++ )
-    if( o.config[ depSectionsNames[ i ] ] )
-    {
-      const src = o.config[ depSectionsNames[ i ] ];
-      const result = Object.create( null );
-      const keys = _.props.keys( src );
-      keys.sort( sortElements );
-      for( let i = 0; i < keys.length; i++ )
-      result[ keys[ i ] ] = src[ keys[ i ] ];
-      o.config[ depSectionsNames[ i ] ] = result;
-    }
-
-    o.changed = true;
-
-    return o.config;
-
-    /* */
-
-    // /* qqq : for Dmytro : very bad! */
-    // function npmMajorVersionIsNewerOrSame( majorVersion )
-    // {
-    //   let op = _.process.start
-    //   ({
-    //     execPath : 'npm --version',
-    //     outputCollecting : 1,
-    //     mode : 'shell',
-    //     sync : 1,
-    //   });
-    //   return _.number.from( op.output[ 0 ] ) >= majorVersion;
-    // }
-
+    const src = o.config[ depSectionsNames[ i ] ];
+    const result = Object.create( null );
+    const keys = _.props.keys( src );
+    keys.sort( sortElementsBackward );
+    for( let i = 0; i < keys.length; i++ )
+    result[ keys[ i ] ] = src[ keys[ i ] ];
+    o.config[ depSectionsNames[ i ] ] = result;
   }
 
-  /* */
+  o.changed = true;
 
-  /* qqq : for Dmytro : bad : poor and sloppy! */
-  function npmMajorVersionIsNewerOrSame( majorVersion )
-  {
-    let op = _.process.start
-    ({
-      execPath : 'npm --version',
-      outputCollecting : 1,
-      mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
-      // mode : 'spawn',
-      sync : 1,
-      outputPiping : 0,
-      verbosity : 0,
-      logger : 0,
-    });
-    return _.number.from( op.output[ 0 ] ) >= majorVersion;
-  }
-
-  /* */
-
-  function sortElementsForward( a, b )
-  {
-    return a.toLowerCase().localeCompare( b.toLowerCase() );
-  }
+  return o.config;
 
   /* */
 
@@ -556,7 +494,115 @@ function structureFormat_functor()
   }
 }
 
-let structureFormat = structureFormat_functor();
+structureFormat.defaults =
+{
+  logger : 0,
+  config : null,
+};
+
+// function structureFormat_functor()
+// {
+//   let npmJsVersionIsNewer;
+//
+//   structureFormat.defaults =
+//   {
+//     logger : 0,
+//     nativizing : 1,
+//     config : null,
+//   };
+//
+//   return structureFormat;
+//
+//   function structureFormat( o )
+//   {
+//     if( o.changed === true )
+//     return o.config;
+//
+//     let depSectionsNames =
+//     [
+//       'dependencies',
+//       'devDependencies',
+//       'optionalDependencies',
+//       'peerDependencies',
+//     ];
+//
+//     // const npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
+//     if( npmJsVersionIsNewer === undefined )
+//     npmJsVersionIsNewer = npmMajorVersionIsNewerOrSame( 7 );
+//     // const sortElements = npmJsVersionIsNewer ? sortElementsBackward : sortElementsForward;
+//     const sortElements = npmJsVersionIsNewer ? sortElementsForward : sortElementsBackward;
+//
+//     _.assert( arguments.length === 1, 'Expects single options map {-o-}' );
+//     _.assert( _.aux.is( o.config ), 'Expects structure {-o.config-}' );
+//
+//     for( let i = 0; i < depSectionsNames.length; i++ )
+//     if( o.config[ depSectionsNames[ i ] ] )
+//     {
+//       const src = o.config[ depSectionsNames[ i ] ];
+//       const result = Object.create( null );
+//       const keys = _.props.keys( src );
+//       keys.sort( sortElements );
+//       for( let i = 0; i < keys.length; i++ )
+//       result[ keys[ i ] ] = src[ keys[ i ] ];
+//       o.config[ depSectionsNames[ i ] ] = result;
+//     }
+//
+//     o.changed = true;
+//
+//     return o.config;
+//
+//     /* */
+//
+//     // /* qqq : for Dmytro : very bad! */
+//     // function npmMajorVersionIsNewerOrSame( majorVersion )
+//     // {
+//     //   let op = _.process.start
+//     //   ({
+//     //     execPath : 'npm --version',
+//     //     outputCollecting : 1,
+//     //     mode : 'shell',
+//     //     sync : 1,
+//     //   });
+//     //   return _.number.from( op.output[ 0 ] ) >= majorVersion;
+//     // }
+//
+//   }
+//
+//   /* */
+//
+//   /* qqq : for Dmytro : bad : poor and sloppy! */
+//   function npmMajorVersionIsNewerOrSame( majorVersion )
+//   {
+//     let op = _.process.start
+//     ({
+//       execPath : 'npm --version',
+//       outputCollecting : 1,
+//       mode : 'shell', /* aaa : for Dmytro : very bad! */ /* Dmytro : Windows cannot spawn NPM process, should use mode `shell` : https://github.com/Wandalen/wNpmTools/runs/2387247651?check_suite_focus=true */
+//       // mode : 'spawn',
+//       sync : 1,
+//       outputPiping : 0,
+//       verbosity : 0,
+//       logger : 0,
+//     });
+//     return _.number.from( op.output[ 0 ] ) >= majorVersion;
+//   }
+//
+//   /* */
+//
+//   function sortElementsForward( a, b )
+//   {
+//     return a.toLowerCase().localeCompare( b.toLowerCase() );
+//   }
+//
+//   /* */
+//
+//   function sortElementsBackward( a, b )
+//   {
+//     return b.toLowerCase().localeCompare( a.toLowerCase() );
+//   }
+// }
+//
+// let structureFormat = structureFormat_functor();
 
 //
 
