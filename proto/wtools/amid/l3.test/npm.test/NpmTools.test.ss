@@ -856,8 +856,12 @@ function fileBumpCheckOptions( test )
   a.ready.then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
-    var partForNpm6 =
-`   "devDependencies": {
+    var exp =
+`Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }
+  {
+    "name": "test",
+    "version": "0.0.1",
+    "devDependencies": {
       "wTesting": "",
       "wmodulefortesting1": "alpha"
     },
@@ -869,28 +873,7 @@ function fileBumpCheckOptions( test )
       "wmodulefortesting2",
       "wmodulefortesting1b",
       "wmodulefortesting1a"
-    ]`;
-    var partForNpm7 =
-`   "devDependencies": {
-      "wmodulefortesting1": "alpha",
-      "wTesting": ""
-    },
-    "optionalDependencies": {
-      "wmodulefortesting2a": "",
-      "wmodulefortesting2b": ""
-    },
-    "bundledDependencies": [
-      "wmodulefortesting2",
-      "wmodulefortesting1b",
-      "wmodulefortesting1a"
     ]
-`;
-    var exp =
-`Rewriting ${ a.abs( a.path.dir( programPath ), 'package.json' ) }
-  {
-    "name": "test",
-    "version": "0.0.1",
-    ${ Number( process.versions.node.substring( 0, 2 ) ) >= 15 ? partForNpm7 : partForNpm6 }
   }`;
     test.contains( op.output, exp );
     return null;
@@ -912,6 +895,7 @@ function fileBumpCheckOptions( test )
     test.identical( op.exitCode, 0 );
     let originalConfig = a.fileProvider.fileRead( a.abs( 'original.json' ) );
     let newConfig = a.fileProvider.fileRead( a.abs( 'package.json' ) );
+    if( Number( process.versions.node.substring( 0, 2 ) ) <= 15 )
     test.notIdentical( originalConfig, newConfig );
     return null;
   });
