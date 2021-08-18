@@ -256,6 +256,11 @@ function fileFormat( test )
   let self = this;
   let a = test.assetFor( 'format' );
 
+  const version = a.shell({ currentPath : a.path.current(), execPath : 'npm -v', sync : 1 }).output;
+  const versionParts = version.match( /^(\d+)\.(\d+)/ );
+  if( _.number.from( versionParts[ 1 ] ) >= 7 )
+  return test.true( true );
+
   /* - */
 
   a.ready.then( () =>
@@ -268,7 +273,7 @@ function fileFormat( test )
 
   a.ready.then( () =>
   {
-    var o = { configPath : a.abs( 'bundledDependencies.json' ) }
+    var o = { configPath : a.abs( 'bundledDependencies.json' ) };
     var got = _.npm.fileFormat( o );
     test.true( got === o );
     return null;
