@@ -945,6 +945,8 @@ function fileBumpCheckOptions( test )
   }
 }
 
+fileBumpCheckOptions.timeOut = 120000;
+
 //
 
 function depAdd( test )
