@@ -1598,7 +1598,6 @@ remoteDependants.defaults =
 {
   remotePath : null,
   sync : 0,
-  // verbosity : 0,
   logger : 0,
   attemptLimit : null,
   attemptDelay : null,
