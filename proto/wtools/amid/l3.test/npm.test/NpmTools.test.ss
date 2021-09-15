@@ -2083,6 +2083,72 @@ function remoteAbout( test )
 
 //
 
+function remoteAboutWithOptionAttemptDelay( test )
+{
+  const a = test.assetFor( false );
+
+  if( process.platform !== 'linux' || !_.process.insideTestContainer() )
+  return test.true( true );
+
+  /* - */
+
+  const netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
+  a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'default attemptDelay';
+    let start;
+    const errCallback = ( err, arg ) =>
+    {
+      const end = _.time.now();
+      const spent = end - start;
+      test.ge( spent, 1000 );
+      test.le( spent, 4000 );
+
+      test.true( _.error.is( err ) );
+      test.identical( arg, undefined );
+    }
+    start = _.time.now();
+    test.shouldThrowErrorSync( () => _.npm.remoteAbout( 'wmodulefortesting1' ), errCallback );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'not default attemptDelay';
+    let start;
+    const errCallback = ( err, arg ) =>
+    {
+      const end = _.time.now();
+      const spent = end - start;
+      console.log( spent );
+      test.ge( spent, 2000 );
+      test.le( spent, 6000 );
+
+      test.true( _.error.is( err ) );
+      test.identical( arg, undefined );
+    }
+    start = _.time.now();
+    test.shouldThrowErrorSync( () => _.npm.remoteAbout({ name : 'wmodulefortesting1', attemptDelay : 1000 }), errCallback );
+    return null;
+  });
+
+  /* */
+
+  a.ready.finally( () => __.test.netInterfacesUp({ interfaces : netInterfaces }) );
+
+  /* - */
+
+  return a.ready;
+}
+
+//
+
 function localVersion( test )
 {
   let self = this;
@@ -3034,6 +3100,7 @@ const Proto =
     versionLogWithOptions,
 
     remoteAbout,
+    remoteAboutWithOptionAttemptDelay,
 
     localVersion,
     remoteVersionLatest,
