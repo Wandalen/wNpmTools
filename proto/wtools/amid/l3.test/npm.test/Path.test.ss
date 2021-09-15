@@ -1939,19 +1939,19 @@ function nativize( test )
 
   test.case = 'simple path with local';
   var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1';
-  var exp = 'wmodulefortesting1';
+  var exp = 'wmodulefortesting1/out/wmodulefortesting1';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
   test.case = 'simple path with local and hash';
   var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1#0.3.100';
-  var exp = 'wmodulefortesting1@0.3.100';
+  var exp = 'wmodulefortesting1/out/wmodulefortesting1@0.3.100';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
   var remotePath = 'npm:///wmodulefortesting1/out/wmodulefortesting1!delta';
-  var exp = 'wmodulefortesting1@delta';
+  var exp = 'wmodulefortesting1/out/wmodulefortesting1@delta';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
@@ -1999,19 +1999,19 @@ function nativize( test )
 
   test.case = 'simple path with local';
   var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1';
-  var exp = 'wmodulefortesting1';
+  var exp = 'wmodulefortesting1/out/wmodulefortesting1';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
   test.case = 'simple path with local and hash';
   var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1#0.3.100';
-  var exp = 'wmodulefortesting1@0.3.100';
+  var exp = 'wmodulefortesting1/out/wmodulefortesting1@0.3.100';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
   test.case = 'simple path with local and tag';
   var remotePath = 'npm://wmodulefortesting1/out/wmodulefortesting1!delta';
-  var exp = 'wmodulefortesting1@delta';
+  var exp = 'wmodulefortesting1/out/wmodulefortesting1@delta';
   var got = _.npm.path.nativize( remotePath );
   test.identical( got, exp );
 
