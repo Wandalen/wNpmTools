@@ -1513,7 +1513,7 @@ remoteAbout.defaults =
   sync : 1,
   throwing : 1,
   attemptLimit : null,
-  attemptDelay : 500,
+  attemptDelay : 100,
   attemptDelayMultiplier : 4,
 };
 
@@ -2191,6 +2191,7 @@ let Extension =
   remoteVersionLatest,
   remoteVersionCurrent,
   remoteVersion,
+
   isUpToDate,
   hasFiles,
   isRepository,
