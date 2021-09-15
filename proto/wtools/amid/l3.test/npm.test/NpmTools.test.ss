@@ -2105,8 +2105,8 @@ function remoteAboutWithOptionAttemptDelay( test )
     {
       const end = _.time.now();
       const spent = end - start;
-      test.ge( spent, 1000 );
-      test.le( spent, 4000 );
+      test.ge( spent, 500 );
+      test.le( spent, 3000 );
 
       test.true( _.error.is( err ) );
       test.identical( arg, undefined );
@@ -2127,14 +2127,99 @@ function remoteAboutWithOptionAttemptDelay( test )
       const end = _.time.now();
       const spent = end - start;
       console.log( spent );
-      test.ge( spent, 2000 );
+      test.ge( spent, 2500 );
+      test.le( spent, 15000 );
+
+      test.true( _.error.is( err ) );
+      test.identical( arg, undefined );
+    }
+    start = _.time.now();
+    test.shouldThrowErrorSync( () => _.npm.remoteAbout({ name : 'wmodulefortesting1', attemptDelay : 500 }), errCallback );
+    return null;
+  });
+
+  /* */
+
+  a.ready.finally( () => __.test.netInterfacesUp({ interfaces : netInterfaces }) );
+
+  /* - */
+
+  return a.ready;
+}
+
+//
+
+function remoteAboutWithOptionAttemptDelayMultiplier( test )
+{
+  const a = test.assetFor( false );
+
+  if( process.platform !== 'linux' || !_.process.insideTestContainer() )
+  return test.true( true );
+
+  /* - */
+
+  const netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
+  a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'default attemptDelayMultiplier';
+    let start;
+    const errCallback = ( err, arg ) =>
+    {
+      const end = _.time.now();
+      const spent = end - start;
+      console.log( spent );
+      console.log( err.originalMessage );
+      test.ge( spent, 2500 );
+      test.le( spent, 15000 );
+
+      test.true( _.error.is( err ) );
+      test.identical( arg, undefined );
+    }
+    start = _.time.now();
+    test.shouldThrowErrorSync( () =>
+    {
+      return _.npm.remoteAbout
+      ({
+        name : 'wmodulefortesting1',
+        attemptLimit : 3,
+        attemptDelay : 500,
+        attemptDelayMultiplier : 4,
+      });
+    }, errCallback );
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'not default attemptDelayMultiplier';
+    let start;
+    const errCallback = ( err, arg ) =>
+    {
+      const end = _.time.now();
+      const spent = end - start;
+      test.ge( spent, 1000 );
       test.le( spent, 6000 );
 
       test.true( _.error.is( err ) );
       test.identical( arg, undefined );
     }
     start = _.time.now();
-    test.shouldThrowErrorSync( () => _.npm.remoteAbout({ name : 'wmodulefortesting1', attemptDelay : 1000 }), errCallback );
+    test.shouldThrowErrorSync( () =>
+    {
+      return _.npm.remoteAbout
+      ({
+        name : 'wmodulefortesting1',
+        attemptLimit : 3,
+        attemptDelay : 500,
+        attemptDelayMultiplier : 1,
+      });
+    }, errCallback );
     return null;
   });
 
@@ -3101,6 +3186,7 @@ const Proto =
 
     remoteAbout,
     remoteAboutWithOptionAttemptDelay,
+    remoteAboutWithOptionAttemptDelayMultiplier,
     remoteDependants,
     remoteDependantsWithOptionAttemptDelayMultiplier,
     dependantsRetrieveMultipleRequests,
