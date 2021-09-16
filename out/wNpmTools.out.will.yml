@@ -156,7 +156,6 @@ module:
           - ../proto/node_modules/Tools
           - ../proto/node_modules/wnpmtools
           - ../proto/wtools
-          - ../proto/wtools/abase
           - ../proto/wtools/amid
           - ../proto/wtools/amid/l3
           - ../proto/wtools/amid/l3/npm
@@ -201,7 +200,6 @@ module:
           - >-
             ../proto/wtools/amid/l3.test/npm.test/_asset/install/package-lock.json
           - ../proto/wtools/amid/l3.test/npm.test/_asset/install/package.json
-          - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
