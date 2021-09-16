@@ -345,7 +345,7 @@ function nativize( remotePath )
   if( !parsed.protocol || _.longHas( _.npm.protocols, parsed.protocol ) )
   {
     _.assert( !_.strHasAny( parsed.longPath, [ 'git@', '.git' ] ), 'Expects full git paths' );
-    result = parsed.host || '';
+    result = parsed.longPath || '';
     result = _.strRemoveBegin( result, '/' );
     if( parsed.tag && parsed.tag !== 'latest' )
     result += '@' + parsed.tag;

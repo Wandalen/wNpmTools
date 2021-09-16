@@ -1448,37 +1448,28 @@ function remoteAbout( o )
 {
   const self = this;
   const packageServer = 'https://registry.npmjs.org/';
-  // let PackageJson = require( 'package-json' );
+
+  _.assert( arguments.length === 1, 'Expects exactly single options map {-o-}.' );
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { name : arguments[ 0 ] };
-  o = _.routine.options( remoteAbout, o );
+  _.routine.options( remoteAbout, o );
 
-  const splits = _.strIsolateLeftOrAll({ src : o.name, delimeter : '!' });
-  o.name = splits[ 0 ];
-  o.version = splits[ 2 ] ? splits[ 2 ] : 'latest';
+  const parsed = self.path.parse( o.name );
+  const name = _.str.removeBegin( parsed.longPath, '/' );
+  const version = parsed.tag;
 
-  // let ready = _.Consequence.From( PackageJson( o.name, { fullMetadata : true, version : o.version } ) );
   const ready = _.http.retrieve
   ({
-    uri : _.path.join( packageServer, o.name ),
+    uri : _.path.join( packageServer, name ),
     sync : 0,
     attemptLimit : o.attemptLimit,
     attemptDelay : o.attemptDelay,
+    attemptDelayMultiplier : o.attemptDelayMultiplier,
     successStatus : [ 200, 404 ],
   });
 
   ready.then( handleResponse );
-
-  // ready.catch( ( err ) =>
-  // {
-  //   if( !o.throwing )
-  //   {
-  //     _.errAttend( err );
-  //     return null;
-  //   }
-  //   throw _.err( err, `\nFailed to get information about remote module ${name}` );
-  // });
 
   if( o.sync )
   {
@@ -1498,20 +1489,20 @@ function remoteAbout( o )
     if( response.statusCode === 200 )
     {
       const data = response.body;
-      const distTagVersion = data[ 'dist-tags' ][ o.version ];
+      const distTagVersion = data[ 'dist-tags' ][ version ];
 
       if( distTagVersion )
       return data.versions[ distTagVersion ];
 
-      const versionData = data.versions[ o.version ];
+      const versionData = data.versions[ version ];
       if( versionData )
       return versionData;
 
-      err = _.err( `Wrong version tag ${ _.strQuote( o.version ) }` );
+      err = _.err( `Wrong version tag ${ _.strQuote( version ) }` );
     }
 
     if( o.throwing )
-    throw _.err( err ? err : response.body.error, `\nFailed to get information about remote module ${ _.strQuote( o.name ) }` );
+    throw _.err( err ? err : response.body.error, `\nFailed to get information about remote module ${ _.strQuote( name ) }` );
     return null;
   }
 }
@@ -1522,7 +1513,8 @@ remoteAbout.defaults =
   sync : 1,
   throwing : 1,
   attemptLimit : null,
-  attemptDelay : 500,
+  attemptDelay : 100,
+  attemptDelayMultiplier : 4,
 };
 
 //
@@ -1546,7 +1538,7 @@ function remoteDependants( o )
   let counter = 0;
 
   if( !_.mapIs( o ) )
-  o = { remotePath : o }
+  o = { remotePath : o };
   _.routine.options( remoteDependants, o );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -1556,7 +1548,7 @@ function remoteDependants( o )
   o.remotePath = _.array.as( o.remotePath );
   o.logger = _.logger.maybe( o.logger );
 
-  let uri = o.remotePath.map( ( remotePath ) => uriNormalize( remotePath ) );
+  let uri = o.remotePath.map( ( remotePath ) => _.npm.path.join( prefixUri, _.npm.path.nativize( remotePath ) ) );
 
   let ready = _.http.retrieve
   ({
@@ -1587,41 +1579,18 @@ function remoteDependants( o )
 
   /* */
 
-  function uriNormalize( filePath )
-  {
-    let result;
-    if( _.uri.isGlobal( filePath ) )
-    {
-      // let parsed = self.pathParse( filePath );
-      let parsed = _.npm.path.parse( filePath );
-      result = prefixUri + ( parsed.longPath[ 0 ] === '/' ? parsed.longPath.slice( 1 ) : parsed.longPath );
-    }
-    else
-    {
-      result = prefixUri + filePath;
-    }
-    return result;
-  }
-
-  /* */
-
   function responsesHandle( op )
   {
-    let dependants = '';
     if( op.response.statusCode !== 200 )
     return NaN;
 
     const html = op.response.body;
-    const strWithDep = html.match( /[0-9]*,?[0-9]*<\/span>Dependents/ );
+    const strWithDep = html.match( /((\d+)(,\d+)*) (Dependents<\/span>)/ );
 
     if( !strWithDep )
     return NaN;
 
-    for( let i = strWithDep.index; html[ i ] !== '<'; i++ )
-    dependants += html[ i ];
-    dependants = Number( dependants.split( ',' ).join( '' ) );
-
-    return dependants;
+    return _.number.from( strWithDep[ 1 ].split( ',' ).join( '' ) );
   }
 }
 
@@ -1629,7 +1598,6 @@ remoteDependants.defaults =
 {
   remotePath : null,
   sync : 0,
-  // verbosity : 0,
   logger : 0,
   attemptLimit : null,
   attemptDelay : null,
@@ -2223,6 +2191,7 @@ let Extension =
   remoteVersionLatest,
   remoteVersionCurrent,
   remoteVersion,
+
   isUpToDate,
   hasFiles,
   isRepository,
