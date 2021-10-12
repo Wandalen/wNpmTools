@@ -1600,7 +1600,7 @@ remoteDependants.defaults =
   sync : 0,
   logger : 0,
   attemptLimit : null,
-  attemptDelay : null,
+  attemptDelay : 250,
   attemptDelayMultiplier : 4,
 };
 
