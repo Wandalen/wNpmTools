@@ -2236,6 +2236,10 @@ function remoteAboutWithOptionAttemptDelayMultiplier( test )
 
 async function remoteDependants( test )
 {
+  if( Config.interpreter === 'njs' )
+  if( !_.str.begins( process.versions.node, '16' ) )
+  return test.true( true );
+
   test.open( 'string as a parameter' );
   {
     test.open( '0 dependants' );
