@@ -938,7 +938,7 @@ function fileBumpCheckOptions( test )
   }
 }
 
-fileBumpCheckOptions.timeOut = 120000;
+fileBumpCheckOptions.timeOut = 220000;
 
 //
 
@@ -2236,6 +2236,10 @@ function remoteAboutWithOptionAttemptDelayMultiplier( test )
 
 async function remoteDependants( test )
 {
+  /*
+     the matrix of test runs is restricted to njs v16 because test routines in all runs can exhaust request limit
+     https://github.com/Wandalen/wNpmTools/runs/3879185779?check_suite_focus=true#step:12:342
+  */
   if( Config.interpreter === 'njs' )
   if( !_.str.begins( process.versions.node, '16' ) )
   return test.true( true );
