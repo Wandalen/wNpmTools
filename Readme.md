@@ -22,3 +22,78 @@ npm add 'wnpmtools@stable'
 
 `Willbe` is not required to use the module in your project as submodule.
 
+### Examples
+
+#### Fixate version of dependencies
+
+File `package.json` ;
+
+```json
+{
+  "dependencies" : {
+    "wTools" : "",
+    "wnpmtools" : ""
+  }
+}
+```
+
+Script `Script.s` :
+
+```js
+const _ = require( 'wnpmtools' );
+_.npm.fileFixate
+({
+  localPath : __dirname,
+  tag : 'stable',
+});
+```
+
+Write both files in a directory. Run command `npm i` and then run `node Script.s`.
+
+Check file `package.json` ( in Unix-like system run `cat package.json` ). File should look like.
+
+```json
+{
+  "dependencies" : {
+    "wTools" : "stable",
+    "wnpmtools" : "stable"
+  }
+}
+```
+
+#### Logging of package versions
+
+Printing of package tag versions.
+
+File `package.json` ;
+
+```json
+{
+  "name" : "wTools",
+  "version" : "0.8.200",
+  "dependencies" : {
+    "wnpmtools" : ""
+  }
+}
+```
+
+Script `Script.s` :
+
+```js
+const _ = require( 'wnpmtools' );
+_.npm.versionLog
+({
+  localPath : __dirname,
+  remotePath : 'wTools',
+  tags : [ 'stable', 'dev' ],
+});
+```
+
+Write both files in a directory. Run command `npm i` and then run `node Script.s`. Output should look like :
+
+```bash
+Stable version of wTools : 0.8.1171
+dev version of wTools : -no-
+Current version : 0.8.200
+```
+
