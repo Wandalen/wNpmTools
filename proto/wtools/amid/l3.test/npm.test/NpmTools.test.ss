@@ -1939,6 +1939,51 @@ function versionLogWithOptions( test )
 
 //
 
+function versionLogWithNoConnection( test )
+{
+  if( process.platform !== 'linux' || !_.process.insideTestContainer() )
+  return test.true( true );
+
+  const a = test.assetFor( false );
+  a.ready.then( () => { a.fileProvider.dirMake( a.abs( '.' ) ); return null });
+  a.shell( 'git clone https://github.com/Wandalen/wModuleForTesting1.git ./' );
+
+  /* - */
+
+  const netInterfaces = __.test.netInterfacesGet({ activeInterfaces : 1, sync : 1 });
+  a.ready.then( () => __.test.netInterfacesDown({ interfaces : netInterfaces }) );
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'several tags';
+    return _.npm.versionLog
+    ({
+      localPath : a.abs( '.' ),
+      remotePath : 'wmodulefortesting1',
+      tags : [ 'latest', 'stable' ],
+    });
+  });
+  a.ready.then( ( op ) =>
+  {
+    test.identical( _.strCount( op, 'Current version :' ), 1 );
+    test.identical( _.strCount( op, 'Latest version of wmodulefortesting1 :' ), 1 );
+    test.identical( _.strCount( op, 'Stable version of wmodulefortesting1 :' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  a.ready.finally( () => __.test.netInterfacesUp({ interfaces : netInterfaces }) );
+
+  /* - */
+
+  return a.ready;
+}
+
+//
+
 function remoteAbout( test )
 {
   let ready = _.take( null );
@@ -3187,6 +3232,7 @@ const Proto =
 
     versionLog,
     versionLogWithOptions,
+    versionLogWithNoConnection,
 
     remoteAbout,
     remoteAboutWithOptionAttemptDelay,

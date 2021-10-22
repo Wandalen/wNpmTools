@@ -1301,19 +1301,9 @@ function versionLog( o )
     stable : 'Stable version of',
   };
 
-  // let start = _.process.starter
-  // ({
-  //   outputCollecting : 1,
-  //   outputPiping : 0,
-  //   inputMirroring : 0,
-  //   throwingExitCode : 0,
-  //   logger : o.logger,
-  //   verbosity : o.logger.verbosity,
-  // });
-
-  let readies = [];
+  let readies = _.array.make( o.tags.length );
   for( let i = 0 ; i < o.tags.length ; i++ )
-  readies.push( versionLogGet( o.tags[ i ] ) );
+  readies[ i ] = versionLogGet( o.tags[ i ] );
 
   return ready.andTake( readies )
   .finally( ( err, resolved ) =>
@@ -1331,7 +1321,7 @@ function versionLog( o )
 
   function versionLogGet( tag )
   {
-    const version = `${ remotePath }@${ tag }`
+    const version = `${ remotePath }@${ tag }`;
     return _.process.start
     ({
       execPath : `npm view ${ version } version`,
@@ -1340,6 +1330,7 @@ function versionLog( o )
       inputMirroring : 0,
       throwingExitCode : 0,
       logger : o.logger,
+      timeOut : 15000,
       verbosity : o.logger.verbosity,
     })
     .then( ( got ) =>
