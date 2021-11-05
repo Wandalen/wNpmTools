@@ -2501,7 +2501,7 @@ function remoteDependantsWithOptionAttemptDelayMultiplier( test )
 
     test.true( _.error.is( err ) );
     _.error.attend( err );
-    test.true( _.strHas( err.originalMessage, 'Attempts is exhausted, made 4 attempts' ) );
+    test.true( _.strHas( err.originalMessage, 'Attempts exhausted, made 4 attempts' ) );
     test.identical( arg, undefined );
 
     return null;
