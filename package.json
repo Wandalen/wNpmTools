@@ -2,11 +2,11 @@
   "name": "wnpmtools",
   "version": "0.3.257",
   "description": "Collection of tools to use npm programmatically.",
-  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "author": "Kostiantyn Wandalen <wandalen@obox.systems>",
   "contributors": [
     {
       "name": "Kostiantyn Wandalen",
-      "email": "wanalen@01.school"
+      "email": "wandalen@obox.systems"
     },
     {
       "name": "Artem Bohush",
