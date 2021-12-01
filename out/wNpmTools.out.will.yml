@@ -3,8 +3,8 @@ root:
   - wNpmTools.out
 consistency:
   ../will.yml: &ref_0
-    hash: 0d4fa9aa1207dec2557ef00a5722bef9
-    size: 6427
+    hash: 5592d280237d3158fd7f1d04cb435aa7
+    size: 6435
 module:
   wNpmTools.out:
     about:
@@ -1491,5 +1491,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: 0d4fa9aa1207dec2557ef00a5722bef9
-        size: 6427
+        hash: 5592d280237d3158fd7f1d04cb435aa7
+        size: 6435
