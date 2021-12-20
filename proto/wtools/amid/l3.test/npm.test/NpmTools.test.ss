@@ -2279,191 +2279,225 @@ function remoteAboutWithOptionAttemptDelayMultiplier( test )
 
 //
 
-async function remoteDependants( test )
+function remoteDependants( test )
 {
+  const a = test.assetFor( false );
+
   /*
-     the matrix of test runs is restricted to njs v16 because test routines in all runs can exhaust request limit
-     https://github.com/Wandalen/wNpmTools/runs/3879185779?check_suite_focus=true#step:12:342
+    the matrix of test runs is restricted to njs v16 because test routines in all runs can exhaust request limit
+    https://github.com/Wandalen/wNpmTools/runs/3879185779?check_suite_focus=true#step:12:342
   */
   if( Config.interpreter === 'njs' )
   if( !_.str.begins( process.versions.node, '16' ) )
   return test.true( true );
 
-  test.open( 'string as a parameter' );
+  /* - */
 
-  test.case = '0 dependants, local relative';
-  var got = await _.npm.remoteDependants( 'wmodulefortesting12ab' );
-  var exp = 0;
-  test.identical( got, exp );
+  a.ready.then( () =>
+  {
+    test.open( 'string as a parameter' );
+    return null;
+  });
 
-  test.case = '0 dependants, global relative';
-  got = await _.npm.remoteDependants( 'npm://wmodulefortesting12ab' );
-  exp = 0;
-  test.identical( got, exp );
+  a.ready.then( async () =>
+  {
+    test.case = '0 dependants, local relative';
+    var got = await _.npm.remoteDependants( 'wmodulefortesting12ab' );
+    var exp = 0;
+    test.identical( got, exp );
 
-  test.case = '0 dependants, global absolute';
-  got = await _.npm.remoteDependants( 'npm:///wmodulefortesting12ab' );
-  exp = 0;
-  test.identical( got, exp );
+    test.case = '0 dependants, global relative';
+    var got = await _.npm.remoteDependants( 'npm://wmodulefortesting12ab' );
+    var exp = 0;
+    test.identical( got, exp );
 
-  /* */
+    test.case = '0 dependants, global absolute';
+    var got = await _.npm.remoteDependants( 'npm:///wmodulefortesting12ab' );
+    var exp = 0;
+    test.identical( got, exp );
 
-  test.case = 'not 0 dependants, local relative';
-  got = await _.npm.remoteDependants( 'wmodulefortesting1a' );
-  exp = 1;
-  test.identical( got, exp );
+    /* */
 
-  test.case = 'not 0 dependants, global relative';
-  got = await _.npm.remoteDependants( 'npm://wmodulefortesting1a' );
-  exp = 1;
-  test.identical( got, exp );
+    test.case = 'not 0 dependants, local relative';
+    var got = await _.npm.remoteDependants( 'wmodulefortesting1a' );
+    var exp = 1;
+    test.identical( got, exp );
 
-  test.case = 'not 0 dependants, global absolute';
-  got = await _.npm.remoteDependants( 'npm:///wmodulefortesting1a' );
-  exp = 1;
-  test.identical( got, exp );
+    test.case = 'not 0 dependants, global relative';
+    var got = await _.npm.remoteDependants( 'npm://wmodulefortesting1a' );
+    var exp = 1;
+    test.identical( got, exp );
 
-  /* */
+    test.case = 'not 0 dependants, global absolute';
+    var got = await _.npm.remoteDependants( 'npm:///wmodulefortesting1a' );
+    var exp = 1;
+    test.identical( got, exp );
 
-  test.case = 'pakage name has "/", local relative';
-  got = await _.npm.remoteDependants( '@tensorflow/tfjs' );
-  test.gt( got, 100 );
+    /* */
 
-  test.case = 'pakage name has "/", global relative';
-  got = await _.npm.remoteDependants( 'npm://@tensorflow/tfjs' );
-  test.gt( got, 100 );
+    test.case = 'pakage name has "/", local relative';
+    var got = await _.npm.remoteDependants( '@tensorflow/tfjs' );
+    test.gt( got, 100 );
 
-  test.case = 'pakage name has "/", global absolute';
-  got = await _.npm.remoteDependants( 'npm:///@tensorflow/tfjs' );
-  test.gt( got, 100 );
+    test.case = 'pakage name has "/", global relative';
+    var got = await _.npm.remoteDependants( 'npm://@tensorflow/tfjs' );
+    test.gt( got, 100 );
 
-  /* */
+    test.case = 'pakage name has "/", global absolute';
+    var got = await _.npm.remoteDependants( 'npm:///@tensorflow/tfjs' );
+    test.gt( got, 100 );
 
-  test.case = 'dependants > 999, local relative';
-  got = await _.npm.remoteDependants( 'express' );
-  test.true( _.numberIs( got ) );
-  test.gt( got, 10000 );
+    /* */
 
-  test.case = 'dependants > 999, global relative';
-  got = await _.npm.remoteDependants( 'npm://express' );
-  test.true( _.numberIs( got ) );
-  test.gt( got, 10000 );
+    test.case = 'dependants > 999, local relative';
+    var got = await _.npm.remoteDependants( 'express' );
+    test.true( _.numberIs( got ) );
+    test.gt( got, 10000 );
 
-  test.case = 'dependants > 999, global absolute';
-  got = await _.npm.remoteDependants( 'npm:///express' );
-  test.true( _.numberIs( got ) );
-  test.gt( got, 10000 );
+    test.case = 'dependants > 999, global relative';
+    var got = await _.npm.remoteDependants( 'npm://express' );
+    test.true( _.numberIs( got ) );
+    test.gt( got, 10000 );
 
-  /* */
+    test.case = 'dependants > 999, global absolute';
+    var got = await _.npm.remoteDependants( 'npm:///express' );
+    test.true( _.numberIs( got ) );
+    test.gt( got, 10000 );
 
-  test.case = 'nonexistent package name, local relative';
-  got = await _.npm.remoteDependants( 'nonexistentPackageName' );
-  exp = NaN;
-  test.identical( got, exp );
+    /* */
 
-  test.case = 'nonexistent package name, global relative';
-  got = await _.npm.remoteDependants( 'npm://nonexistentPackageName' );
-  exp = NaN;
-  test.identical( got, exp );
+    test.case = 'nonexistent package name, local relative';
+    var got = await _.npm.remoteDependants( 'nonexistentPackageName' );
+    var exp = NaN;
+    test.identical( got, exp );
 
-  test.case = 'nonexistent package name, global absolute';
-  got = await _.npm.remoteDependants( 'npm:///nonexistentPackageName' );
-  exp = NaN;
-  test.identical( got, exp );
+    test.case = 'nonexistent package name, global relative';
+    var got = await _.npm.remoteDependants( 'npm://nonexistentPackageName' );
+    var exp = NaN;
+    test.identical( got, exp );
 
-  test.close( 'string as a parameter' );
+    test.case = 'nonexistent package name, global absolute';
+    var got = await _.npm.remoteDependants( 'npm:///nonexistentPackageName' );
+    var exp = NaN;
+    test.identical( got, exp );
+
+    return null;
+  });
+
+  a.ready.then( () =>
+  {
+    test.close( 'string as a parameter' );
+    return null;
+  }).delay( 20000 );
 
   /* - */
 
-  test.open( 'map as a parameter' );
+  a.ready.then( () =>
+  {
+    test.open( 'map as a parameter' );
+    return null;
+  });
 
-  test.case = '0 dependants, local relative';
-  var got = await _.npm.remoteDependants( { remotePath : 'wmodulefortesting12ab' } );
-  var exp = 0;
-  test.identical( got, exp );
+  a.ready.then( async () =>
+  {
+    test.case = '0 dependants, local relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'wmodulefortesting12ab' } );
+    var exp = 0;
+    test.identical( got, exp );
 
-  test.case = '0 dependants, global relative';
-  got = await _.npm.remoteDependants( { remotePath : 'npm://wmodulefortesting12ab' } );
-  exp = 0;
-  test.identical( got, exp );
+    test.case = '0 dependants, global relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm://wmodulefortesting12ab' } );
+    var exp = 0;
+    test.identical( got, exp );
 
-  test.case = '0 dependants, global absolute';
-  got = await _.npm.remoteDependants( { remotePath : 'npm:///wmodulefortesting12ab' } );
-  exp = 0;
-  test.identical( got, exp );
+    test.case = '0 dependants, global absolute';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm:///wmodulefortesting12ab' } );
+    var exp = 0;
+    test.identical( got, exp );
 
-  /* */
+    /* */
 
-  test.case = 'not 0 dependants, local relative';
-  got = await _.npm.remoteDependants( { remotePath : 'wmodulefortesting1a' } );
-  exp = 1;
-  test.identical( got, exp );
+    test.case = 'not 0 dependants, local relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'wmodulefortesting1a' } );
+    var exp = 1;
+    test.identical( got, exp );
 
-  test.case = 'not 0 dependants, global relative';
-  got = await _.npm.remoteDependants( { remotePath : 'npm://wmodulefortesting1a' } );
-  exp = 1;
-  test.identical( got, exp );
+    test.case = 'not 0 dependants, global relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm://wmodulefortesting1a' } );
+    var exp = 1;
+    test.identical( got, exp );
 
-  test.case = 'not 0 dependants, global absolute';
-  got = await _.npm.remoteDependants( { remotePath : 'npm:///wmodulefortesting1a' } );
-  exp = 1;
-  test.identical( got, exp );
+    test.case = 'not 0 dependants, global absolute';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm:///wmodulefortesting1a' } );
+    var exp = 1;
+    test.identical( got, exp );
 
-  /* */
+    /* */
 
-  test.case = 'pakage name has "/", local relative';
-  got = await _.npm.remoteDependants( { remotePath : '@tensorflow/tfjs' } );
-  test.gt( got, 100 );
+    test.case = 'pakage name has "/", local relative';
+    var got = await _.npm.remoteDependants( { remotePath : '@tensorflow/tfjs' } );
+    test.gt( got, 100 );
 
-  test.case = 'pakage name has "/", global relative';
-  got = await _.npm.remoteDependants( { remotePath : 'npm://@tensorflow/tfjs' } );
-  test.gt( got, 100 );
+    test.case = 'pakage name has "/", global relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm://@tensorflow/tfjs' } );
+    test.gt( got, 100 );
 
-  test.case = 'pakage name has "/", global absolute';
-  got = await _.npm.remoteDependants( { remotePath : 'npm:///@tensorflow/tfjs' } );
-  test.gt( got, 100 );
+    test.case = 'pakage name has "/", global absolute';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm:///@tensorflow/tfjs' } );
+    test.gt( got, 100 );
 
-  /* */
+    /* */
 
-  test.case = 'dependants > 999, local relative';
-  got = await _.npm.remoteDependants( { remotePath : 'express' } );
-  test.true( _.numberIs( got ) );
-  test.gt( got, 10000 );
+    test.case = 'dependants > 999, local relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'express' } );
+    test.true( _.numberIs( got ) );
+    test.gt( got, 10000 );
 
-  test.case = 'dependants > 999, global relative';
-  got = await _.npm.remoteDependants( { remotePath : 'npm://express' } );
-  test.true( _.numberIs( got ) );
-  test.gt( got, 10000 );
+    test.case = 'dependants > 999, global relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm://express' } );
+    test.true( _.numberIs( got ) );
+    test.gt( got, 10000 );
 
-  test.case = 'dependants > 999, global absolute';
-  got = await _.npm.remoteDependants( { remotePath : 'npm:///express' } );
-  test.true( _.numberIs( got ) );
-  test.gt( got, 10000 );
+    test.case = 'dependants > 999, global absolute';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm:///express' } );
+    test.true( _.numberIs( got ) );
+    test.gt( got, 10000 );
 
-  /* */
+    /* */
 
-  test.case = 'nonexistent package name, local relative';
-  got = await _.npm.remoteDependants( { remotePath : 'nonexistentPackageName' } );
-  exp = NaN;
-  test.identical( got, exp );
+    test.case = 'nonexistent package name, local relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'nonexistentPackageName' } );
+    var exp = NaN;
+    test.identical( got, exp );
 
-  test.case = 'nonexistent package name, global relative';
-  got = await _.npm.remoteDependants( { remotePath : 'npm://nonexistentPackageName' } );
-  exp = NaN;
-  test.identical( got, exp );
+    test.case = 'nonexistent package name, global relative';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm://nonexistentPackageName' } );
+    var exp = NaN;
+    test.identical( got, exp );
 
-  test.case = 'nonexistent package name, global absolute';
-  got = await _.npm.remoteDependants( { remotePath : 'npm:///nonexistentPackageName' } );
-  exp = NaN;
-  test.identical( got, exp );
+    test.case = 'nonexistent package name, global absolute';
+    var got = await _.npm.remoteDependants( { remotePath : 'npm:///nonexistentPackageName' } );
+    var exp = NaN;
+    test.identical( got, exp );
+    return null;
+  });
 
-  test.close( 'map as a parameter' );
+  a.ready.then( () =>
+  {
+    test.close( 'map as a parameter' );
+    return null;
+  });
+
+  /* - */
+
+  return a.ready;
 }
 
+remoteDependants.timeOut = 90000;
 remoteDependants.description =
 `
 Retrieves the number of dependent packages
-`
+`;
 
 //
 
