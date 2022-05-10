@@ -1,6 +1,6 @@
 {
   "name": "wnpmtools",
-  "version": "0.3.264",
+  "version": "0.3.265",
   "description": "Collection of tools to use npm programmatically.",
   "author": "Kostiantyn Wandalen <wandalen@obox.systems>",
   "contributors": [
