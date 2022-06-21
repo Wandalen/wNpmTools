@@ -40,7 +40,7 @@ jobs :
         attempt_limit : 3
         attempt_delay: 1000
     - name : Update npm
-      if : ${{ matrix.os == 'windows-latest' }}
+      if : ${{ matrix.os == 'windows-latest' && matrix.node-version > '14.x' }}
       run : |
         npm install --global --production npm-windows-upgrade
         npm-windows-upgrade --npm-version latest
